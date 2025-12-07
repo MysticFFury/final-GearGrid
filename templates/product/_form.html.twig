@@ -1,0 +1,27 @@
+{{ form_start(form, {'attr': {'class': 'gg-form'}}) }}
+    <div class="gg-form-card">
+    
+        <div class="gg-form-grid">
+            {# Render each field individually for better control #}
+            {% for child in form %}
+                {% if child.vars.name not in ['_token'] %}
+                    <div class="gg-field">
+                        {{ form_label(child, null, {'label_attr': {'class': 'gg-label'}}) }}
+                        <div class="gg-field-control">
+                            {{ form_widget(child, {'attr': {'class': 'gg-input'}}) }}
+                            {{ form_errors(child) }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="gg-action-row">
+            <button type="submit" class="btn btn-save">
+                <i class="fas fa-save"></i>
+                {{ button_label|default('Save') }}
+            </button>
+        </div>
+
+    </div>
+{{ form_end(form) }}

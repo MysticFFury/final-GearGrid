@@ -1,0 +1,155 @@
+/* =============================
+   GEARGRID PRODUCT PAGE STYLE
+   ============================= */
+
+body {
+    background-color: #0e1522;
+    font-family: 'Oswald', sans-serif;
+    color: #e0e0e0;
+}
+
+/* Top Header */
+.top-header {
+    background: linear-gradient(135deg, #0f1621 0%, #1a2332 100%);
+    padding: 25px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    border-bottom: 1px solid rgba(23,162,184,0.15);
+}
+
+.top-header h1 {
+    color: #fff;
+    font-size: 2rem;
+}
+
+/* Search Bar */
+.search-bar {
+    position: relative;
+    width: 300px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    font-family: 'Oswald', sans-serif;
+    background: rgba(23,162,184,0.1);
+    color: #fff;
+    transition: 0.3s ease;
+}
+
+.search-bar input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+.search-bar input:focus {
+    background: rgba(23,162,184,0.2);
+    box-shadow: 0 0 8px rgba(23,162,184,0.4);
+}
+
+.search-bar i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #17a2b8;
+}
+
+/* Table Section */
+.content-area {
+    padding: 50px;
+}
+
+.table-card {
+    background: linear-gradient(145deg, #1b2738 0%, #22354c 100%);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    border: 1px solid rgba(23,162,184,0.2);
+    padding: 25px;
+}
+
+.table-card .actions {
+    text-align: right;
+    margin-bottom: 15px;
+}
+
+.btn-add {
+    background: linear-gradient(135deg, #17a2b8 0%, #00c2d3 100%);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.btn-add:hover {
+    background: #0fb4ca;
+    transform: translateY(-2px);
+}
+
+/* Table */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+}
+
+.styled-table thead {
+    background: linear-gradient(135deg, #24384c 0%, #2c4762 100%);
+}
+
+.styled-table th, .styled-table td {
+    padding: 18px 25px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.styled-table th {
+    color: #00eaff;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.styled-table td {
+    color: #e0e0e0;
+}
+
+.styled-table tbody tr:hover {
+    background: rgba(23,162,184,0.1);
+    transition: 0.3s ease;
+}
+
+/* Buttons */
+.btn-view, .btn-edit {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-view {
+    background: #17a2b8;
+}
+
+.btn-edit {
+    background: #007bff;
+}
+
+.btn-view:hover {
+    background: #138496;
+    transform: translateY(-2px);
+}
+
+.btn-edit:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}

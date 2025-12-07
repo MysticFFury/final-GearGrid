@@ -1,0 +1,352 @@
+/* ==============================
+   GLOBAL RESET & BASE STYLES
+============================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #1a2332;
+  color: #c8b4a2;
+  font-family: 'Oswald', sans-serif;
+  line-height: 1.6;
+}
+
+/* ==============================
+   SIDEBAR
+============================== */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(180deg, #162436 0%, #0f1a2b 100%);
+  padding-top: 40px;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6),
+              inset -2px 0 10px rgba(23, 162, 184, 0.1);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+/* Logo section */
+.sidebar .logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin: 10px 0 60px 0;
+}
+
+.sidebar .logo-section img {
+  width: 150px;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 20px rgba(23, 162, 184, 0.6));
+  transition: all 0.4s ease;
+  margin-bottom: 15px;
+}
+.sidebar .logo-section img:hover {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 30px rgba(23, 162, 184, 0.9));
+}
+
+.sidebar .logo-section h2 {
+  color: #e5d4c1;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(23, 162, 184, 0.3);
+}
+
+.sidebar .logo-section p {
+  font-size: 0.85rem;
+  color: rgba(200, 180, 162, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Sidebar Navigation */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  margin-bottom: 5px;
+}
+
+.sidebar ul li a {
+  color: #a8b4c3;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 16px 25px;
+  font-weight: 500;
+  font-size: 1rem;
+  border-left: 4px solid transparent;
+  border-radius: 8px;
+  margin: 6px 12px;
+  transition: all 0.3s ease;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+  background: rgba(23, 162, 184, 0.15);
+  color: #fff;
+  border-left-color: #17a2b8;
+  transform: translateX(5px);
+  box-shadow: 0 0 10px rgba(23, 162, 184, 0.2);
+}
+
+.sidebar ul li a i {
+  font-size: 1.2rem;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* ==============================
+   MAIN CONTENT AREA
+============================== */
+.main-content {
+  margin-left: 250px;
+  background-color: #1a2332;
+  min-height: 100vh;
+}
+
+/* ==============================
+   TOP HEADER
+============================== */
+.top-header {
+  background: linear-gradient(135deg, #0f1621 0%, #1a2332 100%);
+  padding: 25px 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(23, 162, 184, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 900;
+}
+
+.top-header h1 {
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ==============================
+   USER PROFILE (TOP RIGHT)
+============================== */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-info .profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(23, 162, 184, 0.1);
+  padding: 10px 15px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+.user-info .profile:hover {
+  background: rgba(23, 162, 184, 0.2);
+  transform: translateY(-2px);
+}
+.user-info .profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #17a2b8;
+}
+.user-info .profile span {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* ==============================
+   CONTENT AREA
+============================== */
+.content-area {
+  padding: 50px;
+}
+
+/* Page header (title + buttons) */
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.content-header h1 {
+  color: #fff;
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.content-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* ==============================
+   SEARCH INPUT
+============================== */
+.search-input {
+  padding: 10px 15px;
+  border: 2px solid rgba(23, 162, 184, 0.3);
+  border-radius: 8px;
+  background-color: #1e2e3f;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  width: 220px;
+  transition: 0.3s ease;
+}
+.search-input:focus {
+  border-color: #17a2b8;
+  box-shadow: 0 0 10px rgba(23, 162, 184, 0.3);
+}
+
+/* ==============================
+   TABLE STYLES
+============================== */
+.table-card {
+  background: linear-gradient(145deg, #1e2e3f 0%, #253549 100%);
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(23, 162, 184, 0.1);
+  overflow: hidden;
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.styled-table thead {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 20px 25px;
+  text-align: left;
+}
+
+.styled-table th {
+  color: #ffffff;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.styled-table td {
+  color: #000000;
+}
+
+.styled-table tbody tr {
+  border-bottom: 1px solid rgba(44, 62, 80, 0.5);
+  transition: all 0.3s ease;
+}
+.styled-table tbody tr:hover {
+  background: rgba(23, 162, 184, 0.08);
+}
+
+/* ==============================
+   BUTTONS
+============================== */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-view {
+  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  color: #ffffff;
+}
+.btn-edit {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: #ffffff;
+}
+.btn-add {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 12px 25px;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(23, 162, 184, 0.3);
+}
+.btn-add:hover {
+  background: #117a8b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(23, 162, 184, 0.4);
+}
+
+/* ==============================
+   FOOTER
+============================== */
+footer {
+  text-align: center;
+  padding: 30px;
+  background: linear-gradient(135deg, #0f1621 0%, #1a2332 100%);
+  color: #8b94a3;
+  font-size: 1rem;
+  margin-left: 250px;
+  border-top: 1px solid rgba(23, 162, 184, 0.1);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ==============================
+   RESPONSIVE DESIGN
+============================== */
+@media (max-width: 992px) {
+  .sidebar {
+    width: 100%;
+    position: relative;
+    height: auto;
+  }
+  .main-content,
+  footer {
+    margin-left: 0;
+  }
+  .content-area {
+    padding: 20px;
+  }
+  .top-header {
+    padding: 20px;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .content-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .search-input {
+    width: 100%;
+  }
+}

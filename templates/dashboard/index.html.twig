@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}GearGrid | Admin Dashboard{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="{{ asset('Css/admin_dashbourd.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin_layout.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    <!-- Sidebar -->
+    {% include 'partials/_sidebar.html.twig' %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <h1>Admin Dashboard</h1>
+            <div class="user-info">
+                <div class="profile">
+                    <img src="https://ui-avatars.com/api/?name={{ app.user.username|default('Admin')|url_encode }}&background=17a2b8&color=fff" alt="User">
+                    <span>{{ app.user.username|default('Admin') }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Stats Cards -->
+            <div class="dashboard-cards">
+                <div class="card">
+                    <i class="fas fa-boxes"></i>
+                    <h3>{{ totalProducts|default(0) }}</h3>
+                    <p>Total Products</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-users"></i>
+                    <h3>{{ totalUsers|default(0) }}</h3>
+                    <p>Registered Users</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>{{ totalOrders|default(0) }}</h3>
+                    <p>Pending Orders</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>₱{{ recentSales|default(0) }}</h3>
+                    <p>Monthly Sales</p>
+                </div>
+            </div>
+
+            <!-- Recent Orders Table -->
+            <div class="table-section">
+                <h2>Recent Orders</h2>
+                <div class="table-card">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recentOrders %}
+                                <tr>
+                                    <td>#{{ order.id }}</td>
+                                    <td>{{ order.customerName }}</td>
+                                    <td>
+                                        <span class="status-badge 
+                                            {% if order.status == 'Pending' %}status-pending{% endif %}
+                                            {% if order.status == 'Completed' %}status-completed{% endif %}
+                                        ">
+                                            {{ order.status }}
+                                        </span>
+                                    </td>
+                                    <td>₱{{ order.totalPrice|number_format(2) }}</td>
+                                    <td>{{ order.createdAt ? order.createdAt|date('M d, Y') : '' }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" style="text-align:center;">No recent orders</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        &copy; {{ "now"|date("Y") }} GearGrid Admin Panel. All Rights Reserved.
+    </footer>
+</div>
+{% endblock %}

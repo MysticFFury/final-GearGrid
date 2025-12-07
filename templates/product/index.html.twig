@@ -1,0 +1,147 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Products | GearGrid Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<style>
+    .table-card {
+        background: #1e1e2f;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        margin-top: 1rem;
+    }
+
+    table.dataTable thead th {
+        color: #fff;
+        font-weight: bold;
+        border-bottom: 1px solid #444;
+    }
+
+    table.dataTable tbody td {
+        color: #e0e0e0;
+        border-bottom: 1px solid #333;
+    }
+
+    .btn-view, .btn-edit, .btn-add {
+        padding: 0.3rem 0.6rem;
+        border-radius: 8px;
+        color: #fff;
+        text-decoration: none;
+        margin-right: 0.3rem;
+        font-weight: bold;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .btn-view { background: #6C63FF; }
+    .btn-edit { background: #ff6584; }
+    .btn-add { background: #00c6ff; margin-left: 1rem; }
+
+    .btn-view:hover, .btn-edit:hover, .btn-add:hover { opacity: 0.85; }
+
+    .content-actions {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        justify-content: space-between;
+    }
+
+    .search-input {
+        padding: 0.5rem 0.8rem;
+        border-radius: 8px;
+        border: 1px solid #444;
+        background: #2a2a3f;
+        color: #fff;
+        width: 250px;
+    }
+
+    .search-input::placeholder { color: #aaa; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    {% include 'partials/_sidebar.html.twig' %}
+    <main class="main-content">
+        <div class="top-header">
+            <h1>Products</h1>
+            <div class="user-info">
+                <div class="profile">
+                    <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="">
+                    <span>John Ralf</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="content-header">
+                <h1>Product List</h1>
+                <div class="content-actions">
+                    <input type="text" id="productSearch" class="search-input" placeholder="🔍 Search products...">
+                    <a href="{{ path('app_product_new') }}" class="btn-add">
+                        <i class="fas fa-plus"></i> Add Product
+                    </a>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <table id="productTable" class="display styled-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>{{ product.id }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.category ?: '-' }}</td>
+                                <td>₱{{ product.price|number_format(2, '.', ',') }}</td>
+                                <td>{{ product.quantity }}</td>
+                                <td>
+                                    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn-view"><i class="fas fa-eye"></i> View</a>
+                                    <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align:center;">No products found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    const table = $('#productTable').DataTable({
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        order: [[0, 'desc']],
+        columnDefs: [{ orderable: false, targets: 5 }],
+        autoWidth: false
+    });
+
+    $('#productSearch').on('keyup', function () {
+        table.search(this.value).draw();
+    });
+});
+</script>
+{% endblock %}

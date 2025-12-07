@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Product Details | GearGrid Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+{# Your external CSS file #}
+<link rel="stylesheet" href="{{ asset('css/admin_product_show.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    
+    <!-- Sidebar -->
+    {% include 'partials/_sidebar.html.twig' %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <div class="top-header">
+            <h1>Product Details</h1>
+
+            <div class="user-info">
+                <div class="profile">
+                    <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="User">
+                    <span>John Ralf</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-container">
+            <div class="product-card">
+
+                <!-- Product Image -->
+                <div class="product-image">
+                    {% if product.image %}
+                        <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="{{ product.name }}">
+                    {% else %}
+                        <i class="fas fa-image" style="font-size: 3rem; color: #17a2b8;"></i>
+                    {% endif %}
+                </div>
+
+                <!-- Product Info Section -->
+                <div class="product-info">
+
+                    <h2>{{ product.name }}</h2>
+
+                    <p><strong>Category:</strong> {{ product.category }}</p>
+                    <p><strong>Price:</strong> ₱{{ product.price|number_format(2, '.', ',') }}</p>
+                    <p><strong>Quantity:</strong> {{ product.quantity }}</p>
+                    <p><strong>Description:</strong> {{ product.description }}</p>
+                    <p><strong>Created At:</strong> {{ product.createdAt|date('Y-m-d H:i:s') }}</p>
+
+                    <div class="action-buttons">
+
+                        <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn btn-edit">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+
+                        <a href="{{ path('app_product_index') }}" class="btn btn-back">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+
+                    </div>
+
+                    {{ include('product/_delete_form.html.twig') }}
+
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            &copy; {{ "now"|date("Y") }} GearGrid Admin Panel. All Rights Reserved.
+        </footer>
+
+    </main>
+</div>
+{% endblock %}

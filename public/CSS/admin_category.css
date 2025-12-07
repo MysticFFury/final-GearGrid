@@ -1,0 +1,137 @@
+/* GEARGRID CATEGORY PAGE STYLE — unified dark theme */
+
+/* General Layout */
+body {
+  background-color: #1a2332;
+  font-family: 'Oswald', sans-serif;
+  color: #fff;
+}
+
+/* Center Card Wrapper */
+.category-card {
+  max-width: 700px;
+  margin: 60px auto;
+  background: linear-gradient(145deg, #1e2e3f 0%, #253549 100%);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+  border: 1px solid rgba(23,162,184,0.2);
+}
+
+.category-card h2 {
+  color: #17a2b8;
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+/* Form Fields */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.category-card label {
+  color: #d8d8d8;
+  font-size: 1rem;
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+}
+
+.category-card input,
+.category-card textarea,
+.category-card select {
+  background: #1e2e3f;
+  border: 2px solid rgba(23,162,184,0.3);
+  color: #fff;
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.category-card input:focus,
+.category-card textarea:focus,
+.category-card select:focus {
+  border-color: #17a2b8;
+  box-shadow: 0 0 10px rgba(23,162,184,0.4);
+}
+
+/* Buttons */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-add {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+  color: #fff;
+}
+
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(23,162,184,0.4);
+}
+
+.btn-back {
+  background: linear-gradient(135deg, #6c757d, #495057);
+  color: #fff;
+}
+
+.btn-back:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(108,117,125,0.4);
+}
+
+/* Category Info (Show Page) */
+.category-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  font-size: 1.1rem;
+  background: rgba(23,162,184,0.05);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(23,162,184,0.2);
+}
+
+.category-info strong {
+  color: #17a2b8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .category-card {
+    margin: 20px;
+    padding: 25px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

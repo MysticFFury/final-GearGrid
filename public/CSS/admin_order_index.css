@@ -1,0 +1,162 @@
+body {
+    background-color: #1a2332;
+    font-family: 'Oswald', sans-serif;
+    color: #C8B4A2;
+    margin: 0;
+}
+
+/* Layout */
+.dashboard {
+    display: flex;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 250px;
+    background: #1a2332;
+    min-height: 100vh;
+}
+
+/* Top Header */
+.top-header {
+    background: linear-gradient(135deg, #0f1621, #1a2332);
+    padding: 25px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(23,162,184,0.2);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+
+.top-header h1 {
+    color: #fff;
+    font-size: 2rem;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    background: rgba(23,162,184,0.1);
+    padding: 8px 15px;
+    border-radius: 25px;
+}
+
+.profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #17a2b8;
+    margin-right: 10px;
+}
+
+/* Content */
+.content-area {
+    padding: 50px;
+}
+
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.content-header h1 {
+    color: #fff;
+    font-size: 2rem;
+}
+
+/* Search bar */
+.search-input {
+    padding: 10px 15px;
+    border: 2px solid rgba(23,162,184,0.3);
+    border-radius: 8px;
+    background-color: #1e2e3f;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s ease;
+    width: 220px;
+}
+
+.search-input:focus {
+    border-color: #17a2b8;
+    box-shadow: 0 0 10px rgba(23,162,184,0.3);
+}
+
+/* Table */
+.table-card {
+    background: linear-gradient(145deg, #1e2e3f 0%, #253549 100%);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    border: 1px solid rgba(23,162,184,0.1);
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+}
+
+.styled-table thead {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 15px 20px;
+    text-align: left;
+    color: #fff;
+}
+
+.styled-table tbody tr:hover {
+    background: rgba(23,162,184,0.1);
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.status-pending {
+    background-color: #ffc107;
+    color: #1a2332;
+}
+
+.status-completed {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+.status-cancelled {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Buttons */
+.btn {
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.3s ease;
+}
+
+.btn-view {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: #fff;
+}
+
+.btn-view:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(23,162,184,0.4);
+}

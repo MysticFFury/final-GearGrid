@@ -1,0 +1,93 @@
+/* Same font & theme tone */
+body {
+  background-color: #1a2332;
+  color: #C8B4A2;
+  font-family: 'Oswald', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Content header */
+.content-header h1 {
+  color: #ffffff;
+  font-size: 2rem;
+  margin-bottom: 25px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border-bottom: 2px solid rgba(23,162,184,0.2);
+  padding-bottom: 10px;
+}
+
+/* Settings grid layout */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 20px;
+}
+
+/* Individual setting card */
+.setting-card {
+  background: linear-gradient(145deg, #1e2e3f 0%, #253549 100%);
+  border: 1px solid rgba(23,162,184,0.15);
+  border-radius: 15px;
+  padding: 30px;
+  text-align: center;
+  transition: all 0.4s ease;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.setting-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(23,162,184,0.3);
+  border-color: rgba(23,162,184,0.4);
+}
+
+/* Icon inside card */
+.setting-card i {
+  font-size: 2.5rem;
+  color: #17a2b8;
+  margin-bottom: 15px;
+  text-shadow: 0 0 10px rgba(23,162,184,0.4);
+}
+
+/* Card title */
+.setting-card h3 {
+  color: #fff;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* Card description */
+.setting-card p {
+  color: rgba(200,180,162,0.9);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Configure button */
+.setting-card .btn {
+  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(23,162,184,0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.setting-card .btn:hover {
+  transform: translateY(-3px);
+  background: #138496;
+  box-shadow: 0 6px 15px rgba(23,162,184,0.5);
+}
+
+.setting-card .btn i {
+  font-size: 1rem;
+}

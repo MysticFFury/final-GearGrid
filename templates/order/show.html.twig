@@ -1,0 +1,183 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Order Details | GearGrid Admin{% endblock %}
+
+{% block stylesheets %}
+<!-- Font Awesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Google Fonts for Oswald -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* Dashboard main styling */
+.dashboard main {
+    padding: 3rem 2rem;
+    min-height: 100vh;
+    background: #14141f;
+}
+
+/* Top header styling */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.top-header h1 {
+    font-family: 'Oswald', sans-serif;
+    color: #fff;
+    font-size: 2.2rem;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profile img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+/* Card styling */
+.card {
+    background: #1e1e2f;
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    max-width: 900px;
+    margin: auto;
+    border: 1px solid #2a2a3f;
+}
+
+.card h2 {
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Table styling */
+.card table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+    margin-bottom: 2rem;
+}
+
+.card table th,
+.card table td {
+    text-align: left;
+    padding: 1rem 1.2rem;
+    font-size: 1.1rem;
+}
+
+.card table th {
+    color: #a0a0a0;
+    font-weight: 500;
+    width: 35%;
+}
+
+.card table td {
+    color: #fff;
+    background: #2a2a3f;
+    border-radius: 8px;
+}
+
+/* Highlight rows */
+.card table tr:nth-child(even) td {
+    background: #25253a;
+}
+
+/* Action buttons */
+.card .actions {
+    display: flex;
+    gap: 1.2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.card .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.btn-back { background: #ff6584; }
+.btn-edit { background: #6C63FF; }
+.btn-delete { background: #dc3545; }
+
+.btn:hover { opacity: 0.85; transform: translateY(-2px); }
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .top-header h1 { font-size: 1.8rem; }
+    .card { padding: 2rem 1rem; }
+    .card table th, .card table td { display: block; width: 100%; }
+    .card table th { margin-bottom: 0.3rem; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    {% include 'partials/_sidebar.html.twig' %}
+
+    <main class="main-content">
+        <div class="top-header">
+            <h1>Order Details</h1>
+            <div class="profile">
+                <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="User">
+                <span>John Ralf</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Order #{{ order.id }}</h2>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Customer Name</th>
+                        <td>{{ order.customerName }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total Price</th>
+                        <td>₱{{ order.totalPrice|number_format(2, '.', ',') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>{{ order.status }}</td>
+                    </tr>
+                    <tr>
+                        <th>Created At</th>
+                        <td>{{ order.createdAt ? order.createdAt|date('Y-m-d H:i:s') : '-' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="actions">
+                <a href="{{ path('app_order_index') }}" class="btn btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+                <a href="{{ path('app_order_edit', {'id': order.id}) }}" class="btn btn-edit"><i class="fas fa-edit"></i> Edit</a>
+                {{ include('order/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{{ form_start(form, {'attr': {'class': 'gg-form'}}) }}
+    <div class="gg-form-card">
+        <h2>{{ form.vars.value.id is defined ? 'Edit Order' : 'Add New Order' }}</h2>
+
+        <div class="gg-form-grid">
+            {# Render each field individually for better styling control #}
+            {% for child in form %}
+                {% if child.vars.name not in ['_token'] %}
+                    <div class="gg-field">
+                        {{ form_label(child, null, {'label_attr': {'class': 'gg-label'}}) }}
+                        <div class="gg-field-control">
+                            {{ form_widget(child, {'attr': {'class': 'gg-input'}}) }}
+                            {{ form_errors(child) }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="gg-action-row">
+            <button type="submit" class="btn btn-save">
+                <i class="fas fa-save"></i> {{ button_label|default('Save') }}
+            </button>
+
+            <a href="{{ app.request.headers.get('referer') ?: path('app_order_index') }}" class="btn btn-cancel">
+                <i class="fas fa-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </div>
+{{ form_end(form) }}
