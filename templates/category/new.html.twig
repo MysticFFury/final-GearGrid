@@ -1,0 +1,189 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Category | GearGrid Admin{% endblock %}
+
+{% block stylesheets %}
+<!-- Font Awesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Google Fonts for Oswald -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* Form Card Styles */
+.form-container {
+    padding: 2rem;
+}
+
+.form-card {
+    background: #1e1e2f;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    max-width: 600px;
+    margin: auto;
+}
+
+.form-card h2 {
+    color: #fff;
+    margin-bottom: 1.5rem;
+}
+
+/* Form Fields */
+.form-grid {
+    display: grid;
+    gap: 1.2rem;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #2a2a3f;
+    color: #fff;
+}
+
+input::placeholder, textarea::placeholder {
+    color: #aaa;
+}
+
+/* Buttons */
+.action-buttons {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-save { background: #6C63FF; color: #fff; }
+.btn-back { background: #ff6584; color: #fff; }
+
+.btn:hover { opacity: 0.85; }
+
+/* Top Header */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.top-header h1 {
+    color: #fff;
+}
+
+.user-info .profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-info .profile img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    {% include 'partials/_sidebar.html.twig' %}
+
+    <main class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <h1>Add Category</h1>
+            <div class="user-info">
+                <div class="profile">
+                    <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="">
+                    <span>John Ralf</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-container">
+            {# Flash Messages #}
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success flash-message" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem; background: #28a745; color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3); max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; opacity: 0.8; padding: 0 5px;">&times;</button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-error flash-message" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem; background: #dc3545; color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3); max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-exclamation-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; opacity: 0.8; padding: 0 5px;">&times;</button>
+                </div>
+            {% endfor %}
+
+            <div class="form-card">
+                <h2>Create New Category</h2>
+
+                {{ form_start(form, {'attr': {'class': 'category-form'}}) }}
+                <div class="form-grid">
+                    <div>
+                        {{ form_row(form.name, {'label': 'Category Name', 'attr': {'placeholder': 'Enter category name'}}) }}
+                        {{ form_errors(form.name) }}
+                    </div>
+
+                    {% if form.description is defined %}
+                    <div>
+                        {{ form_row(form.description, {'label': 'Description', 'attr': {'placeholder': 'Enter description'}}) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-save"><i class="fas fa-save"></i> Save Category</button>
+                    <a href="{{ path('app_category_index') }}" class="btn btn-back"><i class="fas fa-arrow-left"></i> Cancel</a>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+// Auto-dismiss flash messages after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(function(message) {
+            message.style.transition = 'opacity 0.5s';
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 500);
+        });
+    }, 5000);
+});
+</script>
+{% endblock %}

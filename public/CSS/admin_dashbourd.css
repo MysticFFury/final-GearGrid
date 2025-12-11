@@ -1,243 +1,238 @@
+/* --- GLOBAL RESET & BASE STYLES --- */
+/* Assuming the body has padding-left: 250px from the sidebar CSS */
 
-   
-    /* Content Area */
-    .content-area {
-        padding: 50px;
-    }
-    
-    .content-area > h1 {
-        color: #ffffff;
-        font-size: 2.2rem;
-        margin-bottom: 40px;
-        text-align: center;
-        font-weight: 600;
-        letter-spacing: 1px;
-        border-bottom: 2px solid rgba(23,162,184,0.2);
-        padding-bottom: 10px;
-    }
+body {
+    /* Set a dark, sophisticated page background */
+    background-color: #161c28; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #e0e0e0; /* Default text color */
+}
 
-    /* Dashboard Cards */
-    .dashboard-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 30px;
-        margin-bottom: 50px;
-    }
-    
-    .card {
-        background: linear-gradient(145deg, #1e2e3f 0%, #253549 100%);
-        padding: 35px 30px;
-        border-radius: 15px;
-        text-align: center;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
-        transition: all 0.3s ease;
-        border: 1px solid rgba(23,162,184,0.1);
-        position: relative;
-        overflow: hidden;
-    }
+/* --- Content Area --- */
+.content-area {
+    padding: 50px;
+    /* This margin-left is critical if you are *not* using body padding, 
+       but if you used the 'body { padding-left: 250px }' rule, you can remove this.
+       I'll assume you are using body padding for standard layout.
+    */
+}
 
-    .card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #17a2b8, #3498db);
-    }
-    
-    .card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 35px rgba(0,0,0,0.6);
-    }
-    
-    .card i {
-        font-size: 3rem;
-        color: #17a2b8;
-        margin-bottom: 15px;
-        display: block;
-        opacity: 0.8;
-        transition: all 0.3s ease;
-    }
+.content-area > h1 {
+    color: #ffffff;
+    font-size: 2.5rem; /* Slightly larger */
+    margin-bottom: 50px; /* More spacing */
+    text-align: left; /* Aligned left looks cleaner on dashboards */
+    font-weight: 700; /* Bold title */
+    letter-spacing: 2px;
+    /* Use a softer glow/gradient for the border */
+    border-bottom: 3px solid #17a2b8; 
+    width: fit-content; /* Only border the text width */
+    padding-bottom: 10px;
+}
 
-    .card:hover i {
-        opacity: 1;
-        transform: scale(1.1);
-    }
-    
-    .card h3 {
-        font-size: 2.8rem;
-        margin: 0 0 10px 0;
-        color: #ffffff;
-        font-weight: 700;
-        letter-spacing: 1px;
-    }
-    
-    .card p {
-        margin: 0;
-        font-size: 1.2rem;
-        color: #b8c5d6;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
+/* --- Dashboard Cards (Enhanced) --- */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
 
-    /* Table Section */
-    .table-section {
-        margin-top: 40px;
-    }
-    
-    .table-section h2 {
-        color: #ffffff;
-        font-size: 1.8rem;
-        margin-bottom: 25px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid rgba(23,162,184,0.2);
-        padding-bottom: 10px;
-    }
-    
-    .table-card {
-        background: linear-gradient(145deg, #1e2e3f 0%, #253549 100%);
-        border-radius: 15px;
-        padding: 0;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
-        overflow: hidden;
-        border: 1px solid rgba(23,162,184,0.1);
-    }
-    
-    .styled-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 1rem;
-    }
-    
-    .styled-table thead {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-    }
-    
-    .styled-table th {
-        padding: 20px 25px;
-        text-align: left;
-        color: #ffffff;
-        font-weight: 600;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        border: none;
-        white-space: nowrap;
-    }
-    
-    .styled-table tbody tr {
-        border-bottom: 1px solid rgba(44,62,80,0.5);
-        transition: all 0.3s ease;
-    }
-    
-    .styled-table tbody tr:last-child {
-        border-bottom: none;
-    }
+.card {
+    /* Use a more subtle, deep gradient for neumorphism effect */
+    background: #1f2a38; 
+    padding: 30px; /* Adjusted padding */
+    border-radius: 20px; /* More rounded corners */
+    text-align: left; /* Align card content to the left */
+    /* Neumorphic shadow for depth */
+    box-shadow: 10px 10px 20px #11151c, -10px -10px 20px #2d3f54; 
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: none; /* Removed thin border for cleaner neumorphic look */
+    position: relative;
+    overflow: hidden;
+}
 
-    .styled-table tbody tr:hover {
-        background: linear-gradient(135deg, rgba(23,162,184,0.1) 0%, rgba(36,52,71,0.8) 100%);
-        transform: scale(1.01);
-        box-shadow: inset 0 0 10px rgba(23,162,184,0.1);
-    }
-    
-    .styled-table td {
-    padding: 20px 25px;
-    color: #010101ff; /* Light color for dark theme */
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px; /* Thicker header bar */
+    /* Vibrant, cooler gradient */
+    background: linear-gradient(90deg, #17a2b8, #3498db, #5dade2); 
+    z-index: 1;
+}
+
+.card:hover {
+    /* Subtle press-in effect on hover */
+    transform: translateY(-5px); 
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7), 0 0 50px rgba(23,162,184,0.1); /* Added glow */
+}
+
+.card i {
+    font-size: 3.5rem; /* Larger icon */
+    color: #5dade2; /* Lighter blue for a highlight effect */
+    margin-bottom: 5px; /* Less margin before value */
+    display: block;
+    opacity: 0.9;
+    float: right; /* Move icon to the right */
+    transition: all 0.3s ease;
+}
+
+.card:hover i {
+    opacity: 1;
+    transform: scale(1.1) rotate(5deg); /* Added subtle rotation on hover */
+}
+
+.card h3 {
+    font-size: 3.5rem; /* Bold, dominating number */
+    margin: 0;
+    color: #ffffff;
+    font-weight: 800; /* Extra bold */
+    text-shadow: 0 0 10px rgba(255,255,255,0.2); /* Soft text shadow */
+}
+
+.card p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #92a4b8; /* Clearer, lighter subtitle color */
+    font-weight: 500;
+    text-transform: capitalize; /* Cleaner than full uppercase */
+    letter-spacing: 0; /* Removed spacing for cleaner look */
+}
+
+/* --- Table Section (Enhanced) --- */
+.table-section {
+    margin-top: 60px;
+}
+
+.table-section h2 {
+    color: #ffffff;
+    font-size: 2rem;
+    margin-bottom: 25px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border-bottom: 3px solid #17a2b8;
+    width: fit-content;
+    padding-bottom: 10px;
+}
+
+.table-card {
+    background: #1f2a38; /* Same background as cards */
+    border-radius: 20px;
+    box-shadow: 10px 10px 20px #11151c, -10px -10px 20px #2d3f54;
+    overflow: hidden;
+    border: none;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+}
+
+.styled-table thead {
+    background: linear-gradient(135deg, #1f344a 0%, #294158 100%); /* Deeper header */
+}
+
+.styled-table th {
+    padding: 18px 25px;
+    text-align: left;
+    color: #c0c0c0;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid rgba(44,62,80,0.3); /* Softer divider */
+    transition: all 0.3s ease;
+}
+
+.styled-table tbody tr:hover {
+    background: rgba(23,162,184,0.05); /* Very subtle hover */
+    transform: none; /* Removed scale for table rows */
+    box-shadow: none;
+}
+
+.styled-table td {
+    padding: 15px 25px;
+    /* FIX: Changed color to white/light for dark background legibility */
+    color: #e0e0e0; 
     border: none;
     font-weight: 400;
 }
 
+.styled-table td:first-child {
+    font-weight: 600;
+    color: #3498db; /* Highlight first column */
+}
 
+/* --- Status Badges (Improved Contrast) --- */
+.status-badge {
+    padding: 8px 14px; /* Slightly tighter padding */
+    border-radius: 15px; /* More subtle rounding */
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5); /* Inner shadow for depth */
+}
 
-    .styled-table td:first-child {
-        font-weight: 600;
-        color: #17a2b8;
+.status-badge:hover {
+    transform: scale(1.05); /* More prominent hover effect */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.status-pending {
+    /* Made background slightly darker for better text pop */
+    background-color: rgba(255, 193, 7, 0.1); 
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.4);
+}
+
+.status-completed {
+    /* Made background slightly darker for better text pop */
+    background-color: rgba(40, 167, 69, 0.1); 
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.4);
+}
+
+/* --- Footer (Aligned with Sidebar) --- */
+footer {
+    text-align: center;
+    padding: 25px;
+    margin-top: 50px;
+    background: #1f2a38; /* Match card background */
+    color: #8b94a3;
+    font-size: 0.9rem;
+    margin-left: 0; /* Footer should follow main content, controlled by body padding */
+    border-top: 1px solid rgba(23,162,184,0.2);
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+}
+
+/* --- Responsive Adjustments (Kept and slightly refined) --- */
+@media (max-width: 768px) {
+    /* Assuming you implement a toggle for the sidebar here */
+    body {
+        padding-left: 0; /* Remove sidebar padding on mobile */
     }
 
-    /* Status Badges */
-    .status-badge {
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        display: inline-block;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    .sidebar {
+        /* You might want to hide/show the sidebar with a menu button */
+        /* transform: translateX(-100%); */
+        z-index: 1001;
     }
 
-    .status-badge:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    .dashboard-cards {
+        grid-template-columns: 1fr;
     }
 
-    .status-pending {
-        background-color: rgba(255, 193, 7, 0.2);
-        color: #ffc107;
-        border: 1px solid #ffc107;
+    .content-area {
+        padding: 20px;
     }
 
-    .status-completed {
-        background-color: rgba(40, 167, 69, 0.2);
-        color: #28a745;
-        border: 1px solid #28a745;
-    }
-
-    /* Footer */
     footer {
-        text-align: center;
-        padding: 30px;
-        margin-top: 50px;
-        background: linear-gradient(135deg, #0f1621 0%, #1a2332 100%);
-        color: #8b94a3;
-        font-size: 1rem;
-        margin-left: 250px; /* Match sidebar width */
-        border-top: 1px solid rgba(23,162,184,0.1);
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+        margin-left: 0;
     }
-
-    /* Responsive Adjustments */
-    @media (max-width: 1024px) {
-        .dashboard-cards {
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .content-area {
-            padding: 30px 20px;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .sidebar {
-            width: 100%;
-            transform: translateX(-100%);
-        }
-
-        .main-content,
-        footer {
-            margin-left: 0;
-        }
-
-        .content-area {
-            padding: 20px;
-        }
-
-        .top-header {
-            padding: 20px;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .dashboard-cards {
-            grid-template-columns: 1fr;
-        }
-
-        .styled-table {
-            font-size: 0.85rem;
-        }
-    }
+}

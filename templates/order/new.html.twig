@@ -3,70 +3,345 @@
 {% block title %}Add New Order | GearGrid Admin{% endblock %}
 
 {% block stylesheets %}
-<!-- Font Awesome for Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
-<!-- Google Fonts for Oswald -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #6C63FF;
+        --secondary: #ff6584;
+        --danger: #dc3545;
+        --bg-dark: #12121e;
+        --card-bg: #1e1e2f;
+        --text-muted: #88889b;
+        --glass-border: rgba(255, 255, 255, 0.08);
+    }
 
-<!-- Optional: Custom CSS -->
-<link rel="stylesheet" href="{{ asset('css/admin_product_new.css') }}">
+    .dashboard main {
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: var(--bg-dark);
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* --- TOP BAR STYLING --- */
+    .top-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 3rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .header-left h1 {
+        font-family: 'Oswald', sans-serif;
+        color: #fff;
+        font-size: 2rem;
+        letter-spacing: 1px;
+        margin: 0;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 8px;
+    }
+
+    .breadcrumb a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .breadcrumb a:hover { color: var(--primary); }
+
+    .breadcrumb i { font-size: 0.7rem; opacity: 0.5; }
+
+    .breadcrumb span { color: var(--secondary); font-weight: 600; }
+
+    .header-right .profile {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 8px 20px;
+        border-radius: 50px;
+        border: 1px solid var(--glass-border);
+        transition: all 0.3s ease;
+    }
+
+    .header-right .profile:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+    }
+
+    .text-info {
+        display: flex;
+        flex-direction: column;
+        text-align: right;
+    }
+
+    .text-info .name { color: #fff; font-weight: 600; font-size: 0.9rem; }
+    .text-info .role { color: var(--text-muted); font-size: 0.75rem; }
+
+    .avatar-wrapper { position: relative; width: 42px; height: 42px; }
+    .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--primary); }
+    .status-indicator {
+        position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px;
+        background: #4ade80; border: 2px solid var(--bg-dark); border-radius: 50%;
+    }
+
+    /* --- CARD STYLING --- */
+    .card {
+        background: var(--card-bg);
+        padding: 3rem;
+        border-radius: 24px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        max-width: 900px;
+        margin: 0 auto;
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card::before {
+        content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    .card h2 {
+        color: #fff; font-family: 'Oswald', sans-serif; font-size: 1.5rem;
+        margin-bottom: 2.5rem; text-transform: uppercase; display: flex; align-items: center; gap: 12px;
+    }
+
+    .card h2 i { color: var(--primary); }
+
+    /* --- FORM STYLING --- */
+    .gg-form {
+        width: 100%;
+    }
+
+    .gg-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .gg-form-grid .gg-full {
+        grid-column: 1 / -1;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .gg-form label {
+        color: var(--text-muted);
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1.5px;
+    }
+
+    .gg-form input,
+    .gg-form textarea,
+    .gg-form select {
+        width: 100%;
+        padding: 1rem 1.2rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 1rem;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    .gg-form input:focus,
+    .gg-form textarea:focus,
+    .gg-form select:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 20px rgba(108, 99, 255, 0.2);
+    }
+
+    .gg-form select option {
+        background: var(--card-bg);
+        color: #fff;
+    }
+
+    .gg-form .form-error {
+        color: var(--danger);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+
+    /* --- ACTION BUTTONS --- */
+    .actions {
+        display: flex; gap: 15px; justify-content: flex-start; align-items: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 2.5rem;
+    }
+
+    .btn {
+        display: inline-flex; align-items: center; gap: 10px; padding: 0.8rem 1.5rem;
+        border-radius: 12px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;
+        cursor: pointer; border: none; font-size: 0.9rem; color: #fff; font-family: 'Inter', sans-serif;
+    }
+
+    .btn-save {
+        background: var(--primary);
+        box-shadow: 0 4px 20px rgba(108, 99, 255, 0.25);
+    }
+
+    .btn-back { background: rgba(255, 255, 255, 0.05); color: #ccc; border: 1px solid var(--glass-border); }
+
+    .btn:hover { transform: translateY(-3px); filter: brightness(1.2); }
+    .btn-back:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+    /* --- RESPONSIVE --- */
+    @media screen and (max-width: 768px) {
+        .top-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+        .header-right { width: 100%; }
+        .header-right .profile { justify-content: space-between; }
+        .actions { flex-direction: column; align-items: stretch; }
+        .btn { justify-content: center; }
+        .card { padding: 2rem 1.5rem; }
+        .gg-form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
-    <!-- Sidebar -->
     {% include 'partials/_sidebar.html.twig' %}
 
-    <!-- Main Content -->
     <main class="main-content">
-        <!-- Top Header -->
         <div class="top-header">
-            <h1>Add New Order</h1>
-            <div class="user-info">
-                <div class="profile">
-                    <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="User">
-                    <span>John Ralf</span>
+            <div class="header-left">
+                <h1>Add New Order</h1>
+                <nav class="breadcrumb">
+                    <a href="{{ path('app_dashboard') }}">Dashboard</a> 
+                    <i class="fas fa-chevron-right"></i> 
+                    <a href="{{ path('app_order_index') }}">Orders</a> 
+                    <i class="fas fa-chevron-right"></i> 
+                    <span>New Order</span>
+                </nav>
+            </div>
+
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="profile">
+                        <div class="text-info">
+                            <span class="name">{{ app.user.name|default(app.user.username|default('Admin')) }}</span>
+                            <span class="role">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</span>
+                        </div>
+                        <div class="avatar-wrapper">
+                            <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User">
+                            <span class="status-indicator"></span>
+                        </div>
+                        <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Form Container -->
-        <div class="form-container">
-            <div class="form-card">
-                <h2>Order Details</h2>
-
-                {{ form_start(form, {'attr': {'class': 'order-form'}}) }}
-                <div class="form-grid">
-                    <div>
-                        {{ form_row(form.customerName, {'label': 'Customer Name', 'attr': {'placeholder': 'Enter customer name'}}) }}
-                        {{ form_errors(form.customerName) }}
-                    </div>
-                    <div>
-                        {{ form_row(form.totalPrice, {'label': 'Total Price (₱)', 'attr': {'placeholder': '0.00', 'type': 'number', 'step': '0.01'}}) }}
-                        {{ form_errors(form.totalPrice) }}
-                    </div>
-                    <div>
-                        {{ form_row(form.status, {'label': 'Status', 'attr': {'placeholder': 'Select status'}}) }}
-                        {{ form_errors(form.status) }}
-                    </div>
-                    {# Optional notes field
-                    <div class="full-width">
-                        {{ form_row(form.notes, {'label': 'Notes', 'attr': {'placeholder': 'Additional notes'}}) }}
-                        {{ form_errors(form.notes) }}
-                    </div>
-                    #}
-                </div>
-
-                <div class="action-buttons">
-                    <button type="submit" class="btn btn-save"><i class="fas fa-save"></i> Save Order</button>
-                    <a href="{{ path('app_order_index') }}" class="btn btn-back"><i class="fas fa-arrow-left"></i> Cancel</a>
-                </div>
-                {{ form_end(form) }}
+        {# Flash Messages #}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success flash-message" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem; background: #28a745; color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3); max-width: 900px; margin-left: auto; margin-right: auto;">
+                <span style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-check-circle"></i> {{ message }}
+                </span>
+                <button onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; opacity: 0.8; padding: 0 5px;">&times;</button>
             </div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-error flash-message" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem; background: #dc3545; color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3); max-width: 900px; margin-left: auto; margin-right: auto;">
+                <span style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-exclamation-circle"></i> {{ message }}
+                </span>
+                <button onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; opacity: 0.8; padding: 0 5px;">&times;</button>
+            </div>
+        {% endfor %}
+
+        <div class="card">
+            <h2><i class="fas fa-shopping-cart"></i> Create New Order</h2>
+
+            {{ form_start(form, { 'attr': { 'class': 'gg-form' } }) }}
+            
+            <div class="gg-form-grid">
+                <div class="form-group">
+                    {{ form_label(form.customerName) }}
+                    {{ form_widget(form.customerName, {'attr': {'placeholder': 'Enter customer name', 'autofocus': true}}) }}
+                    {{ form_errors(form.customerName) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.totalPrice) }}
+                    {{ form_widget(form.totalPrice, {'attr': {'placeholder': '0.00', 'step': '0.01'}}) }}
+                    {{ form_errors(form.totalPrice) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.status) }}
+                    {{ form_widget(form.status) }}
+                    {{ form_errors(form.status) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.createdAt) }}
+                    {{ form_widget(form.createdAt) }}
+                    {{ form_errors(form.createdAt) }}
+                </div>
+
+                <div class="form-group gg-full">
+                    {{ form_label(form.products) }}
+                    {{ form_widget(form.products) }}
+                    {{ form_errors(form.products) }}
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn btn-save">
+                    <i class="fas fa-save"></i> Save Order
+                </button>
+                
+                <a href="{{ path('app_order_index') }}" class="btn btn-back">
+                    <i class="fas fa-arrow-left"></i> Cancel
+                </a>
+            </div>
+
+            {{ form_end(form) }}
         </div>
     </main>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+// Auto-dismiss flash messages after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(function(message) {
+            message.style.transition = 'opacity 0.5s';
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 500);
+        });
+    }, 5000);
+});
+</script>
 {% endblock %}

@@ -3,83 +3,431 @@
 {% block title %}Products | GearGrid Admin{% endblock %}
 
 {% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
 <style>
-    .table-card {
-        background: #1e1e2f;
-        padding: 1.5rem;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        margin-top: 1rem;
+    :root {
+        --primary: #6C63FF;
+        --secondary: #ff6584;
+        --danger: #dc3545;
+        --bg-dark: #12121e;
+        --card-bg: #1e1e2f;
+        --text-muted: #88889b;
+        --glass-border: rgba(255, 255, 255, 0.08);
     }
 
-    table.dataTable thead th {
-        color: #fff;
-        font-weight: bold;
-        border-bottom: 1px solid #444;
+    .dashboard main {
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: var(--bg-dark);
+        font-family: 'Inter', sans-serif;
     }
 
-    table.dataTable tbody td {
-        color: #e0e0e0;
-        border-bottom: 1px solid #333;
-    }
-
-    .btn-view, .btn-edit, .btn-add {
-        padding: 0.3rem 0.6rem;
-        border-radius: 8px;
-        color: #fff;
-        text-decoration: none;
-        margin-right: 0.3rem;
-        font-weight: bold;
-        transition: all 0.2s;
-        display: inline-flex;
+    /* --- TOP BAR STYLING --- */
+    .top-header {
+        display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 4px;
+        margin-bottom: 3rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--glass-border);
     }
 
-    .btn-view { background: #6C63FF; }
-    .btn-edit { background: #ff6584; }
-    .btn-add { background: #00c6ff; margin-left: 1rem; }
+    .header-left h1 {
+        font-family: 'Oswald', sans-serif;
+        color: #fff;
+        font-size: 2rem;
+        letter-spacing: 1px;
+        margin: 0;
+    }
 
-    .btn-view:hover, .btn-edit:hover, .btn-add:hover { opacity: 0.85; }
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 8px;
+    }
+
+    .breadcrumb a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .breadcrumb a:hover { color: var(--primary); }
+
+    .breadcrumb i { font-size: 0.7rem; opacity: 0.5; }
+
+    .breadcrumb span { color: var(--secondary); font-weight: 600; }
+
+    .header-right .profile {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 8px 20px;
+        border-radius: 50px;
+        border: 1px solid var(--glass-border);
+        transition: all 0.3s ease;
+    }
+
+    .header-right .profile:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+    }
+
+    .text-info {
+        display: flex;
+        flex-direction: column;
+        text-align: right;
+    }
+
+    .text-info .name { color: #fff; font-weight: 600; font-size: 0.9rem; }
+    .text-info .role { color: var(--text-muted); font-size: 0.75rem; }
+
+    .avatar-wrapper { position: relative; width: 42px; height: 42px; }
+    .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--primary); }
+    .status-indicator {
+        position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px;
+        background: #4ade80; border: 2px solid var(--bg-dark); border-radius: 50%;
+    }
+
+    /* --- CONTENT AREA --- */
+    .content-area {
+        width: 100%;
+    }
+
+    /* --- CONTENT HEADER --- */
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .content-header h2 {
+        font-family: 'Oswald', sans-serif;
+        color: #fff;
+        font-size: 1.5rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .content-header h2 i {
+        color: var(--primary);
+    }
 
     .content-actions {
         display: flex;
+        gap: 1rem;
         align-items: center;
-        margin-bottom: 1rem;
-        justify-content: space-between;
+        flex-wrap: wrap;
     }
 
     .search-input {
-        padding: 0.5rem 0.8rem;
-        border-radius: 8px;
-        border: 1px solid #444;
-        background: #2a2a3f;
+        padding: 0.75rem 1.2rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
         color: #fff;
-        width: 250px;
+        font-size: 0.95rem;
+        width: 300px;
+        transition: all 0.3s ease;
     }
 
-    .search-input::placeholder { color: #aaa; }
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 20px rgba(108, 99, 255, 0.2);
+    }
+
+    .search-input::placeholder {
+        color: var(--text-muted);
+    }
+
+    .btn-add {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        background: var(--primary);
+        color: #fff;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 20px rgba(108, 99, 255, 0.25);
+    }
+
+    .btn-add:hover {
+        transform: translateY(-3px);
+        filter: brightness(1.2);
+        box-shadow: 0 6px 25px rgba(108, 99, 255, 0.35);
+    }
+
+    /* --- TABLE CARD --- */
+    .table-card {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 24px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .table-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    /* --- DATA TABLE STYLING --- */
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .styled-table thead {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .styled-table th {
+        padding: 1rem 1.2rem;
+        text-align: left;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1.5px;
+        border-bottom: 2px solid var(--glass-border);
+    }
+
+    .styled-table td {
+        padding: 1.2rem 1.2rem;
+        color: #fff;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .styled-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .styled-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .styled-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* --- ACTION BUTTONS --- */
+    .actions-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn-view,
+    .btn-edit,
+    .btn-delete {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        color: #fff;
+    }
+
+    .btn-view {
+        background: rgba(108, 99, 255, 0.2);
+        color: var(--primary);
+        border: 1px solid rgba(108, 99, 255, 0.3);
+    }
+
+    .btn-view:hover {
+        background: rgba(108, 99, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .btn-edit {
+        background: var(--primary);
+        box-shadow: 0 2px 10px rgba(108, 99, 255, 0.2);
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.2);
+    }
+
+    .btn-delete {
+        background: var(--danger);
+        box-shadow: 0 2px 10px rgba(220, 53, 69, 0.2);
+    }
+
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.2);
+    }
+
+    /* --- FLASH MESSAGES --- */
+    .flash-message {
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .alert-success {
+        background: #28a745;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .alert-error {
+        background: #dc3545;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    /* --- RESPONSIVE --- */
+    @media screen and (max-width: 768px) {
+        .dashboard main {
+            padding: 1.5rem 1rem;
+        }
+
+        .top-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .header-right {
+            width: 100%;
+        }
+
+        .header-right .profile {
+            justify-content: space-between;
+        }
+
+        .content-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .content-actions {
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+        }
+
+        .table-card {
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        .styled-table {
+            font-size: 0.85rem;
+        }
+
+        .styled-table th,
+        .styled-table td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .actions-group {
+            flex-direction: column;
+        }
+
+        .btn-view,
+        .btn-edit,
+        .btn-delete {
+            width: 100%;
+            justify-content: center;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
     {% include 'partials/_sidebar.html.twig' %}
+
     <main class="main-content">
         <div class="top-header">
-            <h1>Products</h1>
-            <div class="user-info">
-                <div class="profile">
-                    <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="">
-                    <span>John Ralf</span>
+            <div class="header-left">
+                <h1>Products</h1>
+                <nav class="breadcrumb">
+                    <a href="{{ path('app_dashboard') }}">Dashboard</a> 
+                    <i class="fas fa-chevron-right"></i> 
+                    <span>Products</span>
+                </nav>
+            </div>
+
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="profile">
+                        <div class="text-info">
+                            <span class="name">{{ app.user.name|default('User') }}</span>
+                            <span class="role">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</span>
+                        </div>
+                        <div class="avatar-wrapper">
+                            <img src="https://ui-avatars.com/api/?name={{ app.user.name|default('User')|url_encode }}&background=6C63FF&color=fff" alt="User">
+                            <span class="status-indicator"></span>
+                        </div>
+                        <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="content-area">
+            {# Flash Messages #}
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success flash-message">
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; opacity: 0.8; padding: 0 5px;">&times;</button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-error flash-message">
+                    <span style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-exclamation-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; opacity: 0.8; padding: 0 5px;">&times;</button>
+                </div>
+            {% endfor %}
+
             <div class="content-header">
-                <h1>Product List</h1>
+                <h2><i class="fas fa-box"></i> Product List</h2>
                 <div class="content-actions">
                     <input type="text" id="productSearch" class="search-input" placeholder="🔍 Search products...">
                     <a href="{{ path('app_product_new') }}" class="btn-add">
@@ -103,19 +451,43 @@
                     <tbody>
                         {% for product in products %}
                             <tr>
-                                <td>{{ product.id }}</td>
-                                <td>{{ product.name }}</td>
-                                <td>{{ product.category ?: '-' }}</td>
-                                <td>₱{{ product.price|number_format(2, '.', ',') }}</td>
-                                <td>{{ product.quantity }}</td>
+                                <td><span style="color: var(--secondary); font-family: monospace; background: rgba(255,101,132,0.1); padding: 4px 10px; border-radius: 6px;">#{{ product.id }}</span></td>
+                                <td style="font-weight: 600;">{{ product.name }}</td>
                                 <td>
-                                    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn-view"><i class="fas fa-eye"></i> View</a>
-                                    <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
+                                    {% if product.category %}
+                                        <span style="color: var(--primary); background: rgba(108,99,255,0.1); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">
+                                            {{ product.category.name }}
+                                        </span>
+                                    {% else %}
+                                        <span style="color: var(--text-muted);">-</span>
+                                    {% endif %}
+                                </td>
+                                <td style="color: #4ade80; font-weight: 600;">₱{{ product.price|number_format(2, '.', ',') }}</td>
+                                <td>
+                                    <span style="background: rgba(74, 222, 128, 0.1); color: #4ade80; padding: 4px 10px; border-radius: 6px; font-weight: 600;">
+                                        {{ product.quantity }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="actions-group">
+                                        <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn-view">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        {% if is_granted('ROLE_ADMIN') or product.createdBy == app.user %}
+                                            <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn-edit">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            {{ include('product/_delete_form.html.twig', { 'product': product }) }}
+                                        {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="6" style="text-align:center;">No products found.</td>
+                                <td colspan="6" style="text-align:center; padding: 2rem; color: var(--text-muted);">
+                                    <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+                                    No products found.
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -136,12 +508,29 @@ $(document).ready(function() {
         lengthMenu: [5, 10, 25, 50],
         order: [[0, 'desc']],
         columnDefs: [{ orderable: false, targets: 5 }],
-        autoWidth: false
+        autoWidth: false,
+        dom: 'lrtip',
+        language: {
+            search: "",
+            searchPlaceholder: "Search...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ products",
+            infoEmpty: "No products available",
+            infoFiltered: "(filtered from _MAX_ total products)"
+        }
     });
 
+    // Wire up the custom search input to the DataTables filter
     $('#productSearch').on('keyup', function () {
         table.search(this.value).draw();
     });
+
+    // Auto-dismiss flash messages after 5 seconds
+    setTimeout(function() {
+        $('.flash-message').fadeOut('slow', function() {
+            $(this).remove();
+        });
+    }, 5000);
 });
 </script>
 {% endblock %}

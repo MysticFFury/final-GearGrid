@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\User;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
@@ -32,7 +33,7 @@ class Product
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: "string", length: 255, nullable: true)]
-    private ?string $image = null; // <-- moved inside the class
+    private ?string $image = null;
 
     /**
      * @var Collection<int, Order>
@@ -40,10 +41,18 @@ class Product
     #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'products')]
     private Collection $orders;
 
+    #[ORM\ManyToOne(targetEntity: Category::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Category $category = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $createdBy = null;
+
     public function __construct()
     {
         $this->orders = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable(); // optional: automatically set creation time
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -141,18 +150,26 @@ class Product
         }
         return $this;
     }
-    #[ORM\Column(length: 255, nullable: true)]
-        private ?string $category = null;
 
-public function getCategory(): ?string
-{
-    return $this->category;
-}
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
 
-public function setCategory(?string $category): static
-{
-    $this->category = $category;
-    return $this;
-}
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
+        return $this;
+    }
 
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
 }

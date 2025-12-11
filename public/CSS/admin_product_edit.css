@@ -1,4 +1,12 @@
-  /* ===== GLOBAL ===== */
+/*
+|--------------------------------------------------------------------------
+| GEARGRID ADMIN DARK THEME CSS
+|--------------------------------------------------------------------------
+| Consolidated Styles for Sidebar, Header, Forms, and Layout.
+| Aesthetic Focus: Deep Dark, Neumorphism, and Vibrant Accents (#17a2b8, #e94560).
+*/
+
+/* ===== GLOBAL & FONT ===== */
 * {
   margin: 0;
   padding: 0;
@@ -6,24 +14,28 @@
 }
 
 body {
+  /* Default background, overridden by .main-content texture */
   background-color: #1a2332;
   color: #C8B4A2;
   font-family: 'Oswald', sans-serif;
   line-height: 1.6;
 }
 
-/* ===== SIDEBAR ===== */
+/* ===== SIDEBAR (Fixed Position & Glow) ===== */
 .sidebar {
   position: fixed;
   left: 0;
   top: 0;
   width: 250px;
   height: 100vh;
+  /* Rich dark gradient */
   background: linear-gradient(180deg, #162436 0%, #0f1a2b 100%);
   padding-top: 40px;
+  /* Deep shadow with a subtle blue inner glow */
   box-shadow: 4px 0 20px rgba(0,0,0,0.6), inset -2px 0 10px rgba(23,162,184,0.1);
   overflow-y: auto;
   z-index: 1000;
+  transition: all 0.3s ease;
 }
 
 .sidebar .logo-section {
@@ -37,9 +49,10 @@ body {
 }
 
 .sidebar .logo-section img {
-    width: 150px; /* Bigger and more visible */
+    width: 150px;
     height: auto;
     border-radius: 50%;
+    /* Strong shadow/glow effect on the logo */
     filter: drop-shadow(0 0 20px rgba(23,162,184,0.6));
     transition: all 0.4s ease;
     margin-bottom: 15px;
@@ -52,7 +65,7 @@ body {
 
 .sidebar .logo-section h2 {
     color: #E5D4C1;
-    font-size: 1.9rem; /* Slightly larger */
+    font-size: 1.9rem;
     font-weight: 700;
     letter-spacing: 1px;
     text-shadow: 0 0 8px rgba(23,162,184,0.3);
@@ -96,6 +109,7 @@ body {
 
 .sidebar ul li a:hover,
 .sidebar ul li a.active {
+  /* Accent color on active/hover */
   background: rgba(23, 162, 184, 0.15);
   color: #fff;
   border-left-color: #17a2b8;
@@ -109,17 +123,26 @@ body {
   text-align: center;
 }
 
-/* ===== MAIN CONTENT ===== */
+/* ===== MAIN CONTENT LAYOUT ===== */
 .main-content {
-  margin-left: 250px;
+  margin-left: 250px; /* Space for fixed sidebar */
   min-height: 100vh;
-  background-color: #1a2332;
+  /* Dark textured background */
+  background-color: #161c28; 
+  background-image: 
+      repeating-linear-gradient(
+          45deg, 
+          #161c28 0, 
+          #161c28 2px, 
+          #1a2332 2px, 
+          #1a2332 3px
+      );
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-/* ===== TOP HEADER ===== */
+/* ===== TOP HEADER (Fixed Nav Bar Look) ===== */
 .top-header {
   background: linear-gradient(135deg, #0f1621 0%, #1a2332 100%);
   padding: 25px 50px;
@@ -174,110 +197,159 @@ body {
   font-weight: 500;
 }
 
-/* ===== CONTENT AREA ===== */
+/* ===== GENERAL CONTENT AREA & CARD STYLES ===== */
 .content-area {
-  padding: 50px;
+  padding: 50px 80px; /* Generous padding for content */
 }
 
 .form-card {
-  background: linear-gradient(145deg, #1e2e3f, #253549);
-  border-radius: 15px;
-  padding: 40px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-  border: 1px solid rgba(23,162,184,0.1);
+  /* Neumorphic/Floating Card Style */
+  background: #1f2a38; 
+  border-radius: 20px;
+  padding: 50px;
+  box-shadow: 15px 15px 40px rgba(0,0,0,0.7), -15px -15px 40px #2a3a4c;
+  border: none;
   margin-bottom: 30px;
 }
 
 .form-card h2 {
-  color: #fff;
-  font-size: 1.8rem;
-  margin-bottom: 30px;
-  border-bottom: 2px solid rgba(23,162,184,0.2);
+  color: #e0e0e0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 35px;
+  border-bottom: 3px solid #e94560; /* Accent border for headings */
   padding-bottom: 10px;
+  width: fit-content;
 }
 
-/* ===== FORM ELEMENTS ===== */
+/* ===== FORM ELEMENTS (Input Fields) ===== */
 label {
   color: #17a2b8;
-  font-weight: 600;
-  margin-bottom: 6px;
+  font-weight: 700;
+  margin-bottom: 8px;
   display: block;
+  font-size: 1.05rem;
 }
 
 input, textarea, select {
   width: 100%;
-  padding: 12px 15px;
+  padding: 15px 18px;
   background: #1e2e3f;
-  border: 2px solid #2c3e50;
-  border-radius: 8px;
+  border: 1px solid #34495e; 
+  border-radius: 12px;
   color: #fff;
+  font-size: 1rem;
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); /* Pressed look */
   transition: all 0.3s ease;
 }
 
 input:focus, textarea:focus, select:focus {
   border-color: #17a2b8;
-  box-shadow: 0 0 10px rgba(23,162,184,0.3);
+  /* Enhanced Focus Glow */
+  box-shadow: 0 0 15px rgba(23,162,184,0.7), inset 2px 2px 5px rgba(0,0,0,0.8);
   outline: none;
+  background-color: #161c28;
 }
 
 textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 120px;
 }
 
-/* ===== BUTTONS ===== */
+/* ===== BUTTONS (Universal Styling & Gradients) ===== */
 .action-buttons {
   margin-top: 30px;
   display: flex;
+  /* Aligns 'Back' left and 'Delete' right */
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 20px 0;
+  border-top: 1px solid #2d3f54; 
   gap: 15px;
   flex-wrap: wrap;
 }
 
+.action-buttons form {
+    display: inline-block;
+    margin: 0;
+}
+
 .btn {
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 25px;
+  border-radius: 10px;
   font-family: 'Oswald', sans-serif;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   text-decoration: none;
   cursor: pointer;
   border: none;
-}
-
-.btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-
-.btn-update {
-  background: linear-gradient(135deg, #28a745, #218838);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
   color: #fff;
 }
 
+.btn:hover,
+.action-buttons form button:hover,
+.form-card button[type="submit"]:hover {
+  /* Dramatic lift effect on hover */
+  transform: translateY(-5px); 
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+}
+
+/* Primary/Submit Button (e.g., Update/Save) */
+.form-card button[type="submit"] {
+    background: linear-gradient(135deg, #e94560 0%, #ff6b81 100%); 
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.5);
+    width: auto;
+    transition: all 0.3s ease;
+}
+
+/* Secondary/Back Button */
 .btn-back {
-  background: linear-gradient(135deg, #6c757d, #5a6268);
+  background: linear-gradient(135deg, #445577 0%, #334466 100%);
   color: #fff;
 }
 
-.btn-delete {
-  background: linear-gradient(135deg, #dc3545, #c82333);
+/* Destructive/Delete Button */
+.action-buttons form button {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7577 100%);
   color: #fff;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 77, 79, 0.4);
 }
 
-/* ===== FOOTER ===== */
+/* ===== FOOTER (Fixed and Aligned) ===== */
 footer {
   text-align: center;
-  padding: 30px;
-  margin-top: 50px;
-  background: linear-gradient(135deg, #0f1621 0%, #1a2332 100%);
+  padding: 20px;
+  background: #1f2a38; 
   color: #8b94a3;
-  font-size: 1rem;
-  margin-left: 250px;
+  font-size: 0.9rem;
   border-top: 1px solid rgba(23,162,184,0.1);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+  position: fixed;
+  bottom: 0;
+  left: 250px;
+  right: 0;
+  width: auto;
+  z-index: 999;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -298,5 +370,15 @@ footer {
     flex-direction: column;
     gap: 15px;
     text-align: center;
+  }
+  .action-buttons {
+      /* Center-align buttons on small screens */
+      justify-content: center;
+  }
+  footer {
+      position: relative;
+      left: 0;
+      width: 100%;
+      margin-top: 0;
   }
 }

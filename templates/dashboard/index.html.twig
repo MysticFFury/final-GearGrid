@@ -1,69 +1,434 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}GearGrid | Admin Dashboard{% endblock %}
+{% block title %}Dashboard | GearGrid{% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #6C63FF;
+        --secondary: #ff6584;
+        --danger: #dc3545;
+        --success: #4ade80;
+        --bg-dark: #12121e;
+        --card-bg: #1e1e2f;
+        --text-muted: #88889b;
+        --glass-border: rgba(255, 255, 255, 0.08);
+    }
 
-    <!-- Dashboard CSS -->
-    <link rel="stylesheet" href="{{ asset('Css/admin_dashbourd.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/admin_layout.css') }}">
+    .dashboard main {
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: var(--bg-dark);
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* --- TOP BAR STYLING --- */
+    .top-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 3rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .header-left h1 {
+        font-family: 'Oswald', sans-serif;
+        color: #fff;
+        font-size: 2rem;
+        letter-spacing: 1px;
+        margin: 0;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 8px;
+    }
+
+    .breadcrumb a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .breadcrumb a:hover { color: var(--primary); }
+
+    .breadcrumb i { font-size: 0.7rem; opacity: 0.5; }
+
+    .breadcrumb span { color: var(--secondary); font-weight: 600; }
+
+    .header-right .profile {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 8px 20px;
+        border-radius: 50px;
+        border: 1px solid var(--glass-border);
+        transition: all 0.3s ease;
+    }
+
+    .header-right .profile:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+    }
+
+    .text-info {
+        display: flex;
+        flex-direction: column;
+        text-align: right;
+    }
+
+    .text-info .name { color: #fff; font-weight: 600; font-size: 0.9rem; }
+    .text-info .role { color: var(--text-muted); font-size: 0.75rem; }
+
+    .avatar-wrapper { position: relative; width: 42px; height: 42px; }
+    .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--primary); }
+    .status-indicator {
+        position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px;
+        background: #4ade80; border: 2px solid var(--bg-dark); border-radius: 50%;
+    }
+
+    /* --- STATS CARDS --- */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 20px;
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+    }
+
+    .stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--primary), #8b7fff); }
+    .stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--success), #6bff9f); }
+    .stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--secondary), #ff8ba3); }
+    .stat-card:nth-child(4)::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    }
+
+    .stat-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #fff;
+    }
+
+    .stat-card:nth-child(1) .stat-icon { background: linear-gradient(135deg, var(--primary), #8b7fff); }
+    .stat-card:nth-child(2) .stat-icon { background: linear-gradient(135deg, var(--success), #6bff9f); }
+    .stat-card:nth-child(3) .stat-icon { background: linear-gradient(135deg, var(--secondary), #ff8ba3); }
+    .stat-card:nth-child(4) .stat-icon { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+
+    .stat-value {
+        font-family: 'Oswald', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+
+    .stat-label {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+
+    /* --- TABLE SECTION --- */
+    .table-section {
+        margin-top: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header h2 {
+        font-family: 'Oswald', sans-serif;
+        color: #fff;
+        font-size: 1.5rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-header h2 i {
+        color: var(--primary);
+    }
+
+    .table-card {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 24px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .table-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    /* --- DATA TABLE STYLING --- */
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .styled-table thead {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .styled-table th {
+        padding: 1rem 1.2rem;
+        text-align: left;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1.5px;
+        border-bottom: 2px solid var(--glass-border);
+    }
+
+    .styled-table td {
+        padding: 1.2rem 1.2rem;
+        color: #fff;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .styled-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .styled-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .styled-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .badge-secondary {
+        color: var(--secondary);
+        font-family: monospace;
+        background: rgba(255,101,132,0.1);
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+    }
+
+    .status-completed {
+        background: rgba(74, 222, 128, 0.2);
+        color: var(--success);
+    }
+
+    /* --- RESPONSIVE --- */
+    @media screen and (max-width: 768px) {
+        .dashboard main {
+            padding: 1.5rem 1rem;
+        }
+
+        .top-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .header-right {
+            width: 100%;
+        }
+
+        .header-right .profile {
+            justify-content: space-between;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .table-card {
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        .styled-table {
+            font-size: 0.85rem;
+        }
+
+        .styled-table th,
+        .styled-table td {
+            padding: 0.75rem 0.5rem;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
-    <!-- Sidebar -->
     {% include 'partials/_sidebar.html.twig' %}
 
-    <!-- Main Content -->
     <main class="main-content">
-        <!-- Top Header -->
         <div class="top-header">
-            <h1>Admin Dashboard</h1>
-            <div class="user-info">
-                <div class="profile">
-                    <img src="https://ui-avatars.com/api/?name={{ app.user.username|default('Admin')|url_encode }}&background=17a2b8&color=fff" alt="User">
-                    <span>{{ app.user.username|default('Admin') }}</span>
+            <div class="header-left">
+                <h1>{% if isAdmin|default(false) %}Admin Dashboard{% else %}Staff Dashboard{% endif %}</h1>
+                <nav class="breadcrumb">
+                    <span>{% if isAdmin|default(false) %}Overview{% else %}My Overview{% endif %}</span>
+                </nav>
+            </div>
+
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="profile">
+                        <div class="text-info">
+                            <span class="name">{{ app.user.name|default(app.user.username|default('Admin')) }}</span>
+                            <span class="role">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</span>
+                        </div>
+                        <div class="avatar-wrapper">
+                            <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User">
+                            <span class="status-indicator"></span>
+                        </div>
+                        <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Content Area -->
+
         <div class="content-area">
             <!-- Stats Cards -->
-            <div class="dashboard-cards">
-                <div class="card">
-                    <i class="fas fa-boxes"></i>
-                    <h3>{{ totalProducts|default(0) }}</h3>
-                    <p>Total Products</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ totalProducts|default(0) }}</div>
+                    <div class="stat-label">{% if isAdmin|default(false) %}Total Products{% else %}My Products{% endif %}</div>
                 </div>
-                <div class="card">
-                    <i class="fas fa-users"></i>
-                    <h3>{{ totalUsers|default(0) }}</h3>
-                    <p>Registered Users</p>
+
+                {% if isAdmin|default(false) %}
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ totalUsers|default(0) }}</div>
+                    <div class="stat-label">Registered Users</div>
                 </div>
-                <div class="card">
-                    <i class="fas fa-shopping-cart"></i>
-                    <h3>{{ totalOrders|default(0) }}</h3>
-                    <p>Pending Orders</p>
+                {% else %}
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ totalCategories|default(0) }}</div>
+                    <div class="stat-label">Categories</div>
                 </div>
-                <div class="card">
-                    <i class="fas fa-chart-line"></i>
-                    <h3>₱{{ recentSales|default(0) }}</h3>
-                    <p>Monthly Sales</p>
+                {% endif %}
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">{{ totalOrders|default(0) }}</div>
+                    <div class="stat-label">{% if isAdmin|default(false) %}Total Orders{% else %}My Orders{% endif %}</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value">₱{{ recentSales|default(0)|number_format(2, '.', ',') }}</div>
+                    <div class="stat-label">{% if isAdmin|default(false) %}Recent Sales{% else %}My Sales{% endif %}</div>
                 </div>
             </div>
 
             <!-- Recent Orders Table -->
             <div class="table-section">
-                <h2>Recent Orders</h2>
+                <div class="section-header">
+                    <h2><i class="fas fa-receipt"></i> {% if isAdmin|default(false) %}Recent Orders{% else %}My Recent Orders{% endif %}</h2>
+                    <a href="{{ path('app_order_index') }}" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
                 <div class="table-card">
                     <table class="styled-table">
                         <thead>
@@ -78,8 +443,8 @@
                         <tbody>
                             {% for order in recentOrders %}
                                 <tr>
-                                    <td>#{{ order.id }}</td>
-                                    <td>{{ order.customerName }}</td>
+                                    <td><span class="badge badge-secondary">#{{ order.id }}</span></td>
+                                    <td style="font-weight: 600;">{{ order.customerName }}</td>
                                     <td>
                                         <span class="status-badge 
                                             {% if order.status == 'Pending' %}status-pending{% endif %}
@@ -88,12 +453,15 @@
                                             {{ order.status }}
                                         </span>
                                     </td>
-                                    <td>₱{{ order.totalPrice|number_format(2) }}</td>
-                                    <td>{{ order.createdAt ? order.createdAt|date('M d, Y') : '' }}</td>
+                                    <td style="color: var(--success); font-weight: 600;">₱{{ order.totalPrice|number_format(2, '.', ',') }}</td>
+                                    <td style="color: var(--text-muted);">{{ order.createdAt ? order.createdAt|date('M d, Y') : 'N/A' }}</td>
                                 </tr>
                             {% else %}
                                 <tr>
-                                    <td colspan="5" style="text-align:center;">No recent orders</td>
+                                    <td colspan="5" style="text-align:center; padding: 2rem; color: var(--text-muted);">
+                                        <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+                                        No recent orders found.
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -102,10 +470,9 @@
             </div>
         </div>
     </main>
-
-    <!-- Footer -->
-    <footer>
-        &copy; {{ "now"|date("Y") }} GearGrid Admin Panel. All Rights Reserved.
-    </footer>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
 {% endblock %}

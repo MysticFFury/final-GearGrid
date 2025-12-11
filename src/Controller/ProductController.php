@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/product')]
 final class ProductController extends AbstractController
@@ -20,8 +21,17 @@ final class ProductController extends AbstractController
     #[Route(name: 'app_product_index', methods: ['GET'])]
     public function index(ProductRepository $productRepository): Response
     {
+        $user = $this->getUser();
+        
+        // Staff can only see their own products, admin can see all
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $products = $productRepository->findAll();
+        } else {
+            $products = $productRepository->findBy(['createdBy' => $user]);
+        }
+
         return $this->render('product/index.html.twig', [
-            'products' => $productRepository->findAll(),
+            'products' => $products,
         ]);
     }
 
@@ -53,6 +63,9 @@ final class ProductController extends AbstractController
                 $product->setImage($newFilename);
             }
 
+            // Set the creator
+            $product->setCreatedBy($this->getUser());
+
             $entityManager->persist($product);
             $entityManager->flush();
 
@@ -68,6 +81,11 @@ final class ProductController extends AbstractController
     #[Route('/{id}', name: 'app_product_show', methods: ['GET'])]
     public function show(Product $product): Response
     {
+        // Staff can only view their own products, admin can view all
+        if (!$this->isGranted('ROLE_ADMIN') && $product->getCreatedBy() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('You can only view your own products.');
+        }
+
         return $this->render('product/show.html.twig', [
             'product' => $product,
         ]);
@@ -76,6 +94,11 @@ final class ProductController extends AbstractController
     #[Route('/{id}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Product $product, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
+        // Check if staff can only edit their own records
+        if (!$this->isGranted('ROLE_ADMIN') && $product->getCreatedBy() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('You can only edit your own products.');
+        }
+
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
 
@@ -128,6 +151,11 @@ final class ProductController extends AbstractController
     #[Route('/{id}', name: 'app_product_delete', methods: ['POST'])]
     public function delete(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
+        // Check if staff can only delete their own records
+        if (!$this->isGranted('ROLE_ADMIN') && $product->getCreatedBy() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('You can only delete your own products.');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->request->get('_token'))) {
             // Delete image if exists
             if ($product->getImage()) {

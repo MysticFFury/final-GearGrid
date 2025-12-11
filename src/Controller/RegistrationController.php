@@ -1,0 +1,80 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\User;
+use App\Entity\Log;
+use App\Form\RegistrationFormType;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+class RegistrationController extends AbstractController
+{
+    #[Route('/register', name: 'app_register')]
+    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
+    {
+        $user = new User();
+        $currentUser = $this->getUser();
+        $isAdmin = $currentUser && $this->isGranted('ROLE_ADMIN');
+        
+        $form = $this->createForm(RegistrationFormType::class, $user, [
+            'is_admin' => $isAdmin
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var string $plainPassword */
+            $plainPassword = $form->get('plainPassword')->getData();
+
+            // encode the plain password
+            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+
+            // Check if admin is creating the user or public user
+            $currentUser = $this->getUser();
+            $isAdmin = $currentUser && $this->isGranted('ROLE_ADMIN');
+            
+            // If admin is creating user, use selected roles. Otherwise, set default role as USER (public registration)
+            if (!$isAdmin) {
+                // Public user registration - set as regular user (ROLE_USER is automatically added by User entity)
+                $user->setRoles([]);
+            } elseif (empty($user->getRoles()) || (count($user->getRoles()) === 1 && in_array('ROLE_USER', $user->getRoles()))) {
+                // Admin created user without selecting roles - default to STAFF
+                $user->setRoles(['ROLE_STAFF']);
+            }
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            // Log user creation if admin is creating it
+            if ($isAdmin) {
+                $log = new Log();
+                $log->setAction('CREATE')
+                    ->setMessage("Admin '{$currentUser->getUserIdentifier()}' created user '{$user->getUserIdentifier()}'")
+                    ->setStatus('active')
+                    ->setUserName($currentUser->getUserIdentifier())
+                    ->setUserRole(implode(', ', $currentUser->getRoles()))
+                    ->setEntity('User')
+                    ->setCreatedAt(new \DateTime());
+                $entityManager->persist($log);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'User "' . $user->getName() . '" has been registered successfully!');
+                // Redirect admin to user list page
+                return $this->redirectToRoute('app_user_index');
+            } else {
+                // Public user registration - redirect to login
+                $this->addFlash('success', 'Account created successfully! Please log in.');
+                return $this->redirectToRoute('app_login');
+            }
+        }
+
+        return $this->render('registration/register.html.twig', [
+            'registrationForm' => $form,
+        ]);
+    }
+}

@@ -1,0 +1,193 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login | GearGrid{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background: radial-gradient(circle at 20% 20%, #1f2840, #0c1022 50%, #080c1a);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: #e9ecf5;
+    }
+
+    .auth-wrapper {
+        width: min(440px, 92vw);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        border-radius: 18px;
+        padding: 32px;
+        backdrop-filter: blur(12px);
+    }
+
+    .auth-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+    }
+
+    .auth-title {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+    }
+
+    .muted { color: #9da7c2; font-size: 14px; }
+
+    .auth-form label {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 6px;
+        color: #c9d3ec;
+    }
+
+    .auth-input {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.04);
+        color: #e9ecf5;
+        outline: none;
+        transition: 0.2s border, 0.2s box-shadow, 0.2s background;
+        margin-bottom: 14px;
+    }
+
+    .auth-input:focus {
+        border-color: #6C63FF;
+        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        background: rgba(255,255,255,0.07);
+    }
+
+    .auth-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 6px;
+        margin-bottom: 6px;
+        font-size: 13px;
+    }
+
+    .auth-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #c9d3ec;
+    }
+
+    .auth-button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #6C63FF, #4ac6ff);
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        margin-top: 6px;
+    }
+
+    .auth-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(76, 133, 255, 0.35);
+    }
+
+    .switch-link {
+        text-align: center;
+        margin-top: 14px;
+        font-size: 14px;
+    }
+
+    .switch-link a {
+        color: #8dd0ff;
+        text-decoration: none;
+    }
+
+    .switch-link a:hover { text-decoration: underline; }
+
+    .alert {
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255, 94, 94, 0.08);
+        color: #ffb5b5;
+    }
+
+    .logged-in {
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(108, 99, 255, 0.12);
+        border: 1px solid rgba(108, 99, 255, 0.25);
+        margin-bottom: 14px;
+    }
+</style>
+
+<div class="auth-wrapper">
+    <div class="auth-header">
+        <div>
+            <div class="auth-title">Welcome back 👋</div>
+            <div class="muted">Access your GearGrid dashboard</div>
+        </div>
+        <div class="muted">Login</div>
+    </div>
+
+    {% if error %}
+        <div class="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    {% if app.user %}
+        <div class="logged-in">
+            You are logged in as <strong>{{ app.user.userIdentifier }}</strong>.
+            <a href="{{ logout_path() }}" style="color:#8dd0ff; text-decoration:none;">Logout</a>
+        </div>
+    {% endif %}
+
+    <form method="post" class="auth-form">
+        <label for="inputEmail">Email</label>
+        <input
+            type="email"
+            value="{{ last_username }}"
+            name="email"
+            id="inputEmail"
+            class="auth-input"
+            autocomplete="email"
+            required
+            autofocus
+        >
+
+        <label for="inputPassword">Password</label>
+        <input
+            type="password"
+            name="password"
+            id="inputPassword"
+            class="auth-input"
+            autocomplete="current-password"
+            required
+        >
+
+        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+        <div class="auth-actions">
+            <label class="auth-checkbox">
+                <input type="checkbox" name="_remember_me" style="width:16px; height:16px;"> Remember me
+            </label>
+            <span class="muted">Forgot password?</span>
+        </div>
+
+        <button class="auth-button" type="submit">Sign in</button>
+    </form>
+
+    <div class="switch-link">
+        New here? <a href="{{ path('app_register') }}">Create an account</a>
+    </div>
+</div>
+{% endblock %}

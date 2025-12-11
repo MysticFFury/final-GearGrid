@@ -3,46 +3,67 @@
         <img src="{{ asset('images/logo.png') }}" alt="GearGrid Logo" class="logo-img">
         <h2>GearGrid</h2>
     </div>
-    <ul>
-        <li>
-            <a href="{{ path('app_dashboard') }}" class="{{ app.request.attributes.get('_route') starts with 'aap_dashboard' ? 'active' : '' }}">
-                <i class="fas fa-chart-line"></i> Dashboard
-            </a>
-        </li>
-        <li>
-            <a href="{{ path('app_product_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_product' ? 'active' : '' }}">
-                <i class="fas fa-box"></i> Products
-            </a>
-        </li>
-        {# <li>
-            <a href="{{ path('app_category_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_category' ? 'active' : '' }}">
-                <i class="fas fa-tags"></i> Categories
-            </a>
-        </li> #}
-        <li>
-            <a href="{{ path('app_order_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_order' ? 'active' : '' }}">
-                <i class="fas fa-shopping-cart"></i> Orders
-            </a>
-        </li>
-        {# <li>
-            <a href="{{ path('app_supplier_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_supplier' ? 'active' : '' }}">
-                <i class="fas fa-truck"></i> Suppliers
-            </a>
-        </li> #}
-        {# <li>
-            <a href="{{ path('app_report_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_report' ? 'active' : '' }}">
-                <i class="fas fa-file-alt"></i> Reports
-            </a>
-        </li> #}
-        <li>
-            <a href="{{ path('app_log_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_log' ? 'active' : '' }}">
-                <i class="fas fa-file-alt"></i> Logs
-            </a>
-        </li>
-        {# <li>
-            <a href="{{ path('app_setting_index') }}" class="{{ app.request.attributes.get('_route') starts with 'app_setting' ? 'active' : '' }}">
-                <i class="fas fa-cog"></i> Settings
-            </a> #}
-        </li>
-    </ul>
+
+    <div class="sidebar-nav">
+        <ul>
+            <li>
+                <a href="{{ path('app_dashboard') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'app_dashboard' ? 'active' : '' }}">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ path('app_product_index') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'app_product' ? 'active' : '' }}">
+                    <i class="fas fa-box"></i> Products
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ path('app_category_index') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'app_category' ? 'active' : '' }}">
+                    <i class="fas fa-tags"></i> Categories
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ path('app_order_index') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'app_order' ? 'active' : '' }}">
+                    <i class="fas fa-shopping-cart"></i> Orders
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ path('app_profile') }}" 
+                   class="{{ app.request.attributes.get('_route') starts with 'app_profile' ? 'active' : '' }}">
+                    <i class="fas fa-user-circle"></i> Profile
+                </a>
+            </li>
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <li>
+                    <a href="{{ path('app_log_index') }}" 
+                       class="{{ app.request.attributes.get('_route') starts with 'app_log' ? 'active' : '' }}">
+                        <i class="fas fa-file-alt"></i> Logs
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ path('app_user_index') }}" 
+                       class="{{ app.request.attributes.get('_route') starts with 'app_user' ? 'active' : '' }}">
+                        <i class="fas fa-users"></i> Users
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+
+        <div class="sidebar-logout">
+            <form method="post" action="{{ path('app_logout') }}">
+                <button type="submit">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </div>
+    </div>
 </aside>
