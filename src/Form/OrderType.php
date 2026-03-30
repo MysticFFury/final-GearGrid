@@ -4,6 +4,9 @@ namespace App\Form;
 
 use App\Entity\Order;
 use App\Entity\Product;
+use App\Entity\User;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -20,22 +23,27 @@ class OrderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('customerName', TextType::class, [
+            ->add('customer', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => 'name',
                 'label' => 'Customer Name',
+                'placeholder' => 'Select a customer',
+                'mapped' => false,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                        ->where('u.roles NOT LIKE :adminRole')
+                        ->andWhere('u.roles NOT LIKE :staffRole')
+                        ->setParameter('adminRole', '%ROLE_ADMIN%')
+                        ->setParameter('staffRole', '%ROLE_STAFF%')
+                        ->orderBy('u.name', 'ASC');
+                },
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Enter customer name',
                     'autofocus' => true,
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter a customer name.',
-                    ]),
-                    new Length([
-                        'min' => 2,
-                        'max' => 255,
-                        'minMessage' => 'Customer name must be at least {{ limit }} characters long.',
-                        'maxMessage' => 'Customer name cannot be longer than {{ limit }} characters.',
+                        'message' => 'Please select a customer.',
                     ]),
                 ],
             ])

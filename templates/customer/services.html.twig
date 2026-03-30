@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Services | GearGrid{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root { --primary:#6C63FF; --text-muted:#a8b4c3; }
+    .landing-page {
+        min-height: 100vh; color:#fff;
+        padding: 5.25rem 2.25rem 5rem;
+        background: radial-gradient(circle at 20% 20%, rgba(108, 99, 255, 0.18), transparent 38%),
+                    radial-gradient(circle at 85% 0%, rgba(255, 101, 132, 0.14), transparent 30%),
+                    linear-gradient(135deg, rgba(11, 17, 32, 1) 0%, rgba(15, 22, 36, 1) 45%, rgba(11, 20, 35, 1) 100%);
+    }
+    .landing-container { max-width: 1320px; margin: 0 auto; }
+    .landing-topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(11, 17, 32, 0.78); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    .landing-topbar__inner { max-width: 1320px; margin: 0 auto; padding: 0.95rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: nowrap; }
+    .landing-brand { display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:#fff; font-weight:900; letter-spacing:0.3px; font-family:'Oswald',sans-serif; font-size:1.25rem; }
+    .landing-brand .mark { width: 38px; height: 38px; border-radius: 14px; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, rgba(108, 99, 255, 0.25), rgba(255, 101, 132, 0.18)); border:1px solid rgba(255, 255, 255, 0.12); flex:0 0 auto; }
+    .landing-nav { display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; flex: 1 1 auto; justify-content: flex-end; min-width: 0; }
+    .landing-nav-link { display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:0.55rem 0.9rem; border-radius:999px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.92); font-weight:800; font-family:'Inter',sans-serif; font-size:0.95rem; transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
+    .landing-nav-link:hover { transform: translateY(-2px); background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.14); }
+
+    .landing-header-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0.6rem 1rem;
+        border-radius: 999px;
+        text-decoration: none;
+        font-family: 'Inter', sans-serif;
+        font-weight: 900;
+        font-size: 0.95rem;
+        color: #fff;
+        background: linear-gradient(135deg, var(--primary), rgba(139, 127, 255, 1));
+        box-shadow: 0 16px 40px rgba(108, 99, 255, 0.20);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        transition: transform 0.2s ease, filter 0.2s ease;
+        white-space: nowrap;
+        flex: 0 0 auto;
+        margin-left: auto;
+    }
+    .landing-header-cta:hover { transform: translateY(-2px); filter: brightness(1.08); }
+
+    .landing-section { margin-top:1.9rem; scroll-margin-top:110px; }
+    .section-title { display:flex; align-items:center; gap:10px; margin-bottom:1rem; font-family:'Oswald',sans-serif; font-size:1.55rem; }
+    .section-title i { color: var(--primary); }
+    .landing-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1.2rem; }
+    .landing-card { border-radius:18px; border:1px solid rgba(255,255,255,0.10); background:rgba(255,255,255,0.03); padding:1.2rem; box-shadow:0 12px 35px rgba(0,0,0,0.25); }
+    .landing-card h3 { font-family:'Oswald',sans-serif; font-size:1.15rem; margin:0 0 0.35rem; }
+    .landing-card p { margin:0; color: var(--text-muted); line-height:1.65; }
+    .icon { width: 46px; height: 46px; border-radius: 14px; display:flex; align-items:center; justify-content:center; background: rgba(108, 99, 255, 0.18); border: 1px solid rgba(108, 99, 255, 0.28); color:#fff; margin-bottom:0.8rem; }
+    @media (max-width: 768px) { .landing-topbar__inner { flex-wrap: wrap; padding: 0.75rem 1rem; } .landing-page { padding-top: 4.25rem; } }
+</style>
+{% endblock %}
+
+{% block body %}
+<main class="landing-page">
+    {% include 'customer/_topnav.html.twig' %}
+
+    <div class="landing-container">
+        <section class="landing-section" aria-label="Services list">
+            <h2 class="section-title"><i class="fas fa-wand-magic-sparkles"></i> Services</h2>
+            <div class="landing-grid">
+                <div class="landing-card">
+                    <div class="icon"><i class="fas fa-cart-shopping"></i></div>
+                    <h3>Order Workflow</h3>
+                    <p>Create and review orders using clear steps that work on mobile.</p>
+                </div>
+                <div class="landing-card">
+                    <div class="icon" style="background: rgba(74, 222, 128, 0.14); border-color: rgba(74, 222, 128, 0.28);"><i class="fas fa-tags"></i></div>
+                    <h3>Product Organization</h3>
+                    <p>Browse categories and product information in a consistent UI.</p>
+                </div>
+                <div class="landing-card">
+                    <div class="icon" style="background: rgba(255, 101, 132, 0.14); border-color: rgba(255, 101, 132, 0.28);"><i class="fas fa-chart-line"></i></div>
+                    <h3>Activity Tracking</h3>
+                    <p>Keep track of recent activity through the app dashboard.</p>
+                </div>
+                <div class="landing-card">
+                    <div class="icon"><i class="fas fa-mobile-screen-button"></i></div>
+                    <h3>Mobile Readability</h3>
+                    <p>Responsive spacing and readable typography for all devices.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}
+

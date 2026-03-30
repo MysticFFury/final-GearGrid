@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Log;
 use App\Form\ChangePasswordType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -63,6 +64,18 @@ class ProfileController extends AbstractController
             // Hash and set new password
             $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
             $user->setPassword($hashedPassword);
+            $entityManager->flush();
+
+            // Log password change
+            $log = new Log();
+            $log->setAction('PASSWORD_CHANGE')
+                ->setMessage("User '{$user->getUserIdentifier()}' changed their password")
+                ->setStatus('active')
+                ->setUserName($user->getUserIdentifier())
+                ->setUserRole(implode(', ', $user->getRoles()))
+                ->setEntity('User')
+                ->setCreatedAt(new \DateTime());
+            $entityManager->persist($log);
             $entityManager->flush();
 
             $this->addFlash('success', 'Password changed successfully!');

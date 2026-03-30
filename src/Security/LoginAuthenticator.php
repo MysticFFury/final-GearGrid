@@ -44,12 +44,32 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        // Role-aware landing:
+        // - Admin/Staff -> /dashboard
+        // - Customers (ROLE_USER) -> /customer-landing
+        $userRoles = method_exists($token, 'getRoleNames') ? $token->getRoleNames() : [];
+        $hasAdminOrStaff = in_array('ROLE_ADMIN', $userRoles, true) || in_array('ROLE_STAFF', $userRoles, true);
+
+        $fallbackTarget = $hasAdminOrStaff
+            ? $this->urlGenerator->generate('app_dashboard')
+            : $this->urlGenerator->generate('app_customer_landing');
+
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+            // If a customer tries to end up anywhere else, always send them to customer landing.
+            // This prevents redirect loops (e.g. hitting /dashboard which customers can't access).
+            if (!$hasAdminOrStaff && is_string($targetPath) && $targetPath !== $this->urlGenerator->generate('app_customer_landing')) {
+                return new RedirectResponse($fallbackTarget);
+            }
+
+            // Admin/Staff: keep the original target unless it is customer landing.
+            if ($hasAdminOrStaff && is_string($targetPath) && str_contains($targetPath, '/customer-landing')) {
+                return new RedirectResponse($fallbackTarget);
+            }
+
             return new RedirectResponse($targetPath);
         }
 
-        // For example:
-        return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
+        return new RedirectResponse($fallbackTarget);
         // throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
 

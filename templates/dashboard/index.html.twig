@@ -343,7 +343,7 @@
             <div class="header-left">
                 <h1>{% if isAdmin|default(false) %}Admin Dashboard{% else %}Staff Dashboard{% endif %}</h1>
                 <nav class="breadcrumb">
-                    <span>{% if isAdmin|default(false) %}Overview{% else %}My Overview{% endif %}</span>
+                    <span>Overview</span>
                 </nav>
             </div>
 
@@ -374,7 +374,7 @@
                         </div>
                     </div>
                     <div class="stat-value">{{ totalProducts|default(0) }}</div>
-                    <div class="stat-label">{% if isAdmin|default(false) %}Total Products{% else %}My Products{% endif %}</div>
+                    <div class="stat-label">Total Products</div>
                 </div>
 
                 {% if isAdmin|default(false) %}
@@ -406,7 +406,7 @@
                         </div>
                     </div>
                     <div class="stat-value">{{ totalOrders|default(0) }}</div>
-                    <div class="stat-label">{% if isAdmin|default(false) %}Total Orders{% else %}My Orders{% endif %}</div>
+                    <div class="stat-label">Total Orders</div>
                 </div>
 
                 <div class="stat-card">
@@ -416,14 +416,14 @@
                         </div>
                     </div>
                     <div class="stat-value">₱{{ recentSales|default(0)|number_format(2, '.', ',') }}</div>
-                    <div class="stat-label">{% if isAdmin|default(false) %}Recent Sales{% else %}My Sales{% endif %}</div>
+                    <div class="stat-label">Recent Sales</div>
                 </div>
             </div>
 
             <!-- Recent Orders Table -->
             <div class="table-section">
                 <div class="section-header">
-                    <h2><i class="fas fa-receipt"></i> {% if isAdmin|default(false) %}Recent Orders{% else %}My Recent Orders{% endif %}</h2>
+                    <h2><i class="fas fa-receipt"></i> Recent Orders</h2>
                     <a href="{{ path('app_order_index') }}" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
                         View All <i class="fas fa-arrow-right"></i>
                     </a>
@@ -468,6 +468,110 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Recent Products Table -->
+            {% if isAdmin|default(false) or isStaff|default(false) %}
+            <div class="table-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-boxes"></i> Recently Added Products</h2>
+                    <a href="{{ path('app_product_index') }}" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="table-card">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Created By</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in recentProducts %}
+                                <tr>
+                                    <td><span class="badge badge-secondary">#{{ product.id }}</span></td>
+                                    <td style="font-weight: 600;">{{ product.name }}</td>
+                                    <td>{{ product.category ? product.category.name : 'N/A' }}</td>
+                                    <td style="color: var(--success); font-weight: 600;">₱{{ product.price|number_format(2, '.', ',') }}</td>
+                                    <td style="color: var(--primary);">{{ product.createdBy ? product.createdBy.name : 'Admin' }}</td>
+                                    <td style="color: var(--text-muted);">{{ product.createdAt ? product.createdAt|date('M d, Y') : 'N/A' }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" style="text-align:center; padding: 2rem; color: var(--text-muted);">
+                                        <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+                                        No products found.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Activity Logs Table (Admin Only) -->
+            <div class="table-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-history"></i> Recent Activity Logs</h2>
+                    <a href="{{ path('app_log_index') }}" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="table-card">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>User</th>
+                                <th>Entity</th>
+                                <th>Message</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in recentLogs %}
+                                <tr>
+                                    <td>
+                                        <span class="badge" style="
+                                            {% if log.action == 'LOGIN' %}
+                                                background: rgba(74, 222, 128, 0.2); color: var(--success);
+                                            {% elseif log.action == 'LOGOUT' %}
+                                                background: rgba(251, 191, 36, 0.2); color: #fbbf24;
+                                            {% elseif log.action == 'Create' %}
+                                                background: rgba(108, 99, 255, 0.2); color: var(--primary);
+                                            {% elseif log.action == 'Update' %}
+                                                background: rgba(255, 101, 132, 0.2); color: var(--secondary);
+                                            {% elseif log.action == 'Delete' %}
+                                                background: rgba(220, 53, 69, 0.2); color: var(--danger);
+                                            {% else %}
+                                                background: rgba(255, 255, 255, 0.1); color: #fff;
+                                            {% endif %}
+                                        ">{{ log.action }}</span>
+                                    </td>
+                                    <td style="font-weight: 600;">{{ log.userName }}</td>
+                                    <td style="color: var(--primary);">{{ log.entity ? log.entity : '—' }}</td>
+                                    <td style="color: var(--text-muted); max-width: 300px; overflow: hidden; text-overflow: ellipsis;">{{ log.message }}</td>
+                                    <td style="color: var(--text-muted); white-space: nowrap;">{{ log.createdAt ? log.createdAt|date('M d, H:i') : 'N/A' }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" style="text-align:center; padding: 2rem; color: var(--text-muted);">
+                                        <i class="fas fa-file-alt" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+                                        No activity logs found.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </main>
 </div>

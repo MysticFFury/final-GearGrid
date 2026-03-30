@@ -1,0 +1,26 @@
+<header class="landing-topbar" aria-label="Landing navigation">
+    <div class="landing-topbar__inner">
+        <a class="landing-brand" href="{{ path('app_customer_landing') }}">
+            <span class="mark"><i class="fas fa-gears"></i></span>
+            GearGrid
+        </a>
+
+        <nav class="landing-nav" aria-label="Section navigation">
+            <a class="landing-nav-link" href="{{ path('app_customer_landing') }}"><i class="fas fa-house"></i> Home</a>
+            <a class="landing-nav-link" href="{{ path('app_customer_about') }}"><i class="fas fa-users"></i> About Us</a>
+            <a class="landing-nav-link" href="{{ path('app_customer_products') }}"><i class="fas fa-box"></i> Our Product</a>
+            <a class="landing-nav-link" href="{{ path('app_customer_services') }}"><i class="fas fa-wand-magic-sparkles"></i> Services</a>
+            <a class="landing-nav-link" href="{{ path('app_customer_contact') }}"><i class="fas fa-envelope"></i> Contact Us</a>
+        </nav>
+
+        <a class="landing-header-cta" href="{% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}{{ path('app_product_index') }}{% else %}{{ path('app_login') }}{% endif %}">
+            <i class="fas fa-bolt" aria-hidden="true"></i>
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                Start Shopping
+            {% else %}
+                Log in
+            {% endif %}
+        </a>
+    </div>
+</header>
+

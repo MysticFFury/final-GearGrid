@@ -61,11 +61,7 @@ final class CategoryController extends AbstractController
     #[Route('/{id}/edit', name: 'app_category_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Category $category, EntityManagerInterface $entityManager): Response
     {
-        // Check if staff can only edit their own records
-        if (!$this->isGranted('ROLE_ADMIN') && $category->getCreatedBy() !== $this->getUser()) {
-            $this->addFlash('error', 'You can only edit your own categories.');
-            return $this->redirectToRoute('app_category_index');
-        }
+        // Admin and Staff can edit all categories
 
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);

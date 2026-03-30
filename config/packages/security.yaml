@@ -37,7 +37,7 @@ security:
         - { path: ^/logout$, roles: PUBLIC_ACCESS }
         - { path: ^/register$, roles: PUBLIC_ACCESS }
 
-        # Dashboard - Admin & Staff (staff sees limited data)
+        # Dashboard - Admin & Staff
         - { path: ^/dashboard, roles: [ROLE_ADMIN, ROLE_STAFF] }
         
         # Admin-only areas (staff cannot access)
@@ -52,6 +52,15 @@ security:
 
         # Profile - All authenticated users
         - { path: ^/profile, roles: ROLE_USER }
+
+        # Customer landing page should be public
+        - { path: ^/customer-landing$, roles: PUBLIC_ACCESS }
+
+        # Public customer marketing pages
+        - { path: ^/customer-about$, roles: PUBLIC_ACCESS }
+        - { path: ^/customer-products$, roles: PUBLIC_ACCESS }
+        - { path: ^/customer-services$, roles: PUBLIC_ACCESS }
+        - { path: ^/customer-contact$, roles: PUBLIC_ACCESS }
 
         # Any other pages require login
         - { path: ^/, roles: ROLE_USER }

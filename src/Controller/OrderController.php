@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Order;
+use App\Entity\User;
 use App\Form\OrderType;
 use App\Repository\OrderRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,14 +19,8 @@ final class OrderController extends AbstractController
     #[Route(name: 'app_order_index', methods: ['GET'])]
     public function index(OrderRepository $orderRepository): Response
     {
-        $user = $this->getUser();
-        
-        // Staff can only see their own orders, admin can see all
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $orders = $orderRepository->findAll();
-        } else {
-            $orders = $orderRepository->findBy(['createdBy' => $user]);
-        }
+        // Admin and Staff see all orders
+        $orders = $orderRepository->findAll();
 
         return $this->render('order/index.html.twig', [
             'orders' => $orders,
@@ -32,13 +28,19 @@ final class OrderController extends AbstractController
     }
 
     #[Route('/new', name: 'app_order_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
         $order = new Order();
         $form = $this->createForm(OrderType::class, $order);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Get the selected customer from the form
+            $selectedCustomer = $form->get('customer')->getData();
+            if ($selectedCustomer instanceof User) {
+                $order->setCustomerName($selectedCustomer->getName());
+            }
+            
             // Set the creator
             $order->setCreatedBy($this->getUser());
 
@@ -59,28 +61,36 @@ final class OrderController extends AbstractController
     #[Route('/{id}', name: 'app_order_show', methods: ['GET'])]
     public function show(Order $order): Response
     {
-        // Staff can only view their own orders, admin can view all
-        if (!$this->isGranted('ROLE_ADMIN') && $order->getCreatedBy() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('You can only view your own orders.');
-        }
-
+        // Admin and Staff can view all orders
         return $this->render('order/show.html.twig', [
             'order' => $order,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_order_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Order $order, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Order $order, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
-        // Check if staff can only edit their own records
-        if (!$this->isGranted('ROLE_ADMIN') && $order->getCreatedBy() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('You can only edit your own orders.');
-        }
+        // Admin and Staff can edit all orders
 
         $form = $this->createForm(OrderType::class, $order);
+        
+        // Pre-populate the customer field if customerName exists
+        if ($order->getCustomerName()) {
+            $customer = $userRepository->findOneBy(['name' => $order->getCustomerName()]);
+            if ($customer) {
+                $form->get('customer')->setData($customer);
+            }
+        }
+        
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Get the selected customer from the form
+            $selectedCustomer = $form->get('customer')->getData();
+            if ($selectedCustomer instanceof User) {
+                $order->setCustomerName($selectedCustomer->getName());
+            }
+            
             $entityManager->flush();
 
             $this->addFlash('success', 'Order #' . $order->getId() . ' has been updated successfully!');
@@ -97,10 +107,7 @@ final class OrderController extends AbstractController
     #[Route('/{id}', name: 'app_order_delete', methods: ['POST'])]
     public function delete(Request $request, Order $order, EntityManagerInterface $entityManager): Response
     {
-        // Check if staff can only delete their own records
-        if (!$this->isGranted('ROLE_ADMIN') && $order->getCreatedBy() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('You can only delete your own orders.');
-        }
+        // Admin and Staff can delete all orders
 
         if ($this->isCsrfTokenValid('delete'.$order->getId(), $request->getPayload()->getString('_token'))) {
             $orderId = $order->getId();

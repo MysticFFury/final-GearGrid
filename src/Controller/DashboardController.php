@@ -6,10 +6,10 @@ use App\Entity\Product;
 use App\Entity\Order;
 use App\Entity\Category;
 use App\Entity\Log;
-use App\Entity\User; // ✅ Add User Entity
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -21,25 +21,34 @@ final class DashboardController extends AbstractController
     {
         $user = $this->getUser();
         $isAdmin = $this->isGranted('ROLE_ADMIN');
+        $isStaff = $this->isGranted('ROLE_STAFF');
 
         if ($isAdmin) {
-            // Admin sees all data
             $totalProducts = $em->getRepository(Product::class)->count([]);
             $totalCategories = $em->getRepository(Category::class)->count([]);
             $totalOrders = $em->getRepository(Order::class)->count([]);
             $totalUsers = $em->getRepository(User::class)->count([]);
-            $recentOrders = $em->getRepository(Order::class)->findBy([], ['createdAt' => 'DESC'], 5);
-        } else {
-            // Staff sees only their own data
+            $recentOrders = $em->getRepository(Order::class)->findBy([], ['createdAt' => 'DESC'], 10);
+            $recentProducts = $em->getRepository(Product::class)->findBy([], ['createdAt' => 'DESC'], 10);
+            $recentLogs = $em->getRepository(Log::class)->findBy([], ['createdAt' => 'DESC'], 10);
+        } elseif ($isStaff) {
+            // Staff sees the same dashboard structure but only their own operational data.
             $totalProducts = $em->getRepository(Product::class)->count(['createdBy' => $user]);
-            $totalCategories = $em->getRepository(Category::class)->count([]); // Categories are shared
+            $totalCategories = $em->getRepository(Category::class)->count([]);
             $totalOrders = $em->getRepository(Order::class)->count(['createdBy' => $user]);
-            $totalUsers = null; // Staff cannot see user count
-            $recentOrders = $em->getRepository(Order::class)->findBy(
-                ['createdBy' => $user],
-                ['createdAt' => 'DESC'],
-                5
-            );
+            $totalUsers = null;
+            $recentOrders = $em->getRepository(Order::class)->findBy(['createdBy' => $user], ['createdAt' => 'DESC'], 10);
+            $recentProducts = $em->getRepository(Product::class)->findBy(['createdBy' => $user], ['createdAt' => 'DESC'], 10);
+            $recentLogs = null;
+        } else {
+            // Regular user - minimal data
+            $totalProducts = null;
+            $totalCategories = $em->getRepository(Category::class)->count([]);
+            $totalOrders = null;
+            $totalUsers = null;
+            $recentOrders = [];
+            $recentProducts = [];
+            $recentLogs = null;
         }
 
         // Calculate total sales from recent orders
@@ -54,9 +63,11 @@ final class DashboardController extends AbstractController
             'totalOrders' => $totalOrders,
             'totalUsers' => $totalUsers,
             'recentOrders' => $recentOrders,
+            'recentProducts' => $recentProducts,
+            'recentLogs' => $recentLogs,
             'recentSales' => $recentSales,
             'isAdmin' => $isAdmin,
+            'isStaff' => $isStaff,
         ]);
     }
 }
- 

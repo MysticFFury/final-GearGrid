@@ -173,9 +173,21 @@
         box-shadow: 0 0 20px rgba(108, 99, 255, 0.2);
     }
 
+    .gg-form select {
+        background: var(--card-bg) !important;
+        color: #fff !important;
+    }
+
     .gg-form select option {
-        background: var(--card-bg);
-        color: #fff;
+        background: var(--card-bg) !important;
+        color: #fff !important;
+        padding: 0.75rem;
+    }
+
+    .gg-form select option:hover,
+    .gg-form select option:checked {
+        background: var(--primary) !important;
+        color: #fff !important;
     }
 
     .gg-form .form-error {
@@ -284,9 +296,9 @@
             
             <div class="gg-form-grid">
                 <div class="form-group">
-                    {{ form_label(form.customerName) }}
-                    {{ form_widget(form.customerName, {'attr': {'placeholder': 'Enter customer name'}}) }}
-                    {{ form_errors(form.customerName) }}
+                    {{ form_label(form.customer) }}
+                    {{ form_widget(form.customer, {'attr': {'placeholder': 'Select a customer'}}) }}
+                    {{ form_errors(form.customer) }}
                 </div>
 
                 <div class="form-group">

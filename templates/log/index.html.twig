@@ -419,9 +419,11 @@
             <form method="get" class="filter-bar">
                 <input type="text" name="user" value="{{ filters.user }}" placeholder="🔍 Filter by user">
                 <select name="action">
-                    <option value="">All actions</option>
+                    <option value="">All Actions</option>
                     {% for action in actions %}
-                        <option value="{{ action }}" {% if filters.action == action %}selected{% endif %}>{{ action }}</option>
+                        <option value="{{ action }}" {% if filters.action == action %}selected{% endif %}>
+                            {{ action }}
+                        </option>
                     {% endfor %}
                 </select>
                 <input type="date" name="from" value="{{ filters.from }}" placeholder="From date">

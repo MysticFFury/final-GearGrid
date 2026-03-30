@@ -11,7 +11,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 
 class EntityLogSubscriber implements EventSubscriber
 {
-    private bool $hasLogs = false;
+    private array $pendingLogs = [];
 
     public function __construct(
         private LogService $logService,
@@ -30,17 +30,17 @@ class EntityLogSubscriber implements EventSubscriber
 
     public function postPersist(LifecycleEventArgs $args): void
     {
-        $this->logEntity('create', $args->getObject());
+        $this->logEntity('ADD', $args->getObject());
     }
 
     public function postUpdate(LifecycleEventArgs $args): void
     {
-        $this->logEntity('update', $args->getObject());
+        $this->logEntity('UPDATE', $args->getObject());
     }
 
     public function postRemove(LifecycleEventArgs $args): void
     {
-        $this->logEntity('delete', $args->getObject());
+        $this->logEntity('DELETE', $args->getObject());
     }
 
     private function logEntity(string $action, object $entity): void
@@ -51,34 +51,59 @@ class EntityLogSubscriber implements EventSubscriber
         $user = $this->security->getUser();
         if (!$user) return; // Skip logging if no user is authenticated
 
-        $entityName = $this->getEntityName($entity);
-        $entityId = method_exists($entity, 'getId') ? $entity->getId() : null;
-        $actionLabel = strtoupper($action);
+        // Only log ADD, UPDATE and DELETE actions for staff users (not admin)
+        $userRoles = $user->getRoles();
+        $isAdmin = in_array('ROLE_ADMIN', $userRoles);
         
-        // Check if user is admin or staff
-        $isAdmin = in_array('ROLE_ADMIN', $user->getRoles());
-        $userType = $isAdmin ? 'Admin' : 'Staff';
+        // Check if user has ROLE_STAFF (and is not admin)
+        // Staff users have ROLE_STAFF in their roles array
+        $hasStaffRole = in_array('ROLE_STAFF', $userRoles);
+        $isStaff = $hasStaffRole && !$isAdmin;
         
-        // Create more descriptive message
-        $message = $entityId
-            ? sprintf('%s %s %s #%s', $userType, $actionLabel, $entityName, $entityId)
-            : sprintf('%s %s %s', $userType, $actionLabel, $entityName);
+        // Only log for staff users (users with ROLE_STAFF but not ROLE_ADMIN)
+        if (!$isStaff) {
+            return; // Skip logging for admin or regular users
+        }
 
-        $this->logService->addLog(
-            $actionLabel,
-            $message,
-            $entity
-        );
-
-        $this->hasLogs = true;
+        // Store entity reference for later use (after flush when ID is available)
+        $this->pendingLogs[] = [
+            'action' => $action,
+            'entity' => $entity,
+        ];
     }
 
     public function postFlush(PostFlushEventArgs $args): void
     {
-        if ($this->hasLogs) {
-            $this->logService->flushLogs();
-            $this->hasLogs = false;
+        // Process logs after flush when entity IDs are available
+        if (empty($this->pendingLogs)) {
+
+            return;
         }
+
+        
+        foreach ($this->pendingLogs as $logData) {
+            $action = $logData['action'];
+            $entity = $logData['entity'];
+            
+            $entityName = $this->getEntityName($entity);
+            // After flush, entity should have ID (for ADD) or still have ID (for UPDATE/DELETE)
+            $entityId = method_exists($entity, 'getId') ? $entity->getId() : null;
+            
+            // Create descriptive message
+            $message = $entityId
+                ? sprintf('Staff %s %s #%s', $action, $entityName, $entityId)
+                : sprintf('Staff %s %s', $action, $entityName);
+
+            $this->logService->addLog(
+                $action,
+                $message,
+                $entity
+            );
+        }
+
+        // Flush the logs
+        $this->logService->flushLogs();
+        $this->pendingLogs = [];
     }
 
     private function getEntityName(object $entity): string

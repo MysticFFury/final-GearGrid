@@ -64,7 +64,28 @@ class LogRepository extends ServiceEntityRepository
             ->getQuery()
             ->getScalarResult();
 
-        return array_column($rows, 'action');
+        $actions = array_column($rows, 'action');
+        
+        // Define preferred order for actions
+        $preferredOrder = ['LOGIN', 'LOGOUT', 'ADD', 'UPDATE', 'DELETE'];
+        $orderedActions = [];
+        $otherActions = [];
+        
+        // Sort actions by preferred order
+        foreach ($preferredOrder as $preferredAction) {
+            if (in_array($preferredAction, $actions)) {
+                $orderedActions[] = $preferredAction;
+            }
+        }
+        
+        // Add any other actions that aren't in the preferred list
+        foreach ($actions as $action) {
+            if (!in_array($action, $preferredOrder)) {
+                $otherActions[] = $action;
+            }
+        }
+        
+        return array_merge($orderedActions, $otherActions);
     }
 
     /**

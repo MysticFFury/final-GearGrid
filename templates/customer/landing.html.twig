@@ -1,0 +1,647 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Customer Landing | GearGrid{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --primary: #6C63FF;
+        --secondary: #ff6584;
+        --success: #4ade80;
+        --bg: rgba(18, 18, 30, 0.95);
+        --text-muted: #a8b4c3;
+        --glass-border: rgba(255, 255, 255, 0.12);
+        --card-bg: rgba(30, 30, 47, 0.65);
+    }
+
+    .landing-page {
+        min-height: 100vh;
+        color: #fff;
+        padding: 5.25rem 2.25rem 5rem;
+        background: radial-gradient(circle at 20% 20%, rgba(108, 99, 255, 0.18), transparent 38%),
+                    radial-gradient(circle at 85% 0%, rgba(255, 101, 132, 0.14), transparent 30%),
+                    linear-gradient(135deg, rgba(11, 17, 32, 1) 0%, rgba(15, 22, 36, 1) 45%, rgba(11, 20, 35, 1) 100%);
+    }
+
+    .landing-container {
+        max-width: 1320px;
+        margin: 0 auto;
+    }
+
+    .landing-topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: rgba(11, 17, 32, 0.78);
+        backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .landing-topbar__inner {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 0.95rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: nowrap;
+    }
+
+    .landing-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: 900;
+        letter-spacing: 0.3px;
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.25rem;
+    }
+
+    .landing-brand .mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(108, 99, 255, 0.25), rgba(255, 101, 132, 0.18));
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        flex: 0 0 auto;
+    }
+
+    .landing-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        flex: 1 1 auto;
+        justify-content: flex-end;
+        min-width: 0;
+    }
+
+    .landing-nav-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        padding: 0.55rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.92);
+        font-weight: 800;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .landing-nav-link:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .landing-header-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0.6rem 1rem;
+        border-radius: 999px;
+        text-decoration: none;
+        font-family: 'Inter', sans-serif;
+        font-weight: 900;
+        font-size: 0.95rem;
+        color: #fff;
+        background: linear-gradient(135deg, var(--primary), rgba(139, 127, 255, 1));
+        box-shadow: 0 16px 40px rgba(108, 99, 255, 0.20);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        transition: transform 0.2s ease, filter 0.2s ease;
+        white-space: nowrap;
+        flex: 0 0 auto;
+        margin-left: auto;
+    }
+
+    .landing-header-cta:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.08);
+    }
+
+    .landing-hero {
+        border: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 24px;
+        padding: 2.25rem 1.5rem;
+        box-shadow: 0 20px 55px rgba(0, 0, 0, 0.45);
+    }
+
+    .landing-hero__grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    .landing-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.04);
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 0.95rem;
+    }
+
+    .landing-hero h1 {
+        font-family: 'Oswald', sans-serif;
+        font-size: 2.65rem;
+        line-height: 1.1;
+        margin: 1rem 0 0.85rem;
+    }
+
+    .landing-hero p {
+        margin: 0 0 1.35rem;
+        color: var(--text-muted);
+        max-width: 62ch;
+        font-size: 1.02rem;
+        line-height: 1.7;
+    }
+
+    .landing-cta {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .landing-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0.85rem 1.1rem;
+        border-radius: 14px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 800;
+        text-decoration: none;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        transition: transform 0.2s ease, filter 0.2s ease, background 0.2s ease;
+        color: #fff;
+    }
+
+    .landing-btn.primary {
+        background: linear-gradient(135deg, var(--primary), rgba(139, 127, 255, 1));
+        box-shadow: 0 18px 45px rgba(108, 99, 255, 0.22);
+    }
+
+    .landing-btn.secondary {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .landing-btn:hover {
+        transform: translateY(-3px);
+        filter: brightness(1.08);
+    }
+
+    .landing-side-card {
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.02);
+        padding: 1.25rem;
+    }
+
+    .landing-side-card h3 {
+        font-family: 'Oswald', sans-serif;
+        margin: 0 0 0.75rem;
+        font-size: 1.25rem;
+    }
+
+    .landing-bullets {
+        display: grid;
+        gap: 0.85rem;
+    }
+
+    .landing-bullet {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    .landing-bullet i {
+        color: var(--primary);
+        font-size: 1.15rem;
+        margin-top: 3px;
+        flex: 0 0 auto;
+    }
+
+    .landing-section {
+        margin-top: 1.9rem;
+        scroll-margin-top: 110px;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1rem;
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.55rem;
+    }
+
+    .section-title i {
+        color: var(--primary);
+    }
+
+    .landing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.2rem;
+    }
+
+    .landing-card {
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.03);
+        padding: 1.2rem;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    .landing-card .icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(108, 99, 255, 0.18);
+        border: 1px solid rgba(108, 99, 255, 0.28);
+        margin-bottom: 0.8rem;
+        font-size: 1.1rem;
+        color: #fff;
+    }
+
+    .landing-card h3 {
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.15rem;
+        margin: 0 0 0.5rem;
+    }
+
+    .landing-card p {
+        margin: 0;
+        color: var(--text-muted);
+        line-height: 1.65;
+        font-size: 0.98rem;
+    }
+
+    .landing-step-num {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(108, 99, 255, 0.18);
+        border: 1px solid rgba(108, 99, 255, 0.28);
+        margin-bottom: 0.8rem;
+        font-weight: 900;
+        font-family: 'Inter', sans-serif;
+        color: #fff;
+        font-size: 1.15rem;
+    }
+
+    .landing-faq dt {
+        font-family: 'Oswald', sans-serif;
+        margin-top: 0.95rem;
+        font-size: 1.05rem;
+    }
+
+    .landing-faq dd {
+        margin: 0.5rem 0 0;
+        color: var(--text-muted);
+        line-height: 1.7;
+    }
+
+    .landing-footer-cta {
+        margin-top: 2.25rem;
+        border-radius: 24px;
+        border: 1px solid var(--glass-border);
+        background: linear-gradient(135deg, rgba(108, 99, 255, 0.18), rgba(255, 101, 132, 0.10));
+        padding: 1.7rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.1rem;
+        flex-wrap: wrap;
+    }
+
+    .landing-footer-cta h2 {
+        margin: 0;
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.7rem;
+    }
+
+    .landing-footer-cta p {
+        margin: 0.3rem 0 0;
+        color: var(--text-muted);
+        line-height: 1.7;
+    }
+
+    @media (max-width: 768px) {
+        .landing-topbar__inner {
+            padding: 0.75rem 1rem;
+            flex-wrap: wrap;
+        }
+
+        .landing-nav {
+            gap: 0.5rem;
+        }
+
+        .landing-hero__grid {
+            grid-template-columns: 1fr;
+        }
+
+        .landing-page {
+            padding: 4.25rem 1rem 4rem;
+        }
+
+        .landing-hero h1 {
+            font-size: 2.2rem;
+        }
+
+        .landing-card {
+            padding: 1.05rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<main class="landing-page">
+    <header class="landing-topbar" aria-label="Landing navigation">
+        <div class="landing-topbar__inner">
+            <a class="landing-brand" href="{{ path('app_customer_landing') }}">
+                <span class="mark"><i class="fas fa-gears"></i></span>
+                GearGrid
+            </a>
+
+            <nav class="landing-nav" aria-label="Section navigation">
+                <a class="landing-nav-link" href="{{ path('app_customer_landing') }}"><i class="fas fa-house"></i> Home</a>
+                <a class="landing-nav-link" href="{{ path('app_customer_about') }}"><i class="fas fa-users"></i> About Us</a>
+                <a class="landing-nav-link" href="{{ path('app_customer_products') }}"><i class="fas fa-box"></i> Our Product</a>
+                <a class="landing-nav-link" href="{{ path('app_customer_services') }}"><i class="fas fa-wand-magic-sparkles"></i> Services</a>
+                <a class="landing-nav-link" href="{{ path('app_customer_contact') }}"><i class="fas fa-envelope"></i> Contact Us</a>
+            </nav>
+
+            <a class="landing-header-cta" href="{% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}{{ path('app_product_index') }}{% else %}{{ path('app_login') }}{% endif %}">
+                <i class="fas fa-bolt" aria-hidden="true"></i>
+                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                    Start Shopping
+                {% else %}
+                    Log in
+                {% endif %}
+            </a>
+        </div>
+    </header>
+
+    <div class="landing-container">
+        <!-- Section 1: Hero -->
+        <section id="home" class="landing-hero" aria-label="Customer landing hero">
+            <div class="landing-hero__grid">
+                <div>
+                    <div class="landing-eyebrow">
+                        <i class="fas fa-gem" style="color: var(--primary);"></i>
+                        GearGrid Customer Landing
+                    </div>
+                    <h1>Manage products, orders, and activity in one place.</h1>
+                    <p>Browse the catalog, create orders, and stay updated with responsive pages built to be easy to read on mobile.</p>
+                    <div class="landing-cta">
+                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                            <a href="{{ path('app_product_index') }}" class="landing-btn primary">
+                                <i class="fas fa-box"></i>
+                                Browse Products
+                            </a>
+                            <a href="{{ path('app_order_new') }}" class="landing-btn secondary">
+                                <i class="fas fa-plus"></i>
+                                Create an Order
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_login') }}" class="landing-btn primary">
+                                <i class="fas fa-right-to-bracket"></i>
+                                Log in to continue
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <aside class="landing-side-card" aria-label="Quick highlights">
+                    <h3>Why customers love it</h3>
+                    <div class="landing-bullets">
+                        <div class="landing-bullet">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Mobile-first layout that stays readable.</span>
+                        </div>
+                        <div class="landing-bullet">
+                            <i class="fas fa-arrows-rotate"></i>
+                            <span>Clear navigation to the tasks you do most.</span>
+                        </div>
+                        <div class="landing-bullet">
+                            <i class="fas fa-shield-halved"></i>
+                            <span>Consistent UI and modern visual styling.</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- Section 2: Our Product -->
+        <section id="products" class="landing-section" aria-label="Our product">
+            <h2 class="section-title"><i class="fas fa-box"></i> Our Product</h2>
+            <div class="landing-grid">
+                <div class="landing-card">
+                    <div class="icon"><i class="fas fa-layer-group"></i></div>
+                    <h3>Catalog browsing</h3>
+                    <p>Find categories and product details with responsive cards.</p>
+                </div>
+
+                <div class="landing-card">
+                    <div class="icon" style="background: rgba(74, 222, 128, 0.14); border-color: rgba(74, 222, 128, 0.24);">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <h3>Order creation</h3>
+                    <p>Create orders quickly and keep your workflow organized.</p>
+                </div>
+
+                <div class="landing-card">
+                    <div class="icon" style="background: rgba(255, 101, 132, 0.14); border-color: rgba(255, 101, 132, 0.24);">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Fast access</h3>
+                    <p>Short paths to the pages you use the most.</p>
+                </div>
+
+                <div class="landing-card">
+                    <div class="icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+                    <h3>Consistent branding</h3>
+                    <p>Unified colors, spacing, and card styling across the experience.</p>
+                </div>
+            </div>
+
+            <div class="landing-cta" style="margin-top: 1.4rem;">
+                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                    <a href="{{ path('app_product_index') }}" class="landing-btn primary">
+                        <i class="fas fa-box"></i>
+                        View Products
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="landing-btn primary">
+                        <i class="fas fa-right-to-bracket"></i>
+                        Log in to view
+                    </a>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Section 3: About Us -->
+        <section id="about" class="landing-section" aria-label="About us">
+            <h2 class="section-title"><i class="fas fa-users"></i> About Us</h2>
+
+            <div class="landing-grid">
+                <div class="landing-card">
+                    <div class="icon"><i class="fas fa-bullseye"></i></div>
+                    <h3>Our goal</h3>
+                    <p>Help customers manage products and orders with clear, responsive pages.</p>
+                </div>
+
+                <div class="landing-card">
+                    <div class="icon" style="background: rgba(108, 99, 255, 0.10); border-color: rgba(108, 99, 255, 0.25);">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Our mission</h3>
+                    <p>Make it easy to find what you need and take action without confusion.</p>
+                </div>
+
+                <div class="landing-card">
+                    <div class="icon" style="background: rgba(74, 222, 128, 0.10); border-color: rgba(74, 222, 128, 0.25);">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>Our promise</h3>
+                    <p>Readable typography, consistent design, and mobile-friendly layout.</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.8rem;">
+                <h3 class="section-title" style="font-size: 1.35rem; margin-bottom: 1rem;">
+                    <i class="fas fa-user-tie"></i> Meet the Team
+                </h3>
+
+                <div class="landing-grid">
+                    <div class="landing-card">
+                        <div class="icon"><i class="fas fa-user"></i></div>
+                        <h3>Alex Mercado</h3>
+                        <p>Project Manager</p>
+                    </div>
+
+                    <div class="landing-card">
+                        <div class="icon" style="background: rgba(255, 101, 132, 0.14); border-color: rgba(255, 101, 132, 0.24);">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h3>Sam Rivera</h3>
+                        <p>Frontend Developer</p>
+                    </div>
+
+                    <div class="landing-card">
+                        <div class="icon" style="background: rgba(74, 222, 128, 0.14); border-color: rgba(74, 222, 128, 0.24);">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3>Jamie Cruz</h3>
+                        <p>Backend Developer</p>
+                    </div>
+
+                    <div class="landing-card">
+                        <div class="icon" style="background: rgba(108, 99, 255, 0.12); border-color: rgba(108, 99, 255, 0.25);">
+                            <i class="fas fa-pen-ruler"></i>
+                        </div>
+                        <h3>Taylor Nguyen</h3>
+                        <p>UX Designer</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Services -->
+        <section id="services" class="landing-section" aria-label="Services">
+            <h2 class="section-title"><i class="fas fa-wand-magic-sparkles"></i> Services</h2>
+            <div class="landing-grid">
+                <div class="landing-card">
+                    <div class="icon"><i class="fas fa-cart-shopping"></i></div>
+                    <h3>Order Workflow</h3>
+                    <p>Create and review orders with a clean layout.</p>
+                </div>
+
+                <div class="landing-card">
+                    <div class="icon" style="background: rgba(108, 99, 255, 0.10); border-color: rgba(108, 99, 255, 0.25);">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3>Product Organization</h3>
+                    <p>Browse products and categories with responsive cards.</p>
+                </div>
+
+                <div class="landing-card">
+                    <div class="icon" style="background: rgba(255, 101, 132, 0.10); border-color: rgba(255, 101, 132, 0.25);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Activity Tracking</h3>
+                    <p>Stay updated with visible summaries of recent activity.</p>
+                </div>
+
+                <div class="landing-card">
+                    <div class="icon" style="background: rgba(74, 222, 128, 0.10); border-color: rgba(74, 222, 128, 0.25);">
+                        <i class="fas fa-mobile-screen-button"></i>
+                    </div>
+                    <h3>Mobile Readability</h3>
+                    <p>Typography and spacing that remain readable on small devices.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Contact Us -->
+        <section id="contact" class="landing-section" aria-label="Contact us">
+            <h2 class="section-title"><i class="fas fa-envelope"></i> Contact Us</h2>
+
+            <div class="landing-card">
+                <h3 style="margin-top: 0;">Send us a message</h3>
+                <p style="margin-bottom: 1rem;">
+                    Complete the form below. After you submit, the confirmation message will appear inside the embedded form.
+                    Replace the embed URL with your own form link when you’re ready.
+                </p>
+
+                <div style="width: 100%; overflow: hidden; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.10);">
+                    <iframe
+                        src="https://docs.google.com/forms/d/e/REPLACE_WITH_YOUR_FORM_ID/viewform?embedded=true"
+                        width="100%"
+                        height="620"
+                        frameborder="0"
+                        marginheight="0"
+                        marginwidth="0"
+                        style="border: 0;"
+                        allow="fullscreen"
+                    ></iframe>
+                </div>
+
+                <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.95rem;">
+                    Need Brevo instead of Google Forms? Tell me which service your class wants and paste the embed code/URL.
+                </p>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}
+
