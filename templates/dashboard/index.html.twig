@@ -1,337 +1,102 @@
+{# templates/dashboard/index.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Dashboard | GearGrid{% endblock %}
 
 {% block stylesheets %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-
-<style>
-    :root {
-        --primary: #6C63FF;
-        --secondary: #ff6584;
-        --danger: #dc3545;
-        --success: #4ade80;
-        --bg-dark: #12121e;
-        --card-bg: #1e1e2f;
-        --text-muted: #88889b;
-        --glass-border: rgba(255, 255, 255, 0.08);
-    }
-
-    .dashboard main {
-        padding: 2rem 3rem;
-        min-height: 100vh;
-        background: var(--bg-dark);
-        font-family: 'Inter', sans-serif;
-    }
-
-    /* --- TOP BAR STYLING --- */
-    .top-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 3rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--glass-border);
-    }
-
-    .header-left h1 {
-        font-family: 'Oswald', sans-serif;
-        color: #fff;
-        font-size: 2rem;
-        letter-spacing: 1px;
-        margin: 0;
-    }
-
-    .breadcrumb {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        margin-top: 8px;
-    }
-
-    .breadcrumb a {
-        color: var(--text-muted);
-        text-decoration: none;
-        transition: color 0.2s;
-    }
-
-    .breadcrumb a:hover { color: var(--primary); }
-
-    .breadcrumb i { font-size: 0.7rem; opacity: 0.5; }
-
-    .breadcrumb span { color: var(--secondary); font-weight: 600; }
-
-    .header-right .profile {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        background: rgba(255, 255, 255, 0.03);
-        padding: 8px 20px;
-        border-radius: 50px;
-        border: 1px solid var(--glass-border);
-        transition: all 0.3s ease;
-    }
-
-    .header-right .profile:hover {
-        background: rgba(255, 255, 255, 0.08);
-        transform: translateY(-2px);
-    }
-
-    .text-info {
-        display: flex;
-        flex-direction: column;
-        text-align: right;
-    }
-
-    .text-info .name { color: #fff; font-weight: 600; font-size: 0.9rem; }
-    .text-info .role { color: var(--text-muted); font-size: 0.75rem; }
-
-    .avatar-wrapper { position: relative; width: 42px; height: 42px; }
-    .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--primary); }
-    .status-indicator {
-        position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px;
-        background: #4ade80; border: 2px solid var(--bg-dark); border-radius: 50%;
-    }
-
-    /* --- STATS CARDS --- */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 3rem;
-    }
-
-    .stat-card {
-        background: var(--card-bg);
-        padding: 2rem;
-        border-radius: 20px;
-        border: 1px solid var(--glass-border);
-        position: relative;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    .stat-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-    }
-
-    .stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--primary), #8b7fff); }
-    .stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--success), #6bff9f); }
-    .stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--secondary), #ff8ba3); }
-    .stat-card:nth-child(4)::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-    }
-
-    .stat-card-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 1.5rem;
-    }
-
-    .stat-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        color: #fff;
-    }
-
-    .stat-card:nth-child(1) .stat-icon { background: linear-gradient(135deg, var(--primary), #8b7fff); }
-    .stat-card:nth-child(2) .stat-icon { background: linear-gradient(135deg, var(--success), #6bff9f); }
-    .stat-card:nth-child(3) .stat-icon { background: linear-gradient(135deg, var(--secondary), #ff8ba3); }
-    .stat-card:nth-child(4) .stat-icon { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
-
-    .stat-value {
-        font-family: 'Oswald', sans-serif;
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #fff;
-        margin-bottom: 0.5rem;
-        line-height: 1;
-    }
-
-    .stat-label {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-weight: 600;
-    }
-
-    /* --- TABLE SECTION --- */
-    .table-section {
-        margin-top: 2rem;
-    }
-
-    .section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 1.5rem;
-    }
-
-    .section-header h2 {
-        font-family: 'Oswald', sans-serif;
-        color: #fff;
-        font-size: 1.5rem;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .section-header h2 i {
-        color: var(--primary);
-    }
-
-    .table-card {
-        background: var(--card-bg);
-        padding: 2rem;
-        border-radius: 24px;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        border: 1px solid var(--glass-border);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .table-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(90deg, var(--primary), var(--secondary));
-    }
-
-    /* --- DATA TABLE STYLING --- */
-    .styled-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .styled-table thead {
-        background: rgba(255, 255, 255, 0.03);
-    }
-
-    .styled-table th {
-        padding: 1rem 1.2rem;
-        text-align: left;
-        color: var(--text-muted);
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 1.5px;
-        border-bottom: 2px solid var(--glass-border);
-    }
-
-    .styled-table td {
-        padding: 1.2rem 1.2rem;
-        color: #fff;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .styled-table tbody tr {
-        transition: all 0.2s ease;
-    }
-
-    .styled-table tbody tr:hover {
-        background: rgba(255, 255, 255, 0.03);
-    }
-
-    .styled-table tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .badge {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .badge-secondary {
-        color: var(--secondary);
-        font-family: monospace;
-        background: rgba(255,101,132,0.1);
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .status-pending {
-        background: rgba(251, 191, 36, 0.2);
-        color: #fbbf24;
-    }
-
-    .status-completed {
-        background: rgba(74, 222, 128, 0.2);
-        color: var(--success);
-    }
-
-    /* --- RESPONSIVE --- */
-    @media screen and (max-width: 768px) {
-        .dashboard main {
-            padding: 1.5rem 1rem;
+    <link rel="stylesheet" href="{{ asset('CSS/admin_layout.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- ONLY CHANGING THE BACKGROUND FOR VISIBILITY --- */
+        body {
+            /* Solid deep background so all text is 100% visible */
+            background-color: #0d1117 !important; 
+            background-image: none !important;
+            color: #f8fafc;
         }
 
-        .top-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 20px;
+        /* Ensuring cards have a solid, slightly lighter background to stand out from the body */
+        .modern-stat-card, .chart-card, .product-rank-card, .table-card {
+            background-color: #161b22 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
 
-        .header-right {
-            width: 100%;
+        /* --- REST OF YOUR DESIGN UNCHANGED --- */
+        .content-area { max-width: 1200px; margin: 0 auto; width: 100%; gap: 2rem; }
+        
+        .section-label {
+            font-size: 0.75rem; font-weight: 700; color: #64748b; letter-spacing: 1.5px;
+            text-transform: uppercase; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
         }
+        .section-label i { color: var(--warning); font-size: 0.9rem; }
 
-        .header-right .profile {
-            justify-content: space-between;
+        .quick-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .action-btn {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.7rem 1.2rem; border-radius: 10px; color: #e2e8f0; font-weight: 500; font-size: 0.9rem;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
         }
+        .action-btn:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); transform: translateY(-2px); }
+        .action-btn i { opacity: 0.7; }
 
-        .stats-grid {
-            grid-template-columns: 1fr;
+        .modern-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
+        .modern-stat-card {
+            border-radius: 16px; padding: 1.5rem; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; transition: transform 0.3s ease, border-color 0.3s ease;
         }
+        .modern-stat-card:hover { transform: translateY(-5px); border-color: rgba(255, 255, 255, 0.15); }
+        
+        .modern-stat-card.blue { border-top: 3px solid var(--primary); }
+        .modern-stat-card.green { border-top: 3px solid var(--success); }
+        .modern-stat-card.red { border-top: 3px solid var(--secondary); }
+        .modern-stat-card.yellow { border-top: 3px solid var(--warning); }
 
-        .table-card {
-            padding: 1rem;
-            overflow-x: auto;
-        }
+        .m-stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+        .m-icon-box { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .m-icon-box.blue { background: rgba(108, 99, 255, 0.15); color: var(--primary); }
+        .m-icon-box.green { background: rgba(74, 222, 128, 0.15); color: var(--success); }
+        .m-icon-box.red { background: rgba(255, 101, 132, 0.15); color: var(--secondary); }
+        .m-icon-box.yellow { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
 
-        .styled-table {
-            font-size: 0.85rem;
-        }
+        .m-trend { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+        .m-trend.up { background: rgba(74, 222, 128, 0.1); color: var(--success); border: 1px solid rgba(74, 222, 128, 0.2); }
+        .m-trend.down { background: rgba(255, 101, 132, 0.1); color: var(--secondary); border: 1px solid rgba(255, 101, 132, 0.2); }
 
-        .styled-table th,
-        .styled-table td {
-            padding: 0.75rem 0.5rem;
+        .m-stat-val { font-size: 2rem; font-weight: 700; color: #fff; line-height: 1; margin-bottom: 0.4rem; }
+        .m-stat-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-bottom: 1.5rem; }
+
+        .sparkline-container { width: 100%; height: 40px; margin-top: auto; position: absolute; bottom: 0; left: 0; right: 0;}
+        .sparkline-container svg { width: 100%; height: 100%; preserveAspectRatio: none; }
+
+        .chart-card { border-radius: 16px; padding: 1.5rem; border-top: 3px solid #8b5cf6; }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .chart-title { font-size: 1.1rem; font-weight: 600; color: #fff; }
+        .chart-filters { display: flex; gap: 8px; }
+        .chart-filter-btn {
+            background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);
+            padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.2s;
         }
-    }
-</style>
+        .chart-filter-btn:hover, .chart-filter-btn.active { background: rgba(255,255,255,0.1); color: #fff; }
+        .chart-wrapper { width: 100%; height: 250px; position: relative; }
+
+        .top-products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+        .product-rank-card {
+            border-radius: 12px; padding: 1.2rem; display: flex; align-items: center; gap: 1rem; transition: transform 0.2s;
+        }
+        .product-rank-card:hover { background: rgba(255,255,255,0.03); transform: translateX(5px); }
+        .p-rank { font-size: 1.2rem; font-weight: 800; color: var(--warning); min-width: 25px; }
+        .p-details { flex: 1; }
+        .p-name { font-weight: 600; color: #f8fafc; font-size: 0.95rem; margin-bottom: 2px; }
+        .p-orders { font-size: 0.75rem; color: var(--text-muted); }
+        .p-price { font-weight: 700; color: var(--success); font-size: 1.1rem; }
+
+        .status-dots-container { display: flex; gap: 1.5rem; padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); width: fit-content; }
+        .status-pill { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: #cbd5e1; font-weight: 500; }
+        .glow-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .glow-dot.warning { background: var(--warning); box-shadow: 0 0 10px var(--warning); }
+        .glow-dot.success { background: var(--success); box-shadow: 0 0 10px var(--success); }
+    </style>
 {% endblock %}
 
 {% block body %}
@@ -339,14 +104,10 @@
     {% include 'partials/_sidebar.html.twig' %}
 
     <main class="main-content">
-        <div class="top-header">
+        <div class="top-header animate-up">
             <div class="header-left">
-                <h1>{% if isAdmin|default(false) %}Admin Dashboard{% else %}Staff Dashboard{% endif %}</h1>
-                <nav class="breadcrumb">
-                    <span>Overview</span>
-                </nav>
+                <h1>{% if isAdmin|default(false) %}Admin Console{% else %}Staff Portal{% endif %}</h1>
             </div>
-
             <div class="header-right">
                 <div class="user-info">
                     <div class="profile">
@@ -354,229 +115,220 @@
                             <span class="name">{{ app.user.name|default(app.user.username|default('Admin')) }}</span>
                             <span class="role">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</span>
                         </div>
-                        <div class="avatar-wrapper">
-                            <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User">
-                            <span class="status-indicator"></span>
-                        </div>
-                        <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                        <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User">
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="content-area">
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-icon">
-                            <i class="fas fa-box"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value">{{ totalProducts|default(0) }}</div>
-                    <div class="stat-label">Total Products</div>
-                </div>
-
-                {% if isAdmin|default(false) %}
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value">{{ totalUsers|default(0) }}</div>
-                    <div class="stat-label">Registered Users</div>
-                </div>
-                {% else %}
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-icon">
-                            <i class="fas fa-tags"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value">{{ totalCategories|default(0) }}</div>
-                    <div class="stat-label">Categories</div>
-                </div>
-                {% endif %}
-
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-icon">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value">{{ totalOrders|default(0) }}</div>
-                    <div class="stat-label">Total Orders</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value">₱{{ recentSales|default(0)|number_format(2, '.', ',') }}</div>
-                    <div class="stat-label">Recent Sales</div>
+            
+            <div class="animate-up delay-1">
+                <div class="section-label"><i class="fas fa-lightbulb"></i> Quick Actions Bar</div>
+                <div class="quick-actions">
+                    <a href="{{ path('app_product_new') }}" class="action-btn"><i class="fas fa-plus"></i> Add Product</a>
+                    <a href="{{ path('app_order_index') }}" class="action-btn"><i class="fas fa-box"></i> View Orders</a>
+                    {% if isAdmin|default(false) %}
+                        <a href="{{ path('app_user_index') }}" class="action-btn" style="color: #c084fc;"><i class="fas fa-user-shield"></i> Manage Users</a>
+                    {% endif %}
+                    <a href="#" class="action-btn" style="color: #94a3b8;"><i class="fas fa-download"></i> Export Report</a>
                 </div>
             </div>
 
-            <!-- Recent Orders Table -->
-            <div class="table-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-receipt"></i> Recent Orders</h2>
-                    <a href="{{ path('app_order_index') }}" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
-                        View All <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
+            <div class="animate-up delay-2">
+                <div class="section-label"><i class="fas fa-chart-pie"></i> Stat Cards — With Trend Badges & Sparklines</div>
+                <div class="modern-stats-grid">
+                    
+                    <div class="modern-stat-card blue">
+                        <div class="m-stat-header">
+                            <div class="m-icon-box blue"><i class="fas fa-box-open"></i></div>
+                            <div class="m-trend up"><i class="fas fa-arrow-up"></i> 12%</div>
+                        </div>
+                        <div class="m-stat-val">{{ totalProducts|default(0) }}</div>
+                        <div class="m-stat-label">Total Products</div>
+                        <div class="sparkline-container">
+                            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="grad-blue" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#6C63FF" stop-opacity="0.4"/><stop offset="100%" stop-color="#6C63FF" stop-opacity="0"/></linearGradient>
+                                </defs>
+                                <path d="M0,30 L0,20 L20,15 L40,22 L60,10 L80,18 L100,5 L100,30 Z" fill="url(#grad-blue)"/>
+                                <polyline points="0,20 20,15 40,22 60,10 80,18 100,5" fill="none" stroke="#6C63FF" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
 
-                <div class="table-card">
-                    <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Status</th>
-                                <th>Total</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for order in recentOrders %}
-                                <tr>
-                                    <td><span class="badge badge-secondary">#{{ order.id }}</span></td>
-                                    <td style="font-weight: 600;">{{ order.customerName }}</td>
-                                    <td>
-                                        <span class="status-badge 
-                                            {% if order.status == 'Pending' %}status-pending{% endif %}
-                                            {% if order.status == 'Completed' %}status-completed{% endif %}
-                                        ">
-                                            {{ order.status }}
-                                        </span>
-                                    </td>
-                                    <td style="color: var(--success); font-weight: 600;">₱{{ order.totalPrice|number_format(2, '.', ',') }}</td>
-                                    <td style="color: var(--text-muted);">{{ order.createdAt ? order.createdAt|date('M d, Y') : 'N/A' }}</td>
-                                </tr>
-                            {% else %}
-                                <tr>
-                                    <td colspan="5" style="text-align:center; padding: 2rem; color: var(--text-muted);">
-                                        <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
-                                        No recent orders found.
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="modern-stat-card green">
+                        <div class="m-stat-header">
+                            <div class="m-icon-box green">{% if isAdmin|default(false) %}<i class="fas fa-users"></i>{% else %}<i class="fas fa-tags"></i>{% endif %}</div>
+                            <div class="m-trend up"><i class="fas fa-arrow-up"></i> 8%</div>
+                        </div>
+                        <div class="m-stat-val">{% if isAdmin|default(false) %}{{ totalUsers|default(0) }}{% else %}{{ totalCategories|default(0) }}{% endif %}</div>
+                        <div class="m-stat-label">{% if isAdmin|default(false) %}Registered Users{% else %}Categories{% endif %}</div>
+                        <div class="sparkline-container">
+                            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="grad-green" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#4ade80" stop-opacity="0.4"/><stop offset="100%" stop-color="#4ade80" stop-opacity="0"/></linearGradient>
+                                </defs>
+                                <path d="M0,30 L0,25 L30,20 L60,15 L100,5 L100,30 Z" fill="url(#grad-green)"/>
+                                <polyline points="0,25 30,20 60,15 100,5" fill="none" stroke="#4ade80" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="modern-stat-card red">
+                        <div class="m-stat-header">
+                            <div class="m-icon-box red"><i class="fas fa-shopping-cart"></i></div>
+                            <div class="m-trend down"><i class="fas fa-arrow-down"></i> 3%</div>
+                        </div>
+                        <div class="m-stat-val">{{ totalOrders|default(0) }}</div>
+                        <div class="m-stat-label">Total Orders</div>
+                        <div class="sparkline-container">
+                            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="grad-red" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#ff6584" stop-opacity="0.4"/><stop offset="100%" stop-color="#ff6584" stop-opacity="0"/></linearGradient>
+                                </defs>
+                                <path d="M0,30 L0,5 L20,15 L40,8 L60,25 L80,18 L100,28 L100,30 Z" fill="url(#grad-red)"/>
+                                <polyline points="0,5 20,15 40,8 60,25 80,18 100,28" fill="none" stroke="#ff6584" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="modern-stat-card yellow">
+                        <div class="m-stat-header">
+                            <div class="m-icon-box yellow"><i class="fas fa-chart-line"></i></div>
+                            <div class="m-trend up"><i class="fas fa-arrow-up"></i> 21%</div>
+                        </div>
+                        <div class="m-stat-val">₱{{ recentSales|default(0)|number_format(0, '.', ',') }}</div>
+                        <div class="m-stat-label">Recent Sales</div>
+                        <div class="sparkline-container">
+                            <svg viewBox="0 0 100 30" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="grad-yellow" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#fbbf24" stop-opacity="0.4"/><stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/></linearGradient>
+                                </defs>
+                                <path d="M0,30 L0,22 L25,18 L50,20 L75,10 L100,5 L100,30 Z" fill="url(#grad-yellow)"/>
+                                <polyline points="0,22 25,18 50,20 75,10 100,5" fill="none" stroke="#fbbf24" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Recent Products Table -->
-            {% if isAdmin|default(false) or isStaff|default(false) %}
-            <div class="table-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-boxes"></i> Recently Added Products</h2>
-                    <a href="{{ path('app_product_index') }}" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
-                        View All <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-
-                <div class="table-card">
-                    <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th>Product ID</th>
-                                <th>Name</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Created By</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for product in recentProducts %}
-                                <tr>
-                                    <td><span class="badge badge-secondary">#{{ product.id }}</span></td>
-                                    <td style="font-weight: 600;">{{ product.name }}</td>
-                                    <td>{{ product.category ? product.category.name : 'N/A' }}</td>
-                                    <td style="color: var(--success); font-weight: 600;">₱{{ product.price|number_format(2, '.', ',') }}</td>
-                                    <td style="color: var(--primary);">{{ product.createdBy ? product.createdBy.name : 'Admin' }}</td>
-                                    <td style="color: var(--text-muted);">{{ product.createdAt ? product.createdAt|date('M d, Y') : 'N/A' }}</td>
-                                </tr>
-                            {% else %}
-                                <tr>
-                                    <td colspan="6" style="text-align:center; padding: 2rem; color: var(--text-muted);">
-                                        <i class="fas fa-box-open" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
-                                        No products found.
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+            <div class="animate-up delay-3">
+                <div class="section-label"><i class="fas fa-chart-area"></i> Revenue Chart (Drop-in)</div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Revenue Overview</div>
+                        <div class="chart-filters">
+                            <button class="chart-filter-btn">7D</button>
+                            <button class="chart-filter-btn active">30D</button>
+                            <button class="chart-filter-btn">90D</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <!-- Activity Logs Table (Admin Only) -->
-            <div class="table-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-history"></i> Recent Activity Logs</h2>
-                    <a href="{{ path('app_log_index') }}" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
-                        View All <i class="fas fa-arrow-right"></i>
-                    </a>
+            <div class="animate-up delay-4">
+                <div class="section-label"><i class="fas fa-trophy"></i> Top Products & Status</div>
+                
+                <div class="top-products-grid" style="margin-bottom: 2rem;">
+                    <div class="product-rank-card">
+                        <div class="p-rank">#1</div>
+                        <div class="p-details">
+                            <div class="p-name">Shimano Deore XT</div>
+                            <div class="p-orders">142 orders</div>
+                        </div>
+                        <div class="p-price">₱28,400</div>
+                    </div>
+                    <div class="product-rank-card">
+                        <div class="p-rank" style="color: #94a3b8;">#2</div>
+                        <div class="p-details">
+                            <div class="p-name">Fox 36 Fork 29"</div>
+                            <div class="p-orders">98 orders</div>
+                        </div>
+                        <div class="p-price">₱21,700</div>
+                    </div>
+                    <div class="product-rank-card">
+                        <div class="p-rank" style="color: #b45309;">#3</div>
+                        <div class="p-details">
+                            <div class="p-name">SRAM Eagle GX</div>
+                            <div class="p-orders">87 orders</div>
+                        </div>
+                        <div class="p-price">₱19,200</div>
+                    </div>
+                    <div class="product-rank-card">
+                        <div class="p-rank" style="color: #475569;">#4</div>
+                        <div class="p-details">
+                            <div class="p-name">Maxxis Minion DHF</div>
+                            <div class="p-orders">73 orders</div>
+                        </div>
+                        <div class="p-price">₱12,800</div>
+                    </div>
                 </div>
 
-                <div class="table-card">
-                    <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th>Action</th>
-                                <th>User</th>
-                                <th>Entity</th>
-                                <th>Message</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for log in recentLogs %}
-                                <tr>
-                                    <td>
-                                        <span class="badge" style="
-                                            {% if log.action == 'LOGIN' %}
-                                                background: rgba(74, 222, 128, 0.2); color: var(--success);
-                                            {% elseif log.action == 'LOGOUT' %}
-                                                background: rgba(251, 191, 36, 0.2); color: #fbbf24;
-                                            {% elseif log.action == 'Create' %}
-                                                background: rgba(108, 99, 255, 0.2); color: var(--primary);
-                                            {% elseif log.action == 'Update' %}
-                                                background: rgba(255, 101, 132, 0.2); color: var(--secondary);
-                                            {% elseif log.action == 'Delete' %}
-                                                background: rgba(220, 53, 69, 0.2); color: var(--danger);
-                                            {% else %}
-                                                background: rgba(255, 255, 255, 0.1); color: #fff;
-                                            {% endif %}
-                                        ">{{ log.action }}</span>
-                                    </td>
-                                    <td style="font-weight: 600;">{{ log.userName }}</td>
-                                    <td style="color: var(--primary);">{{ log.entity ? log.entity : '—' }}</td>
-                                    <td style="color: var(--text-muted); max-width: 300px; overflow: hidden; text-overflow: ellipsis;">{{ log.message }}</td>
-                                    <td style="color: var(--text-muted); white-space: nowrap;">{{ log.createdAt ? log.createdAt|date('M d, H:i') : 'N/A' }}</td>
-                                </tr>
-                            {% else %}
-                                <tr>
-                                    <td colspan="5" style="text-align:center; padding: 2rem; color: var(--text-muted);">
-                                        <i class="fas fa-file-alt" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
-                                        No activity logs found.
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="section-label"><i class="fas fa-circle"></i> Glowing Status Dots</div>
+                <div class="status-dots-container">
+                    <div class="status-pill">
+                        <span class="glow-dot warning"></span> Pending — 24
+                    </div>
+                    <div class="status-pill">
+                        <span class="glow-dot success"></span> Completed — 118
+                    </div>
                 </div>
             </div>
-            {% endif %}
+
         </div>
     </main>
 </div>
 {% endblock %}
 
 {% block javascripts %}
-{{ parent() }}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            let gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, 'rgba(108, 99, 255, 0.4)');
+            gradient.addColorStop(1, 'rgba(108, 99, 255, 0.0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [12000, 19500, 15000, 21800, 17200, 28500, 23800],
+                        borderColor: '#6C63FF',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#6C63FF',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(11, 17, 32, 0.9)',
+                            displayColors: false,
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#64748b' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } }
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}

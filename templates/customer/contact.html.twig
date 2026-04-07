@@ -1,71 +1,86 @@
-{% extends 'base.html.twig' %}
+{# templates/customer/contact.html.twig #}
+{% extends 'customer/base_customer.html.twig' %}
 
 {% block title %}Contact Us | GearGrid{% endblock %}
 
 {% block stylesheets %}
 <style>
-    :root { --primary:#6C63FF; --text-muted:#a8b4c3; }
-    .landing-page {
-        min-height: 100vh; color:#fff;
-        padding: 5.25rem 2.25rem 5rem;
-        background: radial-gradient(circle at 20% 20%, rgba(108, 99, 255, 0.18), transparent 38%),
-                    radial-gradient(circle at 85% 0%, rgba(255, 101, 132, 0.14), transparent 30%),
-                    linear-gradient(135deg, rgba(11, 17, 32, 1) 0%, rgba(15, 22, 36, 1) 45%, rgba(11, 20, 35, 1) 100%);
+    .contact-header { text-align: center; margin-bottom: 4rem; }
+    
+    .contact-title {
+        font-family: 'Oswald', sans-serif; font-size: 4rem; margin-bottom: 1rem;
+        background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); line-height: 1.1;
     }
-    .landing-container { max-width: 1320px; margin: 0 auto; }
-    .landing-topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(11, 17, 32, 0.78); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-    .landing-topbar__inner { max-width: 1320px; margin: 0 auto; padding: 0.95rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: nowrap; }
-    .landing-brand { display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:#fff; font-weight:900; letter-spacing:0.3px; font-family:'Oswald',sans-serif; font-size:1.25rem; }
-    .landing-brand .mark { width: 38px; height: 38px; border-radius: 14px; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, rgba(108, 99, 255, 0.25), rgba(255, 101, 132, 0.18)); border:1px solid rgba(255, 255, 255, 0.12); flex:0 0 auto; }
-    .landing-nav { display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; flex: 1 1 auto; justify-content: flex-end; min-width: 0; }
-    .landing-nav-link { display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:0.55rem 0.9rem; border-radius:999px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.92); font-weight:800; font-family:'Inter',sans-serif; font-size:0.95rem; transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
-    .landing-nav-link:hover { transform: translateY(-2px); background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.14); }
 
-    .landing-header-cta {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 0.6rem 1rem;
-        border-radius: 999px;
-        text-decoration: none;
-        font-family: 'Inter', sans-serif;
-        font-weight: 900;
-        font-size: 0.95rem;
-        color: #fff;
-        background: linear-gradient(135deg, var(--primary), rgba(139, 127, 255, 1));
-        box-shadow: 0 16px 40px rgba(108, 99, 255, 0.20);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        transition: transform 0.2s ease, filter 0.2s ease;
-        white-space: nowrap;
-        flex: 0 0 auto;
-        margin-left: auto;
+    .contact-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 3rem; }
+    
+    .contact-info {
+        background: linear-gradient(to bottom, rgba(255,255,255,0.03), transparent);
+        border: 1px solid var(--glass-border); border-radius: 24px; padding: 2.5rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
     }
-    .landing-header-cta:hover { transform: translateY(-2px); filter: brightness(1.08); }
 
-    .landing-section { margin-top:1.9rem; scroll-margin-top:110px; }
-    .section-title { display:flex; align-items:center; gap:10px; margin-bottom:1rem; font-family:'Oswald',sans-serif; font-size:1.55rem; }
-    .section-title i { color: var(--primary); }
-    .landing-card { border-radius:18px; border:1px solid rgba(255,255,255,0.10); background:rgba(255,255,255,0.03); padding:1.2rem; box-shadow:0 12px 35px rgba(0,0,0,0.25); }
-    .landing-card p { margin:0; color: var(--text-muted); line-height:1.65; }
-    @media (max-width: 768px) { .landing-topbar__inner { flex-wrap: wrap; padding: 0.75rem 1rem; } .landing-page { padding-top: 4.25rem; } }
+    .contact-info img { width: 100%; border-radius: 16px; margin-bottom: 2rem; border: 1px solid var(--glass-border-hover); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+    
+    .contact-item { display: flex; align-items: center; gap: 20px; margin-bottom: 1.5rem; color: var(--text-main); transition: transform 0.3s ease; }
+    .contact-item:hover { transform: translateX(5px); }
+    
+    .contact-icon-box {
+        width: 45px; height: 45px; border-radius: 12px; background: rgba(108, 99, 255, 0.15);
+        color: #a5b4fc; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        border: 1px solid rgba(108, 99, 255, 0.3); box-shadow: 0 5px 15px rgba(108, 99, 255, 0.2);
+    }
+
+    .contact-item span { font-size: 1.05rem; font-weight: 500; }
+
+    .form-card {
+        background: var(--glass-bg); border: 1px solid var(--glass-border);
+        border-radius: 24px; padding: 2.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 992px) {
+        .contact-grid { grid-template-columns: 1fr; }
+        .contact-title { font-size: 3rem; }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
-<main class="landing-page">
-    {% include 'customer/_topnav.html.twig' %}
+    <section class="landing-section animate-up">
+        
+        <div class="contact-header">
+            <h2 class="contact-title">Get in Touch</h2>
+            <p style="color: var(--text-muted); font-size: 1.15rem; max-width: 600px; margin: 0 auto; line-height: 1.7;">
+                Have a question about a product, need help with an order, or want to discuss enterprise solutions? We're here to help.
+            </p>
+        </div>
 
-    <div class="landing-container">
-        <section class="landing-section" aria-label="Contact form">
-            <h2 class="section-title"><i class="fas fa-envelope"></i> Contact Us</h2>
+        <div class="contact-grid">
+            <div class="contact-info animate-up delay-1">
+                <img src="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=600&q=80" alt="Contact Support">
+                
+                <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.8rem; margin-bottom: 2rem; color: #fff;">Contact Details</h3>
+                
+                <div class="contact-item">
+                    <div class="contact-icon-box"><i class="fas fa-location-dot"></i></div>
+                    <span>San Miguel Bacong Neg. Or</span>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon-box" style="background: rgba(74, 222, 128, 0.15); color: #4ade80; border-color: rgba(74, 222, 128, 0.3);"><i class="fas fa-phone"></i></div>
+                    <span>+1 (555) 123-4567</span>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon-box" style="background: rgba(255, 101, 132, 0.15); color: #ff6584; border-color: rgba(255, 101, 132, 0.3);"><i class="fas fa-envelope-open-text"></i></div>
+                    <span>geargrid@gmail.com</span>
+                </div>
+            </div>
 
-            <div class="landing-card">
-                <p style="margin-bottom:1rem;">
-                    Submit the form below. You will receive a confirmation message inside the embedded form after submission.
-                    Replace the embed URL with your Google Forms/Brevo embed link.
-                </p>
-
-                <div style="width:100%; overflow:hidden; border-radius:16px; border:1px solid rgba(255,255,255,0.10);">
+            <div class="form-card animate-up delay-2">
+                <h3 style="font-family: 'Oswald', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; color: #fff;">Send us a message</h3>
+                
+                <div style="width: 100%; overflow: hidden; border-radius: 16px; border: 1px solid var(--glass-border-hover); box-shadow: 0 10px 30px rgba(0,0,0,0.3); background: #0f1624;">
                     <iframe
                         src="https://docs.google.com/forms/d/e/REPLACE_WITH_YOUR_FORM_ID/viewform?embedded=true"
                         width="100%"
@@ -73,13 +88,11 @@
                         frameborder="0"
                         marginheight="0"
                         marginwidth="0"
-                        style="border:0;"
+                        style="border: 0;"
                         allow="fullscreen"
-                    ></iframe>
+                    >Loading...</iframe>
                 </div>
             </div>
-        </section>
-    </div>
-</main>
+        </div>
+    </section>
 {% endblock %}
-

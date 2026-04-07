@@ -1,80 +1,426 @@
-{% extends 'base.html.twig' %}
+{# templates/customer/products.html.twig #}
+{% extends 'customer/base_customer.html.twig' %}
 
-{% block title %}Our Product | GearGrid{% endblock %}
+{% block title %}Our Products | GearGrid{% endblock %}
 
 {% block stylesheets %}
 <style>
-    :root {
-        --primary: #6C63FF;
-        --text-muted: #a8b4c3;
+    /* --- Search & Filters --- */
+    .search-filter-bar { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem; }
+    .search-wrap { position: relative; max-width: 480px; }
+    .search-input { width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0.75rem 1rem 0.75rem 2.75rem; color: var(--text-main); font-size: 0.95rem; outline: none; transition: all 0.2s ease; }
+    .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,99,255,0.15); background: var(--glass-bg-hover); }
+    .search-icon { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    
+    .filter-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-chip { padding: 6px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid var(--glass-border); color: var(--text-muted); background: transparent; transition: all 0.2s ease; }
+    .filter-chip:hover { color: var(--text-main); border-color: var(--glass-border-hover); }
+    .filter-chip.active { background: rgba(108,99,255,0.15); color: #a5b4fc; border-color: rgba(108,99,255,0.4); }
+
+    /* --- Product Grid & Cards --- */
+    .product-header { text-align: center; margin-bottom: 3rem; }
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2.5rem; margin-top: 2rem; }
+    .product-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; overflow: hidden; transition: all 0.4s ease; display: flex; flex-direction: column; position: relative; }
+    .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(108,99,255,0.15); border-color: var(--glass-border-hover); background: var(--glass-bg-hover); }
+    .product-card.hidden { display: none; }
+
+    /* --- Mini-Carousel --- */
+    .product-carousel { position: relative; width: 100%; height: 250px; overflow: hidden; background: #0f1624; }
+    .product-track { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+    .product-slide { min-width: 100%; height: 100%; object-fit: cover; }
+    .product-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(11,17,32,0.6); backdrop-filter: blur(8px); color: white; border: 1px solid var(--glass-border); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.3s ease; z-index: 2; }
+    .product-carousel:hover .product-btn { opacity: 1; }
+    .product-btn:hover { background: var(--primary); border-color: var(--primary); transform: translateY(-50%) scale(1.15); }
+    .product-prev { left: 12px; } .product-next { right: 12px; }
+    .product-dots { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 2; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 12px; }
+    .product-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.3s ease; }
+    .product-dot.active { background: var(--primary); width: 16px; border-radius: 4px; }
+
+    /* --- Quick View Overlay --- */
+    .quick-view-overlay { position: absolute; inset: 0; background: rgba(11,17,32,0.7); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; z-index: 5; }
+    .product-card:hover .quick-view-overlay { opacity: 1; }
+    .quick-view-btn { background: var(--primary); color: #fff; border: none; padding: 10px 22px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.2s; }
+    .quick-view-btn:hover { background: var(--primary-hover); }
+
+    /* --- Product Info --- */
+    .product-info { padding: 1.8rem; display: flex; flex-direction: column; flex-grow: 1; }
+    .product-category { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--primary); font-weight: 700; margin-bottom: 0.5rem; }
+    .product-title { font-family: 'Oswald', sans-serif; font-size: 1.4rem; color: #fff; margin-bottom: 0.4rem; line-height: 1.3; }
+    .product-rating { display: flex; align-items: center; gap: 6px; margin-bottom: 0.7rem; }
+    .stars { display: flex; gap: 2px; }
+    .star { width: 13px; height: 13px; fill: #fbbf24; }
+    .star.empty { fill: #374151; }
+    .rating-text { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Stock Badge */
+    .stock-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.8rem; width: fit-content; }
+    .stock-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .stock-in { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+    .stock-in .stock-dot { background: #4ade80; }
+    .stock-low { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.2); }
+    .stock-low .stock-dot { background: #fbbf24; }
+    .stock-out { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+    .stock-out .stock-dot { background: #f87171; }
+
+    .product-price { font-size: 1.3rem; color: var(--success); font-weight: 700; margin-bottom: 1rem; }
+
+    /* Action Buttons */
+    .product-actions { margin-top: auto; display: flex; flex-direction: column; gap: 0.8rem; }
+    .btn-cart { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; padding: 0.85rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; font-size: 0.95rem; font-family: 'Inter', sans-serif; }
+    .btn-cart:hover { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); border-color: var(--primary); box-shadow: 0 4px 15px rgba(108,99,255,0.3); transform: translateY(-2px); }
+    .btn-cart.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+    /* --- QUICK VIEW MODAL --- */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(5,10,20,0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+    .modal-box { background: #0f1828; border: 1px solid var(--glass-border-hover); border-radius: 20px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; transform: translateY(20px) scale(0.97); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1); display: grid; grid-template-columns: 300px 1fr; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+    .modal-backdrop.open .modal-box { transform: translateY(0) scale(1); }
+    
+    .modal-img-wrap { position: relative; background: #0b1120; }
+    .modal-img { width: 100%; height: 100%; min-height: 350px; object-fit: cover; border-radius: 20px 0 0 20px; }
+    .modal-close { position: absolute; top: 1rem; right: 1rem; background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: all 0.2s; z-index: 10; }
+    .modal-close:hover { background: rgba(248,113,113,0.8); }
+
+    .modal-body { padding: 2.5rem; display: flex; flex-direction: column; }
+    .modal-cat { font-size: 0.8rem; text-transform: uppercase; color: var(--primary); font-weight: 700; margin-bottom: 0.5rem; }
+    .modal-name { font-family: 'Oswald', sans-serif; font-size: 2.2rem; color: #fff; margin-bottom: 0.5rem; line-height: 1.2; }
+    .modal-price { font-size: 1.8rem; color: var(--success); font-weight: 700; margin-bottom: 1rem; }
+    .modal-desc { font-size: 1rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.5rem; }
+
+    /* Qty Counter inside Modal */
+    .qty-row { display: flex; align-items: center; gap: 15px; margin-bottom: 1.5rem; }
+    .qty-label { font-size: 0.95rem; color: var(--text-muted); font-weight: 600; }
+    .qty-counter { display: flex; align-items: center; border: 1px solid var(--glass-border); border-radius: 10px; overflow: hidden; background: rgba(255,255,255,0.03); }
+    .qty-btn { background: transparent; border: none; color: #fff; width: 40px; height: 40px; cursor: pointer; font-size: 1.2rem; transition: background 0.2s; }
+    .qty-btn:hover { background: rgba(108,99,255,0.3); }
+    .qty-val { padding: 0 15px; font-size: 1rem; font-weight: 700; color: #fff; min-width: 45px; text-align: center; border-left: 1px solid var(--glass-border); border-right: 1px solid var(--glass-border); }
+
+    .modal-actions { margin-top: auto; }
+
+    /* --- Toast Notification --- */
+    .toast-container { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 10000; display: flex; flex-direction: column; gap: 0.5rem; align-items: center; pointer-events: none; }
+    .toast { display: inline-flex; align-items: center; gap: 12px; background: rgba(15, 24, 40, 0.95); border: 1px solid rgba(74,222,128,0.4); border-radius: 12px; padding: 12px 20px; color: #fff; box-shadow: 0 8px 32px rgba(0,0,0,0.5); transform: translateY(20px); opacity: 0; transition: all 0.4s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast-icon { width: 24px; height: 24px; border-radius: 50%; background: rgba(74,222,128,0.2); display: flex; align-items: center; justify-content: center; color: #4ade80;}
+
+    /* --- Floating Cart --- */
+    .floating-cart { position: fixed; bottom: 2rem; right: 2rem; z-index: 900; display: flex; align-items: center; gap: 10px; background: var(--primary); color: #fff; padding: 14px 22px; border-radius: 50px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 24px rgba(108,99,255,0.4); transition: all 0.3s ease; text-decoration: none; opacity: 0; pointer-events: none; transform: translateY(10px); }
+    .floating-cart.visible { opacity: 1; pointer-events: all; transform: translateY(0); }
+    .floating-cart:hover { background: var(--primary-hover); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(108,99,255,0.5); color: #fff; }
+    .cart-count { background: rgba(255,255,255,0.25); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+
+    @media (max-width: 768px) {
+        .modal-box { grid-template-columns: 1fr; }
+        .modal-img { min-height: 250px; border-radius: 20px 20px 0 0; }
     }
-    .landing-page {
-        min-height: 100vh;
-        color: #fff;
-        padding: 5.25rem 2.25rem 5rem;
-        background: radial-gradient(circle at 20% 20%, rgba(108, 99, 255, 0.18), transparent 38%),
-                    radial-gradient(circle at 85% 0%, rgba(255, 101, 132, 0.14), transparent 30%),
-                    linear-gradient(135deg, rgba(11, 17, 32, 1) 0%, rgba(15, 22, 36, 1) 45%, rgba(11, 20, 35, 1) 100%);
-    }
-    .landing-container { max-width: 1320px; margin: 0 auto; }
-    .landing-topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(11, 17, 32, 0.78); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-    .landing-topbar__inner { max-width: 1320px; margin: 0 auto; padding: 0.95rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: nowrap; }
-    .landing-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; font-weight: 900; letter-spacing: 0.3px; font-family: 'Oswald', sans-serif; font-size: 1.25rem; }
-    .landing-brand .mark { width: 38px; height: 38px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(108, 99, 255, 0.25), rgba(255, 101, 132, 0.18)); border: 1px solid rgba(255, 255, 255, 0.12); flex: 0 0 auto; }
-    .landing-nav { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; flex: 1 1 auto; justify-content: flex-end; min-width: 0; }
-    .landing-nav-link { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 0.55rem 0.9rem; border-radius: 999px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.92); font-weight: 800; font-family: 'Inter', sans-serif; font-size: 0.95rem; transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
-    .landing-nav-link:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.14); }
-    .landing-header-cta { display: inline-flex; align-items: center; gap: 10px; padding: 0.6rem 1rem; border-radius: 999px; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 900; font-size: 0.95rem; color: #fff; background: linear-gradient(135deg, var(--primary), rgba(139, 127, 255, 1)); box-shadow: 0 16px 40px rgba(108, 99, 255, 0.20); border: 1px solid rgba(255, 255, 255, 0.10); transition: transform 0.2s ease, filter 0.2s ease; white-space: nowrap; flex: 0 0 auto; margin-left: auto; }
-    .landing-header-cta:hover { transform: translateY(-2px); filter: brightness(1.08); }
-    .landing-section { margin-top: 1.9rem; scroll-margin-top: 110px; }
-    .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; font-family: 'Oswald', sans-serif; font-size: 1.55rem; }
-    .section-title i { color: var(--primary); }
-    .landing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; }
-    .landing-card { border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.10); background: rgba(255, 255, 255, 0.03); padding: 1.2rem; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25); }
-    .landing-card h3 { font-family: 'Oswald', sans-serif; font-size: 1.15rem; margin: 0 0 0.35rem; }
-    .landing-card p { margin: 0; color: var(--text-muted); line-height: 1.65; }
-    .landing-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.10); background: rgba(255, 255, 255, 0.04); color: #fff; font-weight: 800; }
-    @media (max-width: 768px) { .landing-topbar__inner { flex-wrap: wrap; padding: 0.75rem 1rem; } .landing-page { padding-top: 4.25rem; } }
 </style>
 {% endblock %}
 
 {% block body %}
-<main class="landing-page">
-    {% include 'customer/_topnav.html.twig' %}
 
-    <div class="landing-container">
-        <section class="landing-section" aria-label="Product categories">
-            <h2 class="section-title"><i class="fas fa-box"></i> Our Product</h2>
-            <div class="landing-card">
-                <p>Browse a sample catalog. In your project, the “Products” page is managed by the backend admin/staff area.</p>
-            </div>
-        </section>
+{# ─── Toast Container ─── #}
+<div class="toast-container" id="toastContainer"></div>
 
-        <section class="landing-section" aria-label="Product previews">
-            <div class="landing-grid">
-                <div class="landing-card">
-                    <div class="landing-pill"><i class="fas fa-screwdriver-wrench"></i> Tools</div>
-                    <h3 style="margin-top:0.9rem;">Reliable equipment</h3>
-                    <p>Durable tools and parts designed for everyday use.</p>
+{# ─── Quick View Modal ─── #}
+<div class="modal-backdrop" id="quickViewModal">
+    <div class="modal-box">
+        <div class="modal-img-wrap">
+            <img src="" alt="" class="modal-img" id="modalImg">
+            <button class="modal-close" id="modalClose"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-cat" id="modalCat"></div>
+            <h2 class="modal-name" id="modalName"></h2>
+            <div class="modal-price" id="modalPrice"></div>
+            <p class="modal-desc" id="modalDesc"></p>
+            
+            <div class="modal-actions">
+                <div class="qty-row">
+                    <span class="qty-label">Quantity:</span>
+                    <div class="qty-counter">
+                        <button class="qty-btn" id="modalQtyDown">−</button>
+                        <span class="qty-val" id="modalQtyVal">1</span>
+                        <button class="qty-btn" id="modalQtyUp">+</button>
+                    </div>
                 </div>
-                <div class="landing-card">
-                    <div class="landing-pill"><i class="fas fa-gears"></i> Gear Sets</div>
-                    <h3 style="margin-top:0.9rem;">Precision components</h3>
-                    <p>Gear packages that keep your workflow moving.</p>
-                </div>
-                <div class="landing-card">
-                    <div class="landing-pill"><i class="fas fa-microscope"></i> Accessories</div>
-                    <h3 style="margin-top:0.9rem;">Finishing touches</h3>
-                    <p>Optional add-ons and compatible accessories.</p>
-                </div>
-                <div class="landing-card">
-                    <div class="landing-pill"><i class="fas fa-truck-fast"></i> Ready to order</div>
-                    <h3 style="margin-top:0.9rem;">Fast checkout</h3>
-                    <p>Create new orders after browsing the catalog.</p>
-                </div>
+                
+                {# The button inside the modal #}
+                <a href="{{ path('app_login') }}" class="btn-cart auth-required-btn" id="modalAddCart">
+                    <i class="fas fa-cart-plus"></i> Add to Cart
+                </a>
             </div>
-        </section>
+        </div>
     </div>
-</main>
-{% endblock %}
+</div>
 
+{# ─── Floating Cart Button ─── #}
+<a href="{{ path('app_login') }}" class="floating-cart" id="floatingCart">
+    <i class="fas fa-cart-shopping"></i> View Cart <span class="cart-count" id="cartCount">0</span>
+</a>
+
+<section class="landing-section animate-up">
+
+    <div class="product-header">
+        <h2 class="section-title" style="justify-content: center; font-size: 3rem;">
+            <i class="fas fa-microchip"></i> GearGrid Catalog
+        </h2>
+        <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+            Explore our premium selection of hardware. Filter by category or search by name.
+        </p>
+    </div>
+
+    {# ─── Search + Filters ─── #}
+    <div class="search-filter-bar animate-up delay-1">
+        <div class="search-wrap">
+            <i class="fas fa-magnifying-glass search-icon"></i>
+            <input type="text" class="search-input" id="productSearch" placeholder="Search components…" autocomplete="off">
+        </div>
+        <div class="filter-chips" id="filterChips">
+            <button class="filter-chip active" data-filter="all">All</button>
+            
+            {# Dynamic Category Buttons! #}
+            {% set unique_categories = [] %}
+            {% for product in products %}
+                {% if product.category and product.category.name not in unique_categories %}
+                    {% set unique_categories = unique_categories|merge([product.category.name]) %}
+                {% endif %}
+            {% endfor %}
+            
+            {% for category_name in unique_categories %}
+                <button class="filter-chip" data-filter="{{ category_name|lower }}">{{ category_name }}</button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="product-grid animate-up delay-2" id="productGrid">
+
+        {# Tracker array to ensure only 1 product per category is shown #}
+        {% set displayed_categories = [] %}
+
+        {% for product in products %}
+            {% set cat_name = product.category ? product.category.name : 'Uncategorized' %}
+
+            {# Only show the product if its category hasn't been displayed yet #}
+            {% if cat_name not in displayed_categories %}
+                <div class="product-card"
+                    data-name="{{ product.name }}"
+                    data-category="{{ cat_name|lower }}"
+                    data-price="₱{{ product.price|number_format(2, '.', ',') }}"
+                    data-desc="{{ product.description|escape('html_attr') }}"
+                    data-img="{% if product.image %}{{ asset('uploads/products/' ~ product.image) }}{% else %}https://via.placeholder.com/600x400?text=No+Image{% endif %}">
+
+                    <div class="product-carousel">
+                        <div class="product-track">
+                            {% if product.image %}
+                                <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="{{ product.name }}" class="product-slide">
+                            {% else %}
+                                <div style="width: 100%; height: 100%; background: #1e1e2f; display: flex; align-items: center; justify-content: center; color: #555;">
+                                    <i class="fas fa-image fa-3x"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="quick-view-overlay">
+                            <button class="quick-view-btn quick-view-trigger"><i class="fas fa-eye"></i> Quick View</button>
+                        </div>
+                    </div>
+
+                    <div class="product-info">
+                        <span class="product-category">{{ cat_name }}</span>
+                        <h3 class="product-title">{{ product.name }}</h3>
+                        
+                        {% if product.quantity > 5 %}
+                            <span class="stock-badge stock-in"><span class="stock-dot"></span>In Stock</span>
+                        {% elseif product.quantity > 0 %}
+                            <span class="stock-badge stock-low"><span class="stock-dot"></span>Only {{ product.quantity }} left</span>
+                        {% else %}
+                            <span class="stock-badge stock-out"><span class="stock-dot"></span>Out of Stock</span>
+                        {% endif %}
+
+                        <div class="product-price">₱{{ product.price|number_format(2, '.', ',') }}</div>
+                        
+                        {% if product.quantity > 0 %}
+                            <div class="product-actions">
+                                <a href="{{ path('app_login') }}" class="btn-cart auth-required-btn" data-product="{{ product.name }}" data-price="₱{{ product.price|number_format(2, '.', ',') }}">
+                                    <i class="fas fa-cart-plus"></i> Add to Cart
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="product-actions" style="margin-top: auto;">
+                                <button class="btn-cart disabled" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                    <i class="fas fa-ban"></i> Out of Stock
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# Add this category to the tracker so we skip the rest of the products in this category #}
+                {% set displayed_categories = displayed_categories|merge([cat_name]) %}
+            {% endif %}
+
+        {% else %}
+            <div class="no-results visible" style="grid-column: 1 / -1; display: block;">
+                <i class="fas fa-box-open"></i>
+                <p style="font-size:1.2rem; font-weight:600; margin-bottom:0.5rem;">No products found</p>
+                <p style="font-size:0.95rem;">Check back later for new inventory.</p>
+            </div>
+        {% endfor %}
+
+    </div>
+</section>
+
+<script>
+    // --- AUTHENTICATION CHECK ---
+    const isLoggedIn = {{ app.user ? 'true' : 'false' }};
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        /* ─── Toast Notification Logic ─── */
+        let cartCount = 0;
+        const toastContainer = document.getElementById('toastContainer');
+        const floatingCart = document.getElementById('floatingCart');
+        const cartCountEl = document.getElementById('cartCount');
+
+        const showToast = (name, price) => {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fas fa-check"></i></div>
+                <div>
+                    <div class="toast-title">Added to cart</div>
+                    <div class="toast-sub">${name} &nbsp;·&nbsp; ${price}</div>
+                </div>`;
+            toastContainer.appendChild(toast);
+            requestAnimationFrame(() => { requestAnimationFrame(() => { toast.classList.add('show'); }); });
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        };
+
+        /* ─── Add to Cart (Auth Protection) ─── */
+        document.querySelectorAll('.auth-required-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (!isLoggedIn) return; 
+
+                e.preventDefault(); 
+                const name = btn.dataset.product || btn.closest('.modal-body').querySelector('.modal-name').textContent;
+                const price = btn.dataset.price || btn.closest('.modal-body').querySelector('.modal-price').textContent;
+                
+                // Get Quantity
+                let qty = 1;
+                if (btn.id === 'modalAddCart') {
+                    // Try to get quantity from modal if we are inside it
+                    const modalQtyNode = document.getElementById('modalQtyVal');
+                    if(modalQtyNode) qty = parseInt(modalQtyNode.textContent) || 1;
+                }
+                
+                cartCount += qty;
+                cartCountEl.textContent = cartCount;
+                floatingCart.classList.add('visible');
+                
+                showToast(name, price);
+
+                if(btn.id === 'modalAddCart') {
+                    closeModal();
+                }
+            });
+        });
+
+        /* ─── Quick View Modal Logic ─── */
+        const modal = document.getElementById('quickViewModal');
+        const modalImg = document.getElementById('modalImg');
+        const modalCat = document.getElementById('modalCat');
+        const modalName = document.getElementById('modalName');
+        const modalPrice = document.getElementById('modalPrice');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalClose = document.getElementById('modalClose');
+
+        document.querySelectorAll('.quick-view-trigger').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const card = btn.closest('.product-card');
+                
+                modalImg.src = card.dataset.img;
+                modalCat.textContent = card.querySelector('.product-category').textContent;
+                modalName.textContent = card.dataset.name;
+                modalPrice.textContent = card.dataset.price;
+                modalDesc.textContent = card.dataset.desc || "No description provided.";
+                
+                const modalQtyNode = document.getElementById('modalQtyVal');
+                if(modalQtyNode) modalQtyNode.textContent = '1';
+
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden'; 
+            });
+        });
+
+        const closeModal = () => {
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        };
+
+        if(modalClose) modalClose.addEventListener('click', closeModal);
+        modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+        // Modal Quantity Controls
+        const btnDown = document.getElementById('modalQtyDown');
+        const btnUp = document.getElementById('modalQtyUp');
+        const valNode = document.getElementById('modalQtyVal');
+
+        if(btnDown && btnUp && valNode) {
+            btnDown.addEventListener('click', () => {
+                const v = parseInt(valNode.textContent);
+                if (v > 1) valNode.textContent = v - 1;
+            });
+            btnUp.addEventListener('click', () => {
+                valNode.textContent = parseInt(valNode.textContent) + 1;
+            });
+        }
+
+        /* ─── Search & Filter ─── */
+        const productSearch = document.getElementById('productSearch');
+        const filterChips = document.querySelectorAll('.filter-chip');
+        const productCards = document.querySelectorAll('.product-card');
+        let activeFilter = 'all';
+
+        const applyFilters = () => {
+            const query = productSearch.value.toLowerCase().trim();
+            let visibleCount = 0;
+            productCards.forEach(card => {
+                const name = card.dataset.name.toLowerCase();
+                const category = card.dataset.category.toLowerCase();
+                const matchesFilter = activeFilter === 'all' || category.includes(activeFilter) || activeFilter.includes(category);
+                const matchesSearch = name.includes(query) || category.includes(query);
+                
+                if (matchesFilter && matchesSearch) {
+                    card.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+            
+            const noResults = document.getElementById('noResults');
+            if(noResults) {
+                noResults.classList.toggle('visible', visibleCount === 0);
+            }
+        };
+
+        if (productSearch) productSearch.addEventListener('input', applyFilters);
+
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                filterChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                activeFilter = chip.dataset.filter;
+                applyFilters();
+            });
+        });
+    });
+</script>
+{% endblock %}

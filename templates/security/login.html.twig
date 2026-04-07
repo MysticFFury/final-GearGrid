@@ -1,193 +1,236 @@
+{# templates/security/login.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Login | GearGrid{% endblock %}
 
 {% block body %}
 <style>
+    /* --- Split-Screen Auth Layout --- */
     body {
-        background: radial-gradient(circle at 20% 20%, #1f2840, #0c1022 50%, #080c1a);
+        margin: 0;
+        padding: 0;
+        background-color: #0B1120;
+        font-family: 'Inter', sans-serif;
+        color: #fff;
         min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    .auth-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 100vh;
+    }
+
+    /* Left Side: Image Cover */
+    .auth-cover {
+        position: relative;
+        background-image: url('https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 3rem;
+    }
+
+    .auth-cover-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(11, 17, 32, 0.3), rgba(11, 17, 32, 0.9));
+    }
+
+    .auth-cover-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: #fff;
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .auth-brand .mark {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary), rgba(255, 101, 132, 0.8));
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        color: #e9ecf5;
+        font-size: 1.3rem;
     }
 
-    .auth-wrapper {
-        width: min(440px, 92vw);
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 20px 60px rgba(0,0,0,0.35);
-        border-radius: 18px;
-        padding: 32px;
-        backdrop-filter: blur(12px);
+    .auth-quote {
+        position: relative;
+        z-index: 1;
+        max-width: 500px;
     }
 
-    .auth-header {
+    .auth-quote h2 {
+        font-family: 'Oswald', sans-serif;
+        font-size: 3rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+
+    .auth-quote p {
+        color: #94a3b8;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    /* Right Side: Form Content */
+    .auth-form-wrapper {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        margin-bottom: 18px;
+        justify-content: center;
+        padding: 2rem;
+        position: relative;
     }
 
-    .auth-title {
-        font-size: 26px;
-        font-weight: 700;
-        letter-spacing: 0.2px;
+    /* Keep the floating orbs behind the form */
+    .bg-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        z-index: 0;
+        animation: float 10s infinite ease-in-out alternate;
+    }
+    .orb-1 { width: 300px; height: 300px; background: rgba(108, 99, 255, 0.15); top: 10%; right: 10%; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(255, 101, 132, 0.1); bottom: 10%; left: 10%; animation-delay: -5s; }
+
+    @keyframes float {
+        0% { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(20px, -30px) scale(1.05); }
     }
 
-    .muted { color: #9da7c2; font-size: 14px; }
-
-    .auth-form label {
-        display: block;
-        font-size: 13px;
-        margin-bottom: 6px;
-        color: #c9d3ec;
+    .auth-card {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 420px;
     }
 
+    .auth-header { margin-bottom: 2.5rem; }
+    .auth-title { font-family: 'Oswald', sans-serif; font-size: 2.2rem; font-weight: 600; margin: 0 0 0.5rem 0; }
+    .auth-subtitle { color: #94a3b8; font-size: 1rem; margin: 0; }
+
+    /* Inputs */
+    .input-group { position: relative; margin-bottom: 1.5rem; }
+    .input-group i { position: absolute; top: 50%; left: 1.2rem; transform: translateY(-50%); color: #64748b; transition: color 0.3s ease; }
+    
     .auth-input {
-        width: 100%;
-        padding: 12px 14px;
-        border-radius: 12px;
-        border: 1px solid rgba(255,255,255,0.08);
-        background: rgba(255,255,255,0.04);
-        color: #e9ecf5;
-        outline: none;
-        transition: 0.2s border, 0.2s box-shadow, 0.2s background;
-        margin-bottom: 14px;
+        width: 100%; padding: 1.1rem 1rem 1.1rem 3rem; background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: #fff;
+        font-size: 1rem; font-family: 'Inter', sans-serif; transition: all 0.3s ease; box-sizing: border-box;
     }
 
-    .auth-input:focus {
-        border-color: #6C63FF;
-        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
-        background: rgba(255,255,255,0.07);
+    .auth-input:focus { outline: none; border-color: #6C63FF; background: rgba(255, 255, 255, 0.06); box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.15); }
+    .auth-input:focus + i, .auth-input:not(:placeholder-shown) + i { color: #6C63FF; }
+
+    .auth-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; font-size: 0.9rem; }
+    .auth-checkbox { display: flex; align-items: center; gap: 8px; color: #cbd5e1; cursor: pointer; }
+    .auth-checkbox input { accent-color: #6C63FF; width: 16px; height: 16px; cursor: pointer; }
+    .forgot-link { color: #6C63FF; text-decoration: none; font-weight: 500; transition: color 0.2s; }
+    .forgot-link:hover { color: #8b7fff; }
+
+    /* Button */
+    .auth-btn {
+        width: 100%; padding: 1.1rem; border: none; border-radius: 12px;
+        background: linear-gradient(135deg, #6C63FF, #ff6584); color: #fff; font-family: 'Inter', sans-serif;
+        font-weight: 700; font-size: 1.05rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 10px 25px rgba(108, 99, 255, 0.3);
     }
+    .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(108, 99, 255, 0.4); }
 
-    .auth-actions {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 6px;
-        margin-bottom: 6px;
-        font-size: 13px;
-    }
+    .auth-footer { text-align: center; margin-top: 2rem; font-size: 0.95rem; color: #94a3b8; }
+    .auth-footer a { color: #fff; font-weight: 600; text-decoration: none; transition: color 0.2s; }
+    .auth-footer a:hover { color: #6C63FF; }
 
-    .auth-checkbox {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #c9d3ec;
-    }
+    .alert { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #fca5a5; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; }
 
-    .auth-button {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #6C63FF, #4ac6ff);
-        color: #fff;
-        font-weight: 700;
-        letter-spacing: 0.3px;
-        cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-        margin-top: 6px;
-    }
-
-    .auth-button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 10px 25px rgba(76, 133, 255, 0.35);
-    }
-
-    .switch-link {
-        text-align: center;
-        margin-top: 14px;
-        font-size: 14px;
-    }
-
-    .switch-link a {
-        color: #8dd0ff;
-        text-decoration: none;
-    }
-
-    .switch-link a:hover { text-decoration: underline; }
-
-    .alert {
-        border-radius: 12px;
-        padding: 12px 14px;
-        margin-bottom: 16px;
-        font-size: 14px;
-        border: 1px solid rgba(255,255,255,0.08);
-        background: rgba(255, 94, 94, 0.08);
-        color: #ffb5b5;
-    }
-
-    .logged-in {
-        padding: 10px 12px;
-        border-radius: 12px;
-        background: rgba(108, 99, 255, 0.12);
-        border: 1px solid rgba(108, 99, 255, 0.25);
-        margin-bottom: 14px;
+    /* Responsive */
+    @media (max-width: 992px) {
+        .auth-container { grid-template-columns: 1fr; }
+        .auth-cover { display: none; } /* Hide image on mobile for cleaner login */
+        .auth-form-wrapper { padding: 2rem 1.5rem; }
     }
 </style>
 
-<div class="auth-wrapper">
-    <div class="auth-header">
-        <div>
-            <div class="auth-title">Welcome back 👋</div>
-            <div class="muted">Access your GearGrid dashboard</div>
+<div class="auth-container">
+    <div class="auth-cover">
+        <div class="auth-cover-overlay"></div>
+        <div class="auth-cover-content">
+            <a href="{{ path('app_customer_landing') }}" class="auth-brand">
+                <span class="mark"><i class="fas fa-gears"></i></span>
+                GearGrid
+            </a>
         </div>
-        <div class="muted">Login</div>
+        <div class="auth-quote">
+            <h2>Equip Your Setup.</h2>
+            <p>Access your dashboard to manage your orders, view your saved builds, and explore the latest hardware additions.</p>
+        </div>
     </div>
 
-    {% if error %}
-        <div class="alert">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+    <div class="auth-form-wrapper">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2"></div>
 
-    {% if app.user %}
-        <div class="logged-in">
-            You are logged in as <strong>{{ app.user.userIdentifier }}</strong>.
-            <a href="{{ logout_path() }}" style="color:#8dd0ff; text-decoration:none;">Logout</a>
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-subtitle">Sign in to your account</p>
+            </div>
+
+            {% if error %}
+                <div class="alert">
+                    <i class="fas fa-exclamation-circle"></i> 
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            {% if app.user %}
+                <div class="alert" style="background: rgba(108, 99, 255, 0.1); border-color: rgba(108, 99, 255, 0.2); color: #c7d2fe;">
+                    You are logged in as {{ app.user.userIdentifier }}. 
+                    <a href="{{ logout_path() }}" style="color: #fff; margin-left: 5px;">Logout</a>
+                </div>
+            {% endif %}
+
+            <form method="post">
+                <div class="input-group">
+                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="auth-input" placeholder="Email address" autocomplete="email" required autofocus>
+                    <i class="fas fa-envelope"></i>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" name="password" id="inputPassword" class="auth-input" placeholder="Password" autocomplete="current-password" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <div class="auth-options">
+                    <label class="auth-checkbox">
+                        <input type="checkbox" name="_remember_me"> Remember me
+                    </label>
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button class="auth-btn" type="submit">Sign In <i class="fas fa-arrow-right" style="margin-left: 5px;"></i></button>
+            </form>
+
+            <div class="auth-footer">
+                New to GearGrid? <a href="{{ path('app_register') }}">Create an account</a>
+            </div>
         </div>
-    {% endif %}
-
-    <form method="post" class="auth-form">
-        <label for="inputEmail">Email</label>
-        <input
-            type="email"
-            value="{{ last_username }}"
-            name="email"
-            id="inputEmail"
-            class="auth-input"
-            autocomplete="email"
-            required
-            autofocus
-        >
-
-        <label for="inputPassword">Password</label>
-        <input
-            type="password"
-            name="password"
-            id="inputPassword"
-            class="auth-input"
-            autocomplete="current-password"
-            required
-        >
-
-        <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
-
-        <div class="auth-actions">
-            <label class="auth-checkbox">
-                <input type="checkbox" name="_remember_me" style="width:16px; height:16px;"> Remember me
-            </label>
-            <span class="muted">Forgot password?</span>
-        </div>
-
-        <button class="auth-button" type="submit">Sign in</button>
-    </form>
-
-    <div class="switch-link">
-        New here? <a href="{{ path('app_register') }}">Create an account</a>
     </div>
 </div>
 {% endblock %}

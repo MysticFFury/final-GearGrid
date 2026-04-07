@@ -142,7 +142,7 @@
         gap: 0.75rem;
     }
 
-    .gg-form label {
+    .gg-form label, .gg-form .faux-label {
         color: var(--text-muted);
         font-weight: 500;
         text-transform: uppercase;
@@ -264,7 +264,6 @@
                             <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User">
                             <span class="status-indicator"></span>
                         </div>
-                        <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 0.8rem;"></i>
                     </div>
                 </div>
             </div>
@@ -296,9 +295,12 @@
             
             <div class="gg-form-grid">
                 <div class="form-group">
-                    {{ form_label(form.customer) }}
-                    {{ form_widget(form.customer, {'attr': {'placeholder': 'Select a customer'}}) }}
-                    {{ form_errors(form.customer) }}
+                    <label class="faux-label">Customer Name</label>
+                    <input type="text" value="{{ order.customerName }}" disabled style="cursor: not-allowed; opacity: 0.6; background: rgba(0,0,0,0.3);">
+                    
+                    <div style="display: none;">
+                        {{ form_widget(form.customer) }}
+                    </div>
                 </div>
 
                 <div class="form-group">

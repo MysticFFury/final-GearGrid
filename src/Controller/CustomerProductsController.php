@@ -2,16 +2,23 @@
 
 namespace App\Controller;
 
+use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-final class CustomerProductsController extends AbstractController
+// Notice how the class name now perfectly matches the filename!
+class CustomerProductsController extends AbstractController
 {
-    #[Route('/customer-products', name: 'app_customer_products', methods: ['GET'])]
-    public function index(): Response
+    #[Route('/customer-products', name: 'app_customer_products')]
+    public function products(ProductRepository $productRepository): Response
     {
-        return $this->render('customer/products.html.twig');
+        // 1. Fetch all products from the database
+        $products = $productRepository->findAll();
+
+        // 2. Pass them to the Twig template
+        return $this->render('customer/products.html.twig', [
+            'products' => $products,
+        ]);
     }
 }
-

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
+use App\Service\LogService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +14,6 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/product')]
 final class ProductController extends AbstractController
@@ -21,16 +21,13 @@ final class ProductController extends AbstractController
     #[Route(name: 'app_product_index', methods: ['GET'])]
     public function index(ProductRepository $productRepository): Response
     {
-        // Admin and Staff see all products
-        $products = $productRepository->findAll();
-
         return $this->render('product/index.html.twig', [
-            'products' => $products,
+            'products' => $productRepository->findAll(),
         ]);
     }
 
     #[Route('/new', name: 'app_product_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, LogService $logService): Response
     {
         $product = new Product();
         $form = $this->createForm(ProductType::class, $product);
@@ -46,22 +43,19 @@ final class ProductController extends AbstractController
                 $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
 
                 try {
-                    $imageFile->move(
-                        $this->getParameter('products_directory'),
-                        $newFilename
-                    );
+                    $imageFile->move($this->getParameter('products_directory'), $newFilename);
                 } catch (FileException $e) {
                     $this->addFlash('error', 'Image upload failed: '.$e->getMessage());
                 }
-
                 $product->setImage($newFilename);
             }
 
-            // Set the creator
             $product->setCreatedBy($this->getUser());
-
             $entityManager->persist($product);
             $entityManager->flush();
+
+            // LOG THE ACTION
+            $logService->log('CREATE', 'Product', "Created new product: {$product->getName()}");
 
             $this->addFlash('success', '✅ Product added successfully!');
             return $this->redirectToRoute('app_product_index');
@@ -75,20 +69,16 @@ final class ProductController extends AbstractController
     #[Route('/{id}', name: 'app_product_show', methods: ['GET'])]
     public function show(Product $product): Response
     {
-        // Admin and Staff can view all products
         return $this->render('product/show.html.twig', [
             'product' => $product,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Product $product, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
+    public function edit(Request $request, Product $product, EntityManagerInterface $entityManager, SluggerInterface $slugger, LogService $logService): Response
     {
-        // Admin and Staff can edit all products
-
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
-
         $oldImage = $product->getImage();
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -96,34 +86,27 @@ final class ProductController extends AbstractController
             $imageFile = $form->get('imageFile')->getData();
 
             if ($imageFile) {
-                // Delete old image if exists
                 if ($oldImage) {
                     $oldPath = $this->getParameter('products_directory').'/'.$oldImage;
-                    if (file_exists($oldPath)) {
-                        @unlink($oldPath);
-                    }
+                    if (file_exists($oldPath)) { @unlink($oldPath); }
                 }
-
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
 
                 try {
-                    $imageFile->move(
-                        $this->getParameter('products_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Image upload failed: '.$e->getMessage());
-                }
+                    $imageFile->move($this->getParameter('products_directory'), $newFilename);
+                } catch (FileException $e) { }
 
                 $product->setImage($newFilename);
             } else {
-                // Keep old image if none uploaded
                 $product->setImage($oldImage);
             }
 
             $entityManager->flush();
+
+            // LOG THE ACTION
+            $logService->log('UPDATE', 'Product', "Updated product: {$product->getName()}");
 
             $this->addFlash('success', '✅ Product updated successfully!');
             return $this->redirectToRoute('app_product_index');
@@ -136,21 +119,20 @@ final class ProductController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_product_delete', methods: ['POST'])]
-    public function delete(Request $request, Product $product, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Product $product, EntityManagerInterface $entityManager, LogService $logService): Response
     {
-        // Admin and Staff can delete all products
-
         if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->request->get('_token'))) {
-            // Delete image if exists
             if ($product->getImage()) {
                 $path = $this->getParameter('products_directory').'/'.$product->getImage();
-                if (file_exists($path)) {
-                    @unlink($path);
-                }
+                if (file_exists($path)) { @unlink($path); }
             }
 
+            $productName = $product->getName();
             $entityManager->remove($product);
             $entityManager->flush();
+
+            // LOG THE ACTION
+            $logService->log('DELETE', 'Product', "Deleted product: {$productName}");
 
             $this->addFlash('success', '🗑️ Product deleted successfully!');
         }

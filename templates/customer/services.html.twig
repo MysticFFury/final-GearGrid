@@ -1,90 +1,113 @@
-{% extends 'base.html.twig' %}
+{# templates/customer/services.html.twig #}
+{% extends 'customer/base_customer.html.twig' %}
 
-{% block title %}Services | GearGrid{% endblock %}
+{% block title %}Our Services | GearGrid{% endblock %}
 
 {% block stylesheets %}
 <style>
-    :root { --primary:#6C63FF; --text-muted:#a8b4c3; }
-    .landing-page {
-        min-height: 100vh; color:#fff;
-        padding: 5.25rem 2.25rem 5rem;
-        background: radial-gradient(circle at 20% 20%, rgba(108, 99, 255, 0.18), transparent 38%),
-                    radial-gradient(circle at 85% 0%, rgba(255, 101, 132, 0.14), transparent 30%),
-                    linear-gradient(135deg, rgba(11, 17, 32, 1) 0%, rgba(15, 22, 36, 1) 45%, rgba(11, 20, 35, 1) 100%);
+    .service-card {
+        background: linear-gradient(to bottom, rgba(255,255,255,0.03), transparent);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px; padding: 3rem 2rem;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex; flex-direction: column; align-items: center;
+        text-align: center; position: relative; overflow: hidden;
     }
-    .landing-container { max-width: 1320px; margin: 0 auto; }
-    .landing-topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(11, 17, 32, 0.78); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-    .landing-topbar__inner { max-width: 1320px; margin: 0 auto; padding: 0.95rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: nowrap; }
-    .landing-brand { display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:#fff; font-weight:900; letter-spacing:0.3px; font-family:'Oswald',sans-serif; font-size:1.25rem; }
-    .landing-brand .mark { width: 38px; height: 38px; border-radius: 14px; display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, rgba(108, 99, 255, 0.25), rgba(255, 101, 132, 0.18)); border:1px solid rgba(255, 255, 255, 0.12); flex:0 0 auto; }
-    .landing-nav { display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; flex: 1 1 auto; justify-content: flex-end; min-width: 0; }
-    .landing-nav-link { display:inline-flex; align-items:center; gap:8px; text-decoration:none; padding:0.55rem 0.9rem; border-radius:999px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.92); font-weight:800; font-family:'Inter',sans-serif; font-size:0.95rem; transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
-    .landing-nav-link:hover { transform: translateY(-2px); background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.14); }
 
-    .landing-header-cta {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 0.6rem 1rem;
-        border-radius: 999px;
-        text-decoration: none;
-        font-family: 'Inter', sans-serif;
-        font-weight: 900;
-        font-size: 0.95rem;
-        color: #fff;
-        background: linear-gradient(135deg, var(--primary), rgba(139, 127, 255, 1));
-        box-shadow: 0 16px 40px rgba(108, 99, 255, 0.20);
-        border: 1px solid rgba(255, 255, 255, 0.10);
-        transition: transform 0.2s ease, filter 0.2s ease;
-        white-space: nowrap;
-        flex: 0 0 auto;
-        margin-left: auto;
+    .service-card:hover {
+        transform: translateY(-8px); border-color: rgba(108, 99, 255, 0.4);
+        box-shadow: 0 25px 50px rgba(108, 99, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.1);
     }
-    .landing-header-cta:hover { transform: translateY(-2px); filter: brightness(1.08); }
 
-    .landing-section { margin-top:1.9rem; scroll-margin-top:110px; }
-    .section-title { display:flex; align-items:center; gap:10px; margin-bottom:1rem; font-family:'Oswald',sans-serif; font-size:1.55rem; }
-    .section-title i { color: var(--primary); }
-    .landing-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1.2rem; }
-    .landing-card { border-radius:18px; border:1px solid rgba(255,255,255,0.10); background:rgba(255,255,255,0.03); padding:1.2rem; box-shadow:0 12px 35px rgba(0,0,0,0.25); }
-    .landing-card h3 { font-family:'Oswald',sans-serif; font-size:1.15rem; margin:0 0 0.35rem; }
-    .landing-card p { margin:0; color: var(--text-muted); line-height:1.65; }
-    .icon { width: 46px; height: 46px; border-radius: 14px; display:flex; align-items:center; justify-content:center; background: rgba(108, 99, 255, 0.18); border: 1px solid rgba(108, 99, 255, 0.28); color:#fff; margin-bottom:0.8rem; }
-    @media (max-width: 768px) { .landing-topbar__inner { flex-wrap: wrap; padding: 0.75rem 1rem; } .landing-page { padding-top: 4.25rem; } }
+    /* A glowing orb that appears on hover */
+    .service-card::before {
+        content: ''; position: absolute; top: 0%; left: 50%; transform: translate(-50%, -50%);
+        width: 150px; height: 150px; background: var(--primary);
+        filter: blur(60px); opacity: 0; transition: opacity 0.5s ease; z-index: 0;
+    }
+
+    .service-card:hover::before { opacity: 0.25; }
+
+    .service-icon-wrapper {
+        width: 80px; height: 80px; border-radius: 20px;
+        background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border-hover);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.2rem; margin-bottom: 2rem; color: var(--primary);
+        z-index: 1; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .service-card:hover .service-icon-wrapper {
+        background: var(--primary); color: #fff;
+        transform: scale(1.1) translateY(-5px); border-color: var(--primary-hover);
+        box-shadow: 0 15px 30px rgba(108, 99, 255, 0.4);
+    }
+
+    .service-title { font-family: 'Oswald', sans-serif; font-size: 1.8rem; color: #fff; margin-bottom: 1rem; z-index: 1; }
+    .service-desc { color: var(--text-muted); line-height: 1.8; font-size: 1.05rem; z-index: 1; }
+
+    /* Seamless CTA Banner matching Newsletter */
+    .cta-banner {
+        background: linear-gradient(135deg, rgba(108,99,255,0.1), rgba(255,101,132,0.05)), url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=');
+        border: 1px solid var(--glass-border-hover); border-radius: 30px;
+        padding: 5rem 3rem; text-align: center; margin-top: 6rem;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+        position: relative; overflow: hidden;
+    }
+    
+    .cta-banner::before {
+        content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 60%); pointer-events: none;
+    }
 </style>
 {% endblock %}
 
 {% block body %}
-<main class="landing-page">
-    {% include 'customer/_topnav.html.twig' %}
-
-    <div class="landing-container">
-        <section class="landing-section" aria-label="Services list">
-            <h2 class="section-title"><i class="fas fa-wand-magic-sparkles"></i> Services</h2>
-            <div class="landing-grid">
-                <div class="landing-card">
-                    <div class="icon"><i class="fas fa-cart-shopping"></i></div>
-                    <h3>Order Workflow</h3>
-                    <p>Create and review orders using clear steps that work on mobile.</p>
-                </div>
-                <div class="landing-card">
-                    <div class="icon" style="background: rgba(74, 222, 128, 0.14); border-color: rgba(74, 222, 128, 0.28);"><i class="fas fa-tags"></i></div>
-                    <h3>Product Organization</h3>
-                    <p>Browse categories and product information in a consistent UI.</p>
-                </div>
-                <div class="landing-card">
-                    <div class="icon" style="background: rgba(255, 101, 132, 0.14); border-color: rgba(255, 101, 132, 0.28);"><i class="fas fa-chart-line"></i></div>
-                    <h3>Activity Tracking</h3>
-                    <p>Keep track of recent activity through the app dashboard.</p>
-                </div>
-                <div class="landing-card">
-                    <div class="icon"><i class="fas fa-mobile-screen-button"></i></div>
-                    <h3>Mobile Readability</h3>
-                    <p>Responsive spacing and readable typography for all devices.</p>
-                </div>
+    <section class="landing-section animate-up">
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 30px; background: linear-gradient(135deg, rgba(108, 99, 255, 0.15), rgba(108, 99, 255, 0.05)); border: 1px solid rgba(108, 99, 255, 0.3); color: #a5b4fc; font-weight: 600; font-size: 0.85rem; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">
+                <i class="fas fa-star"></i> Premium Support
             </div>
-        </section>
-    </div>
-</main>
-{% endblock %}
+            <h2 class="section-title" style="justify-content: center; font-size: 3.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                More Than Just Hardware
+            </h2>
+            <p style="color: var(--text-muted); font-size: 1.15rem; max-width: 600px; margin: 0 auto; line-height: 1.7;">
+                From professional assembly to enterprise deployments, our team of experts is here to ensure your tech performs flawlessly.
+            </p>
+        </div>
+        
+        <div class="landing-grid animate-up delay-1">
+            <div class="service-card">
+                <div class="service-icon-wrapper"><i class="fas fa-screwdriver-wrench"></i></div>
+                <h3 class="service-title">Custom PC Assembly</h3>
+                <p class="service-desc">Don't want to build it yourself? Select your components and our professional technicians will assemble, cable-manage, and stress-test your rig.</p>
+            </div>
 
+            <div class="service-card">
+                <div class="service-icon-wrapper" style="color: var(--success);"><i class="fas fa-puzzle-piece"></i></div>
+                <h3 class="service-title">Compatibility Checks</h3>
+                <p class="service-desc">Not sure if that new RTX 4090 will fit in your case? Our experts review every order to guarantee 100% hardware compatibility before shipping.</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon-wrapper" style="color: var(--secondary);"><i class="fas fa-stethoscope"></i></div>
+                <h3 class="service-title">Diagnostics & Repair</h3>
+                <p class="service-desc">Experiencing blue screens or thermal throttling? Bring in your machine for deep-level diagnostics, component repair, and thermal repasting.</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon-wrapper" style="color: #00c6ff;"><i class="fas fa-building"></i></div>
+                <h3 class="service-title">Enterprise Solutions</h3>
+                <p class="service-desc">Equipping a whole office or an e-sports arena? We offer bulk pricing, standardized workstation builds, and dedicated corporate account management.</p>
+            </div>
+        </div>
+
+        <div class="cta-banner animate-up delay-2">
+            <h2 style="font-family: 'Oswald', sans-serif; font-size: 2.8rem; margin-bottom: 1rem; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">Ready to upgrade your experience?</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2.5rem; font-size: 1.15rem;">Reach out to our team to schedule a build consultation or diagnostic appointment.</p>
+            <a href="{{ path('app_customer_contact') }}" style="display: inline-flex; align-items: center; gap: 10px; background: var(--primary); color: #fff; border: none; padding: 1rem 2.5rem; border-radius: 40px; font-weight: 700; font-size: 1.1rem; cursor: pointer; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 10px 25px rgba(108, 99, 255, 0.4);">
+                <i class="fas fa-envelope"></i> Contact Our Experts
+            </a>
+        </div>
+    </section>
+{% endblock %}
