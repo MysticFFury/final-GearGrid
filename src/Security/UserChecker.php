@@ -16,12 +16,20 @@ class UserChecker implements UserCheckerInterface
         }
 
         if (!$user->isActive()) {
-            throw new CustomUserMessageAccountStatusException('Your account is deactivated.');
+            throw new CustomUserMessageAccountStatusException('Your account has been deactivated.');
         }
     }
 
     public function checkPostAuth(UserInterface $user): void
     {
-        // No-op for now
+        if (!$user instanceof User) {
+            return;
+        }
+
+        // For public users, require email verification.
+        // Staff/Admin users created by admin do not require this check.
+        if ($user->getRoles() === ['ROLE_USER'] && $user->isVerified() !== true) {
+            throw new CustomUserMessageAccountStatusException('Your email has not been verified yet. Please check your email for a verification link.');
+        }
     }
 }

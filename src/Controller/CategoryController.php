@@ -81,11 +81,6 @@ final class CategoryController extends AbstractController
     #[Route('/{id}', name: 'app_category_delete', methods: ['POST'])]
     public function delete(Request $request, Category $category, EntityManagerInterface $entityManager, LogService $logService): Response
     {
-        if (!$this->isGranted('ROLE_ADMIN') && $category->getCreatedBy() !== $this->getUser()) {
-            $this->addFlash('error', 'You can only delete your own categories.');
-            return $this->redirectToRoute('app_category_index', [], Response::HTTP_SEE_OTHER);
-        }
-
         if ($this->isCsrfTokenValid('delete'.$category->getId(), $request->getPayload()->getString('_token'))) {
             $categoryName = $category->getName();
             $entityManager->remove($category);

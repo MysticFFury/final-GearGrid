@@ -1,29 +1,37 @@
 parameters:
-    products_directory: '%kernel.project_dir%/public/uploads/products'
+  products_directory: "%kernel.project_dir%/public/uploads/products"
 
 services:
-    _defaults:
-        autowire: true
-        autoconfigure: true
+  _defaults:
+    autowire: true
+    autoconfigure: true
 
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+  App\:
+    resource: "../src/"
+    exclude:
+      - "../src/DependencyInjection/"
+      - "../src/Entity/"
+      - "../src/Kernel.php"
 
-    # Logs login/logout
-    App\EventSubscriber\SecurityLogSubscriber:
-        tags:
-            - { name: 'kernel.event_subscriber' }
+  # Logs login/logout
+  App\EventSubscriber\SecurityLogSubscriber:
+    tags:
+      - { name: "kernel.event_subscriber" }
 
-    # Automatic CRUD logs (Doctrine lifecycle)
-    App\EventSubscriber\EntityLogSubscriber:
-        tags:
-            - { name: 'doctrine.event_subscriber' }
+  # Automatic CRUD logs (Doctrine lifecycle)
+  App\EventSubscriber\EntityLogSubscriber:
+    tags:
+      - { name: "doctrine.event_subscriber" }
 
-    # Redirect AccessDeniedException to login
-    App\EventListener\AccessDeniedListener:
-        tags:
-            - { name: 'kernel.event_listener', event: 'kernel.exception', priority: 10 }
+  # Redirect AccessDeniedException to login
+  App\EventListener\AccessDeniedListener:
+    tags:
+      - {
+          name: "kernel.event_listener",
+          event: "kernel.exception",
+          priority: 10,
+        }
+
+  App\Service\EmailVerificationService:
+    arguments:
+      $senderEmail: "%env(MAILER_FROM)%"

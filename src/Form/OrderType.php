@@ -29,6 +29,7 @@ class OrderType extends AbstractType
                 'label' => 'Customer Name',
                 'placeholder' => 'Select a customer',
                 'mapped' => false,
+                'required' => false,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('u')
                         ->where('u.roles NOT LIKE :adminRole')
@@ -40,11 +41,6 @@ class OrderType extends AbstractType
                 'attr' => [
                     'class' => 'form-control',
                     'autofocus' => true,
-                ],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please select a customer.',
-                    ]),
                 ],
             ])
             ->add('totalPrice', NumberType::class, [

@@ -119,7 +119,7 @@ final class ProductController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_product_delete', methods: ['POST'])]
-    public function delete(Request $request, Product $product, EntityManagerInterface $entityManager, LogService $logService): Response
+    public function delete(Request $request, Product $product): Response
     {
         if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->request->get('_token'))) {
             if ($product->getImage()) {
@@ -128,6 +128,8 @@ final class ProductController extends AbstractController
             }
 
             $productName = $product->getName();
+            $this->entityManager->remove($product);
+            $this->entityManager->flush();
             $entityManager->remove($product);
             $entityManager->flush();
 

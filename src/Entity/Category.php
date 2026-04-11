@@ -8,12 +8,36 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\User;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use Symfony\Component\Serializer\Attribute\Groups;
+
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Put(),
+        new Delete()
+    ],
+    normalizationContext: [
+        'groups' => ['category:read']
+    ],
+    denormalizationContext: [
+        'groups' => ['category:write']
+    ]
+)]
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['category:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -24,6 +48,7 @@ class Category
         minMessage: "Category name must be at least {{ limit }} characters long.",
         maxMessage: "Category name cannot be longer than {{ limit }} characters."
     )]
+    #[Groups(['category:read', 'category:write'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

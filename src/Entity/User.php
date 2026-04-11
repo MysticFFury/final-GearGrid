@@ -42,6 +42,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     private bool $isActive = true;
 
+    #[ORM\Column(type: 'boolean', nullable: true, options: ['default' => null])]
+    private ?bool $isVerified = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $verificationToken = null;
+
     // ---------------------------
     // Getters and Setters
     // ---------------------------
@@ -149,5 +155,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // @deprecated, to be removed when upgrading to Symfony 8
+    }
+
+    public function isVerified(): ?bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(?bool $isVerified): self
+    {
+        $this->isVerified = $isVerified;
+        return $this;
+    }
+
+    public function getVerificationToken(): ?string
+    {
+        return $this->verificationToken;
+    }
+
+    public function setVerificationToken(?string $verificationToken): self
+    {
+        $this->verificationToken = $verificationToken;
+        return $this;
     }
 }

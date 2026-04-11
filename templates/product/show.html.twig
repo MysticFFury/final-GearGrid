@@ -332,7 +332,7 @@
                     <i class="fas fa-arrow-left"></i> Back to List
                 </a>
                 
-                {% if is_granted('ROLE_ADMIN') or product.createdBy == app.user %}
+                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
                     <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn btn-edit">
                         <i class="fas fa-edit"></i> Edit Product
                     </a>

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Log;
 use App\Form\RegistrationFormType;
+use App\Service\EmailVerificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class RegistrationController extends AbstractController
 {
+    public function __construct(
+        private EmailVerificationService $emailVerificationService,
+    ) {
+    }
+
     #[Route('/register', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
@@ -42,9 +48,16 @@ class RegistrationController extends AbstractController
             if (!$isAdmin) {
                 // Public user registration - set as regular user (ROLE_USER is automatically added by User entity)
                 $user->setRoles([]);
+                
+                // Generate verification token for public users
+                $verificationToken = EmailVerificationService::generateToken();
+                $user->setVerificationToken($verificationToken);
+                $user->setIsVerified(false);
             } elseif (empty($user->getRoles()) || (count($user->getRoles()) === 1 && in_array('ROLE_USER', $user->getRoles()))) {
                 // Admin created user without selecting roles - default to STAFF
                 $user->setRoles(['ROLE_STAFF']);
+                // Admin-created users are automatically verified
+                $user->setIsVerified(true);
             }
 
             $entityManager->persist($user);
@@ -67,8 +80,13 @@ class RegistrationController extends AbstractController
                 // Redirect admin to user list page
                 return $this->redirectToRoute('app_user_index');
             } else {
-                // Public user registration - redirect to login
-                $this->addFlash('success', 'Account created successfully! Please log in.');
+                // Public user registration - send verification email
+                try {
+                    $this->emailVerificationService->sendVerificationEmail($user, $verificationToken);
+                    $this->addFlash('success', 'Account created! Please check your email to verify your account.');
+                } catch (\Exception $e) {
+                    $this->addFlash('warning', 'Account created! However, we couldn\'t send the verification email. Please contact support.');
+                }
                 return $this->redirectToRoute('app_login');
             }
         }

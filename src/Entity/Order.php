@@ -8,6 +8,29 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\User;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use Symfony\Component\Serializer\Attribute\Groups;
+
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Put(),
+        new Delete()
+    ],
+    normalizationContext: [
+        'groups' => ['order:read']
+    ],
+    denormalizationContext: [
+        'groups' => ['order:write']
+    ]
+)]
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
 class Order
@@ -15,18 +38,23 @@ class Order
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['order:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['order:read', 'order:write'])]
     private ?string $customerName = null;
 
     #[ORM\Column]
+    #[Groups(['order:read', 'order:write'])]
     private ?float $totalPrice = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['order:read', 'order:write'])]
     private ?string $status = null;
 
     #[ORM\Column]
+    #[Groups(['order:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     /**

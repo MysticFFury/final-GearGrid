@@ -82,6 +82,11 @@ final class OrderController extends AbstractController
             if ($selectedCustomer instanceof User) {
                 $order->setCustomerName($selectedCustomer->getName());
             }
+            // Keep existing customer name if no new customer is selected
+            elseif (!$order->getCustomerName()) {
+                // If no customer name exists, set a default
+                $order->setCustomerName('Guest Customer');
+            }
             
             $entityManager->flush();
 
