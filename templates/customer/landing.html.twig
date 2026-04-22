@@ -4,6 +4,227 @@
 
 {% block stylesheets %}
 <style>
+    /* --- Loading Screen --- */
+    #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0B1120 0%, #1a1f35 50%, #0B1120 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.8s ease, visibility 0.8s ease;
+        overflow: hidden;
+    }
+
+    #loading-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    /* Animated Background Particles */
+    .loading-particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: #6C63FF;
+        border-radius: 50%;
+        opacity: 0.6;
+        animation: float-particle 8s infinite ease-in-out;
+        box-shadow: 0 0 10px #6C63FF, 0 0 20px #6C63FF;
+    }
+
+    .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; animation-duration: 6s; }
+    .particle:nth-child(2) { left: 20%; top: 80%; animation-delay: 1s; animation-duration: 8s; }
+    .particle:nth-child(3) { left: 30%; top: 30%; animation-delay: 2s; animation-duration: 7s; }
+    .particle:nth-child(4) { left: 40%; top: 70%; animation-delay: 0.5s; animation-duration: 9s; }
+    .particle:nth-child(5) { left: 50%; top: 40%; animation-delay: 1.5s; animation-duration: 5s; }
+    .particle:nth-child(6) { left: 60%; top: 60%; animation-delay: 2.5s; animation-duration: 8s; }
+    .particle:nth-child(7) { left: 70%; top: 25%; animation-delay: 3s; animation-duration: 6s; }
+    .particle:nth-child(8) { left: 80%; top: 75%; animation-delay: 0.8s; animation-duration: 7s; }
+    .particle:nth-child(9) { left: 90%; top: 45%; animation-delay: 1.2s; animation-duration: 9s; }
+    .particle:nth-child(10) { left: 15%; top: 55%; animation-delay: 2.2s; animation-duration: 6s; }
+
+    @keyframes float-particle {
+        0%, 100% {
+            transform: translateY(0) translateX(0) scale(1);
+            opacity: 0.6;
+        }
+        25% {
+            transform: translateY(-30px) translateX(15px) scale(1.2);
+            opacity: 0.8;
+        }
+        50% {
+            transform: translateY(-60px) translateX(-10px) scale(1);
+            opacity: 0.4;
+        }
+        75% {
+            transform: translateY(-30px) translateX(20px) scale(1.1);
+            opacity: 0.7;
+        }
+    }
+
+    /* Glowing Ring Animation */
+    .loading-ring {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin-bottom: 2rem;
+    }
+
+    .loading-ring::before,
+    .loading-ring::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        border: 2px solid transparent;
+    }
+
+    .loading-ring::before {
+        width: 100%;
+        height: 100%;
+        border-top-color: #6C63FF;
+        border-right-color: #6C63FF;
+        animation: spin 1.5s linear infinite;
+        box-shadow: 0 0 20px rgba(108, 99, 255, 0.5);
+    }
+
+    .loading-ring::after {
+        width: 70%;
+        height: 70%;
+        border-bottom-color: #ff6584;
+        border-left-color: #ff6584;
+        animation: spin-reverse 1s linear infinite;
+        box-shadow: 0 0 15px rgba(255, 101, 132, 0.5);
+    }
+
+    .loading-logo-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .loading-logo-center img {
+        width: 50px;
+        height: 50px;
+        animation: pulse-glow 2s ease-in-out infinite;
+        filter: drop-shadow(0 0 15px rgba(108, 99, 255, 0.8));
+    }
+
+    .loading-logo-center h2 {
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.8rem;
+        color: #fff;
+        letter-spacing: 3px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: fadeInUp 1s ease-out;
+    }
+
+    /* Progress Bar */
+    .loading-progress {
+        width: 200px;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        margin-top: 2rem;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .loading-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #6C63FF, #ff6584, #6C63FF);
+        background-size: 200% 100%;
+        border-radius: 10px;
+        animation: progress-slide 2s ease-in-out infinite, shimmer 1.5s linear infinite;
+        box-shadow: 0 0 10px rgba(108, 99, 255, 0.8);
+    }
+
+    .loading-text {
+        margin-top: 1.5rem;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        animation: fadeIn 2s ease-in-out;
+        font-weight: 500;
+    }
+
+    .loading-text span {
+        color: #6C63FF;
+        animation: text-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes spin-reverse {
+        to { transform: translate(-50%, -50%) rotate(-360deg); }
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(108, 99, 255, 0.8)); }
+        50% { transform: scale(1.1); filter: drop-shadow(0 0 25px rgba(108, 99, 255, 1)); }
+    }
+
+    @keyframes progress-slide {
+        0% { width: 0%; }
+        50% { width: 100%; }
+        100% { width: 0%; }
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes text-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
     /* --- Hero Layout --- */
     .hero-section {
         position: relative; /* Needed for the 3D canvas positioning */
@@ -279,6 +500,39 @@
 {% endblock %}
 
 {% block body %}
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <!-- Animated Particles -->
+        <div class="loading-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+
+        <!-- Glowing Ring with Logo -->
+        <div class="loading-ring">
+            <div class="loading-logo-center">
+                <img src="{{ asset('images/logo.png') }}" alt="GearGrid Logo">
+                <h2>GEARGRID</h2>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+
+        <!-- Loading Text -->
+        <p class="loading-text">Initializing <span>•</span></p>
+    </div>
+
     <section class="hero-section animate-up">
         <div id="canvas-container"></div>
 
@@ -734,7 +988,18 @@
                 moveToSlide(track, currentSlide, targetSlide); updateDots(currentDot, targetDot);
             });
 
-            setInterval(() => { nextButton.click(); }, 5000); 
+            setInterval(() => { nextButton.click(); }, 5000);
+
+            // Loading Screen Logic
+            window.addEventListener('load', function() {
+                const loadingScreen = document.getElementById('loading-screen');
+                setTimeout(function() {
+                    loadingScreen.classList.add('hidden');
+                    setTimeout(function() {
+                        loadingScreen.style.display = 'none';
+                    }, 800);
+                }, 1500);
+            });
         });
     </script>
 {% endblock %}

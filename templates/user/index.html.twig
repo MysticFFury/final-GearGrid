@@ -5,198 +5,32 @@
 {% block stylesheets %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
     :root {
         --primary: #6C63FF;
+        --primary-hover: #5b54d6;
         --secondary: #ff6584;
-        --danger: #dc3545;
         --success: #4ade80;
-        --bg-dark: #12121e;
-        --card-bg: #1e1e2f;
-        --text-muted: #88889b;
-        --glass-border: rgba(255, 255, 255, 0.08);
+        --bg-base: #0B1120;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --glass-bg: rgba(255, 255, 255, 0.02);
+        --glass-bg-hover: rgba(255, 255, 255, 0.04);
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-border-hover: rgba(255, 255, 255, 0.12);
+        --danger: #dc3545;
+        --card-bg: rgba(255, 255, 255, 0.02);
     }
 
     .dashboard main {
+        margin-left: 16rem;
         padding: 2rem 3rem;
         min-height: 100vh;
-        background: var(--bg-dark);
-        font-family: 'Inter', sans-serif;
+        background: var(--bg-base);
     }
 
-    /* --- TOP BAR STYLING --- */
-    .top-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 3rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--glass-border);
-    }
-
-    .header-left h1 {
-        font-family: 'Oswald', sans-serif;
-        color: #fff;
-        font-size: 2rem;
-        letter-spacing: 1px;
-        margin: 0;
-    }
-
-    .breadcrumb {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        margin-top: 8px;
-    }
-
-    .breadcrumb a {
-        color: var(--text-muted);
-        text-decoration: none;
-        transition: color 0.2s;
-    }
-
-    .breadcrumb a:hover { color: var(--primary); }
-
-    .breadcrumb i { font-size: 0.7rem; opacity: 0.5; }
-
-    .breadcrumb span { color: var(--secondary); font-weight: 600; }
-
-    .header-right .profile {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        background: rgba(255, 255, 255, 0.03);
-        padding: 8px 20px;
-        border-radius: 50px;
-        border: 1px solid var(--glass-border);
-        transition: all 0.3s ease;
-    }
-
-    .header-right .profile:hover {
-        background: rgba(255, 255, 255, 0.08);
-        transform: translateY(-2px);
-    }
-
-    .text-info {
-        display: flex;
-        flex-direction: column;
-        text-align: right;
-    }
-
-    .text-info .name { color: #fff; font-weight: 600; font-size: 0.9rem; }
-    .text-info .role { color: var(--text-muted); font-size: 0.75rem; }
-
-    .avatar-wrapper { position: relative; width: 42px; height: 42px; }
-    .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--primary); }
-    .status-indicator {
-        position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px;
-        background: #4ade80; border: 2px solid var(--bg-dark); border-radius: 50%;
-    }
-
-    /* --- CONTENT AREA --- */
-    .content-area {
-        width: 100%;
-    }
-
-    /* --- CONTENT HEADER --- */
-    .content-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .content-header h2 {
-        font-family: 'Oswald', sans-serif;
-        color: #fff;
-        font-size: 1.5rem;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .content-header h2 i {
-        color: var(--primary);
-    }
-
-    .content-actions {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .search-input {
-        padding: 0.75rem 1.2rem;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.05);
-        color: #fff;
-        font-size: 0.95rem;
-        width: 300px;
-        transition: all 0.3s ease;
-    }
-
-    .search-input:focus {
-        outline: none;
-        border-color: var(--primary);
-        background: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 0 20px rgba(108, 99, 255, 0.2);
-    }
-
-    .search-input::placeholder {
-        color: var(--text-muted);
-    }
-
-    .btn-add {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 0.75rem 1.5rem;
-        border-radius: 12px;
-        font-weight: 600;
-        text-decoration: none;
-        background: var(--primary);
-        color: #fff;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 20px rgba(108, 99, 255, 0.25);
-    }
-
-    .btn-add:hover {
-        transform: translateY(-3px);
-        filter: brightness(1.2);
-        box-shadow: 0 6px 25px rgba(108, 99, 255, 0.35);
-    }
-
-    /* --- TABLE CARD --- */
-    .table-card {
-        background: var(--card-bg);
-        padding: 2rem;
-        border-radius: 24px;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        border: 1px solid var(--glass-border);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .table-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: linear-gradient(90deg, var(--primary), var(--secondary));
-    }
-
-    /* --- DATA TABLE STYLING --- */
     .styled-table {
         width: 100%;
         border-collapse: collapse;
@@ -221,6 +55,7 @@
         padding: 1.2rem 1.2rem;
         color: #fff;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 0.9rem;
     }
 
     .styled-table tbody tr {
@@ -235,11 +70,261 @@
         border-bottom: none;
     }
 
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .badge-id {
+        color: var(--secondary);
+        font-family: monospace;
+        background: rgba(255,101,132,0.1);
+    }
+
+    .badge-role {
+        background: rgba(108, 99, 255, 0.2);
+        color: var(--primary);
+    }
+
+    .badge-status-active {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+    }
+
+    .badge-status-inactive {
+        background: rgba(220, 53, 69, 0.2);
+        color: #ff6b6b;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
+    }
+
+        font-size: 0.6rem; 
+        opacity: 0.4; 
+    }
+
+    .breadcrumb span { 
+        color: var(--primary); 
+        font-weight: 600;
+    }
+
+    .header-right .profile {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: linear-gradient(135deg, rgba(108, 99, 255, 0.08) 0%, rgba(255, 101, 132, 0.08) 100%);
+        padding: 10px 20px;
+        border-radius: 50px;
+        border: 1px solid var(--glass-border);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .header-right .profile:hover {
+        background: linear-gradient(135deg, rgba(108, 99, 255, 0.12) 0%, rgba(255, 101, 132, 0.12) 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(108, 99, 255, 0.15);
+    }
+
+    .text-info {
+        display: flex;
+        flex-direction: column;
+        text-align: right;
+    }
+
+    .text-info .name { 
+        color: var(--text-main); 
+        font-weight: 600; 
+        font-size: 0.9rem; 
+    }
+    .text-info .role { 
+        color: var(--text-muted); 
+        font-size: 0.75rem; 
+        font-weight: 500;
+    }
+
+    .avatar-wrapper { 
+        position: relative; 
+        width: 40px; 
+        height: 40px; 
+    }
+    .avatar-wrapper img { 
+        width: 100%; 
+        height: 100%; 
+        border-radius: 50%; 
+        border: 2px solid var(--primary);
+        box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+    }
+    .status-indicator {
+        position: absolute; 
+        bottom: 1px; 
+        right: 1px; 
+        width: 10px; 
+        height: 10px;
+        background: var(--success); 
+        border: 2px solid var(--bg-card); 
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+    }
+
+    /* --- CONTENT AREA --- */
+    .content-area {
+        width: 100%;
+    }
+
+    /* --- CONTENT HEADER --- */
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .content-header h2 {
+        font-family: 'Oswald', sans-serif;
+        color: var(--text-main);
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .content-header h2 i {
+        color: var(--primary);
+        font-size: 1.2rem;
+    }
+
+    .content-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .search-input {
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-card);
+        color: var(--text-main);
+        font-size: 0.9rem;
+        width: 280px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: var(--bg-elevated);
+        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+        width: 320px;
+    }
+
+    .search-input::placeholder {
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+
+    .btn-add {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: #fff;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 14px rgba(108, 99, 255, 0.4);
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+    }
+
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(108, 99, 255, 0.5);
+    }
+
+    /* --- TABLE CARD --- */
+    .table-card {
+        background: var(--bg-card);
+        padding: 1.75rem;
+        border-radius: 16px;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .table-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+
+    /* --- DATA TABLE STYLING --- */
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .styled-table thead {
+        background: linear-gradient(135deg, rgba(108, 99, 255, 0.05) 0%, rgba(255, 101, 132, 0.05) 100%);
+    }
+
+    .styled-table th {
+        padding: 1rem 1.25rem;
+        text-align: left;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        border-bottom: 1px solid var(--border-color);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .styled-table td {
+        padding: 1.1rem 1.25rem;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--border-color);
+        font-weight: 500;
+    }
+
+    .styled-table tbody tr {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .styled-table tbody tr:hover {
+        background: rgba(108, 99, 255, 0.03);
+    }
+
+    .styled-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
     /* --- ACTION BUTTONS --- */
     .actions-group {
         display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
+        gap: 0;
+        align-items: center;
     }
 
     .btn-view,
@@ -247,124 +332,129 @@
     .btn-delete {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
+        gap: 5px;
+        padding: 0.4rem 0.75rem;
+        border-radius: 0;
         font-weight: 600;
         text-decoration: none;
-        font-size: 0.85rem;
-        transition: all 0.3s ease;
+        font-size: 0.8rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         border: none;
         cursor: pointer;
-        color: #fff;
+        font-family: 'Inter', sans-serif;
+        border-right: 1px solid var(--border-color);
     }
 
     .btn-view {
-        background: rgba(108, 99, 255, 0.2);
-        color: var(--primary);
-        border: 1px solid rgba(108, 99, 255, 0.3);
+        background: rgba(108, 99, 255, 0.1);
+        color: var(--primary-light);
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
     }
 
     .btn-view:hover {
-        background: rgba(108, 99, 255, 0.3);
-        transform: translateY(-2px);
+        background: rgba(108, 99, 255, 0.2);
     }
 
     .btn-edit {
-        background: var(--primary);
-        box-shadow: 0 2px 10px rgba(108, 99, 255, 0.2);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: #fff;
     }
 
     .btn-edit:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.2);
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
     }
 
     .btn-delete {
-        background: var(--danger);
-        box-shadow: 0 2px 10px rgba(220, 53, 69, 0.2);
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+        border-right: none;
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
     }
 
     .btn-delete:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.2);
+        background: rgba(239, 68, 68, 0.2);
     }
 
     .badge {
         display: inline-block;
-        padding: 6px 12px;
+        padding: 0.35rem 0.75rem;
         border-radius: 6px;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         font-weight: 600;
+        font-family: 'Inter', sans-serif;
     }
 
     .badge-secondary {
         color: var(--secondary);
-        font-family: monospace;
-        background: rgba(255,101,132,0.1);
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        background: rgba(255, 101, 132, 0.1);
+        border: 1px solid rgba(255, 101, 132, 0.2);
     }
 
     .role-badge {
         display: inline-block;
-        padding: 4px 10px;
+        padding: 0.3rem 0.75rem;
         margin: 2px;
         border-radius: 6px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         font-weight: 600;
-        background: rgba(108, 99, 255, 0.2);
-        color: var(--primary);
+        background: linear-gradient(135deg, rgba(108, 99, 255, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+        color: var(--primary-light);
+        border: 1px solid rgba(108, 99, 255, 0.2);
     }
 
     .btn-toggle {
-        padding: 6px 12px;
-        border-radius: 6px;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
         border: none;
         cursor: pointer;
         font-weight: 600;
-        font-size: 0.85rem;
-        transition: all 0.3s ease;
-        color: #fff;
+        font-size: 0.75rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
     }
 
     .btn-toggle.active {
-        background: rgba(74, 222, 128, 0.2);
+        background: rgba(16, 185, 129, 0.15);
         color: var(--success);
-        border: 1px solid rgba(74, 222, 128, 0.3);
+        border: 1px solid rgba(16, 185, 129, 0.25);
     }
 
     .btn-toggle.inactive {
-        background: rgba(239, 68, 68, 0.2);
-        color: #ef4444;
-        border: 1px solid rgba(239, 68, 68, 0.3);
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(239, 68, 68, 0.2);
     }
 
     .btn-toggle:hover {
-        transform: translateY(-2px);
-        filter: brightness(1.2);
+        transform: translateY(-1px);
     }
 
     /* --- FLASH MESSAGES --- */
     .flash-message {
         margin-bottom: 1.5rem;
         padding: 1rem 1.5rem;
-        border-radius: 8px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        box-shadow: var(--shadow-md);
+        backdrop-filter: blur(10px);
     }
 
     .alert-success {
-        background: #28a745;
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+        color: var(--success);
+        border: 1px solid rgba(16, 185, 129, 0.25);
     }
 
     .alert-error {
-        background: #dc3545;
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        background: linear-gradient(135deg, rgba(255, 101, 132, 0.15) 0%, rgba(255, 101, 132, 0.1) 100%);
+        color: var(--secondary);
+        border: 1px solid rgba(255, 101, 132, 0.25);
     }
 
     /* --- RESPONSIVE --- */
@@ -376,7 +466,7 @@
         .top-header {
             flex-direction: column;
             align-items: flex-start;
-            gap: 20px;
+            gap: 1.5rem;
         }
 
         .header-right {
@@ -411,7 +501,7 @@
 
         .styled-table th,
         .styled-table td {
-            padding: 0.75rem 0.5rem;
+            padding: 0.75rem 0.75rem;
         }
 
         .actions-group {
@@ -433,64 +523,52 @@
     {% include 'partials/_sidebar.html.twig' %}
 
     <main class="main-content">
-        <div class="top-header">
-            <div class="header-left">
-                <h1>Users</h1>
-                <nav class="breadcrumb">
-                    <a href="{{ path('app_dashboard') }}">Dashboard</a> 
-                    <i class="fas fa-chevron-right"></i> 
-                    <span>Users</span>
+        <!-- Top Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-gray-800">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Users</h1>
+                <nav class="flex items-center gap-2 text-sm text-gray-400">
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-purple-400 transition-colors">Dashboard</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <span class="text-pink-400 font-semibold">Users</span>
                 </nav>
             </div>
-
-            <div class="header-right">
-                <div class="user-info">
-                    <div class="profile">
-                        <div class="text-info">
-                            <span class="name">{{ app.user.name|default(app.user.username|default('Admin')) }}</span>
-                            <span class="role">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</span>
-                        </div>
-                        <div class="avatar-wrapper">
-                            <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User">
-                            <span class="status-indicator"></span>
-                        </div>
-                        <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 0.8rem;"></i>
-                    </div>
-                </div>
+            <div class="mt-4 md:mt-0">
+                {% include 'partials/_user_dropdown.html.twig' %}
             </div>
         </div>
 
         <div class="content-area">
-            {# Flash Messages #}
+            <!-- Flash Messages -->
             {% for message in app.flashes('success') %}
-                <div class="alert alert-success flash-message">
-                    <span style="display: flex; align-items: center; gap: 10px;">
+                <div class="bg-green-500/20 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg mb-4 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
                         <i class="fas fa-check-circle"></i> {{ message }}
                     </span>
-                    <button onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; opacity: 0.8; padding: 0 5px;">&times;</button>
+                    <button onclick="this.parentElement.remove()" class="text-green-400 hover:text-green-300 text-xl opacity-80 hover:opacity-100 transition-opacity">&times;</button>
                 </div>
             {% endfor %}
 
             {% for message in app.flashes('error') %}
-                <div class="alert alert-error flash-message">
-                    <span style="display: flex; align-items: center; gap: 10px;">
+                <div class="bg-red-500/20 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg mb-4 flex items-center justify-between">
+                    <span class="flex items-center gap-2">
                         <i class="fas fa-exclamation-circle"></i> {{ message }}
                     </span>
-                    <button onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; opacity: 0.8; padding: 0 5px;">&times;</button>
+                    <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-300 text-xl opacity-80 hover:opacity-100 transition-opacity">&times;</button>
                 </div>
             {% endfor %}
 
-            <div class="content-header">
-                <h2><i class="fas fa-users"></i> User List</h2>
-                <div class="content-actions">
-                    <input type="text" id="userSearch" class="search-input" placeholder="🔍 Search users...">
-                    <a href="{{ path('app_register') }}" class="btn-add">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <h2 class="text-xl font-semibold text-white flex items-center gap-3"><i class="fas fa-users text-purple-500"></i> User List</h2>
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <input type="text" id="userSearch" class="px-4 py-2 pl-10 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all w-full sm:w-auto" placeholder="🔍 Search users...">
+                    <a href="{{ path('app_register') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20">
                         <i class="fas fa-user-plus"></i> Add New User
                     </a>
                 </div>
             </div>
 
-            <div class="table-card">
+            <div class="bg-gray-800/30 border border-gray-700 rounded-xl p-6 border-t-4 border-t-purple-500">
                 <table id="userTable" class="display styled-table" style="width:100%;">
                     <thead>
                         <tr>
@@ -506,33 +584,33 @@
                     <tbody>
                         {% for user in users %}
                             <tr>
-                                <td><span class="badge badge-secondary">#{{ user.id }}</span></td>
-                                <td style="font-weight: 600;">{{ user.name }}</td>
-                                <td style="color: var(--text-muted);">{{ user.email }}</td>
+                                <td><span class="badge badge-id">#{{ user.id }}</span></td>
+                                <td class="font-semibold">{{ user.name }}</td>
+                                <td class="text-gray-400">{{ user.email }}</td>
                                 <td>
                                     {% for role in user.roles %}
                                         {% if role != 'ROLE_USER' %}
-                                            <span class="role-badge">
+                                            <span class="badge badge-role">
                                                 {{ role|replace({'ROLE_':''}) }}
                                             </span>
                                         {% endif %}
                                     {% endfor %}
                                 </td>
-                                <td style="color: var(--text-muted);">{{ user.createdAt ? user.createdAt|date('M d, Y') : 'N/A' }}</td>
+                                <td class="text-gray-400">{{ user.createdAt ? user.createdAt|date('M d, Y') : 'N/A' }}</td>
                                 <td>
                                     <form method="post" action="{{ path('app_user_toggle', {id: user.id}) }}" style="display:inline;">
                                         <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ user.id) }}">
-                                        <button type="submit" class="btn-toggle {{ user.isActive ? 'active' : 'inactive' }}">
+                                        <button type="submit" class="px-3 py-1 rounded-lg text-sm font-medium transition-colors {% if user.isActive %}bg-green-500/20 text-green-400 hover:bg-green-500/30{% else %}bg-red-500/20 text-red-400 hover:bg-red-500/30{% endif %}">
                                             {{ user.isActive ? 'Active' : 'Inactive' }}
                                         </button>
                                     </form>
                                 </td>
                                 <td>
-                                    <div class="actions-group">
-                                        <a href="{{ path('app_user_show', {'id': user.id}) }}" class="btn-view">
+                                    <div class="flex items-center gap-0">
+                                        <a href="{{ path('app_user_show', {'id': user.id}) }}" class="bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-600/30 px-3 py-1.5 text-sm font-medium transition-colors flex items-center gap-1 rounded-l-lg">
                                             <i class="fas fa-eye"></i> View
                                         </a>
-                                        <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn-edit">
+                                        <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 text-sm font-medium transition-colors flex items-center gap-1 border-l border-l-gray-700">
                                             <i class="fas fa-edit"></i> Edit
                                         </a>
                                         {{ include('user/_delete_form.html.twig', { 'user': user }) }}
@@ -541,8 +619,8 @@
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="7" style="text-align:center; padding: 2rem; color: var(--text-muted);">
-                                    <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+                                <td colspan="7" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-users text-4xl mb-3 opacity-50 block"></i>
                                     No users found.
                                 </td>
                             </tr>

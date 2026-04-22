@@ -83,8 +83,8 @@ class SecurityLogSubscriber implements EventSubscriberInterface
         $this->em->persist($log);
         $this->em->flush();
 
-        // Redirect to login page after logout
-        $response = new RedirectResponse($this->urlGenerator->generate('app_login'));
+        // Redirect to customer-landing page after logout
+        $response = new RedirectResponse($this->urlGenerator->generate('app_customer_landing'));
         
         // Prevent back button access by setting cache control headers
         $response->headers->addCacheControlDirective('no-cache', true);

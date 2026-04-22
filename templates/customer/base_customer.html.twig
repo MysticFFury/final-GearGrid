@@ -80,6 +80,13 @@
             display: flex; align-items: center; justify-content: center;
             background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(255, 101, 132, 0.1));
             border: 1px solid var(--glass-border-hover); font-size: 1.1rem;
+            overflow: hidden;
+        }
+
+        .landing-brand .mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .landing-nav { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
@@ -174,23 +181,53 @@
         }
         .footer-top { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem; }
         .brand-col .brand { display: flex; align-items: center; gap: 10px; font-family: 'Oswald', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.8rem; color: #fff;}
-        
+
         /* Updated brand-mark to hold the image logo nicely */
-        .brand-mark { 
-            width: 38px; 
-            height: 38px; 
-            border-radius: 9px; 
-            background: rgba(108,99,255,0.15); 
-            border: 1px solid rgba(108,99,255,0.25); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, rgba(108,99,255,0.2), rgba(255,101,132,0.1));
+            border: 1px solid rgba(108,99,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 4px;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
         }
+
+        .brand-mark::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(108,99,255,0.4), rgba(255,101,132,0.3));
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .brand-mark:hover {
+            transform: scale(1.1) rotate(3deg);
+            box-shadow: 0 0 25px rgba(108,99,255,0.5), 0 0 50px rgba(108,99,255,0.3);
+            border-color: rgba(108,99,255,0.6);
+        }
+
+        .brand-mark:hover::before {
+            opacity: 1;
+        }
+
         .brand-logo-img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            transition: transform 0.5s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-mark:hover .brand-logo-img {
+            transform: scale(1.1) rotate(-3deg);
         }
 
         .brand-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 1.1rem; }

@@ -4,123 +4,32 @@
 
 {% block stylesheets %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
     :root {
         --primary: #6C63FF;
+        --primary-hover: #5b54d6;
         --secondary: #ff6584;
+        --success: #4ade80;
+        --bg-base: #0B1120;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --glass-bg: rgba(255, 255, 255, 0.02);
+        --glass-bg-hover: rgba(255, 255, 255, 0.04);
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-border-hover: rgba(255, 255, 255, 0.12);
         --danger: #dc3545;
-        --bg-dark: #12121e;
-        --card-bg: #1e1e2f;
-        --text-muted: #88889b;
-        --glass-border: rgba(255, 255, 255, 0.08);
+        --card-bg: rgba(255, 255, 255, 0.02);
     }
 
     .dashboard main {
+        margin-left: 16rem;
         padding: 2rem 3rem;
         min-height: 100vh;
-        background: var(--bg-dark);
-        font-family: 'Inter', sans-serif;
+        background: var(--bg-base);
     }
 
-    /* --- TOP BAR STYLING --- */
-    .top-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 3rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px solid var(--glass-border);
-    }
-
-    .header-left h1 {
-        font-family: 'Oswald', sans-serif;
-        color: #fff;
-        font-size: 2rem;
-        letter-spacing: 1px;
-        margin: 0;
-    }
-
-    .breadcrumb {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        margin-top: 8px;
-    }
-
-    .breadcrumb a {
-        color: var(--text-muted);
-        text-decoration: none;
-        transition: color 0.2s;
-    }
-
-    .breadcrumb a:hover { color: var(--primary); }
-
-    .breadcrumb i { font-size: 0.7rem; opacity: 0.5; }
-
-    .breadcrumb span { color: var(--secondary); font-weight: 600; }
-
-    .header-right .profile {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        background: rgba(255, 255, 255, 0.03);
-        padding: 8px 20px;
-        border-radius: 50px;
-        border: 1px solid var(--glass-border);
-        transition: all 0.3s ease;
-    }
-
-    .header-right .profile:hover {
-        background: rgba(255, 255, 255, 0.08);
-        transform: translateY(-2px);
-    }
-
-    .text-info {
-        display: flex;
-        flex-direction: column;
-        text-align: right;
-    }
-
-    .text-info .name { color: #fff; font-weight: 600; font-size: 0.9rem; }
-    .text-info .role { color: var(--text-muted); font-size: 0.75rem; }
-
-    .avatar-wrapper { position: relative; width: 42px; height: 42px; }
-    .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--primary); }
-    .status-indicator {
-        position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px;
-        background: #4ade80; border: 2px solid var(--bg-dark); border-radius: 50%;
-    }
-
-    /* --- CARD STYLING --- */
-    .card {
-        background: var(--card-bg);
-        padding: 3rem;
-        border-radius: 24px;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        max-width: 900px;
-        margin: 0 auto;
-        border: 1px solid var(--glass-border);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .card::before {
-        content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-        background: linear-gradient(90deg, var(--primary), var(--secondary));
-    }
-
-    .card h2 {
-        color: #fff; font-family: 'Oswald', sans-serif; font-size: 1.5rem;
-        margin-bottom: 2.5rem; text-transform: uppercase; display: flex; align-items: center; gap: 12px;
-    }
-
-    .card h2 i { color: var(--primary); }
-
-    /* --- DATA TABLE --- */
     .detail-table { width: 100%; border-collapse: collapse; margin-bottom: 3rem; }
     .detail-table tr { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
     .detail-table tr:last-child { border: none; }
@@ -159,29 +68,11 @@
         background: rgba(255,101,132,0.1);
     }
 
-    /* --- ACTION BUTTONS --- */
-    .actions {
-        display: flex; gap: 15px; justify-content: flex-start; align-items: center;
-        border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 2.5rem;
-    }
-
-    .btn {
-        display: inline-flex; align-items: center; gap: 10px; padding: 0.8rem 1.5rem;
-        border-radius: 12px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;
-        cursor: pointer; border: none; font-size: 0.9rem; color: #fff; font-family: 'Inter', sans-serif;
-    }
-
-    .btn-back { background: rgba(255, 255, 255, 0.05); color: #ccc; border: 1px solid var(--glass-border); }
-    .btn-back:hover { background: rgba(255, 255, 255, 0.1); color: #fff; transform: translateY(-3px); }
-
-    /* --- RESPONSIVE --- */
-    @media screen and (max-width: 768px) {
-        .top-header { flex-direction: column; align-items: flex-start; gap: 20px; }
-        .header-right { width: 100%; }
-        .header-right .profile { justify-content: space-between; }
-        .actions { flex-direction: column; align-items: stretch; }
-        .btn { justify-content: center; }
-        .card { padding: 2rem 1.5rem; }
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
     }
 </style>
 {% endblock %}
@@ -191,83 +82,81 @@
     {% include 'partials/_sidebar.html.twig' %}
 
     <main class="main-content">
-        <div class="top-header">
-            <div class="header-left">
-                <h1>Log Details</h1>
-                <nav class="breadcrumb">
-                    <a href="{{ path('app_dashboard') }}">Dashboard</a> 
-                    <i class="fas fa-chevron-right"></i> 
-                    <a href="{{ path('app_log_index') }}">Logs</a> 
-                    <i class="fas fa-chevron-right"></i> 
-                    <span>Log #{{ log.id }}</span>
+        <!-- Top Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-gray-800">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Log Details</h1>
+                <nav class="flex items-center gap-2 text-sm text-gray-400">
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-purple-400 transition-colors">Dashboard</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <a href="{{ path('app_log_index') }}" class="hover:text-purple-400 transition-colors">Logs</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <span class="text-pink-400 font-semibold">Log #{{ log.id }}</span>
                 </nav>
             </div>
-
-            <div class="header-right">
-                <div class="user-info">
-                    <div class="profile">
-                        <div class="text-info">
-                            <span class="name">{{ app.user.name|default('User') }}</span>
-                            <span class="role">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</span>
-                        </div>
-                        <div class="avatar-wrapper">
-                            <img src="https://ui-avatars.com/api/?name={{ app.user.name|default('User')|url_encode }}&background=6C63FF&color=fff" alt="User">
-                            <span class="status-indicator"></span>
-                        </div>
-                        <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 0.8rem;"></i>
-                    </div>
+            <div class="mt-4 md:mt-0 flex items-center gap-3 bg-gray-800/50 px-4 py-2 rounded-full border border-gray-700">
+                <div class="text-right">
+                    <p class="text-white font-semibold text-sm">{{ app.user.name|default(app.user.username|default('Admin')) }}</p>
+                    <p class="text-gray-400 text-xs">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</p>
                 </div>
+                <div class="relative">
+                    <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User" class="w-10 h-10 rounded-lg border-2 border-purple-500">
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-gray-900 rounded-full"></span>
+                </div>
+                <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
             </div>
         </div>
 
-        <div class="card">
-            <h2><i class="fas fa-file-alt"></i> Log Information</h2>
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-gray-800/30 border border-gray-700 rounded-xl p-8 border-t-4 border-t-purple-500">
+                <h2 class="text-xl font-semibold text-white mb-8 flex items-center gap-3"><i class="fas fa-file-alt text-purple-500"></i> Log Information</h2>
 
-            <table class="detail-table">
-                <tbody>
-                    <tr>
-                        <th>Log ID</th>
-                        <td><span class="badge badge-secondary">#{{ log.id }}</span></td>
-                    </tr>
-                    <tr>
-                        <th>Action</th>
-                        <td><span class="badge badge-primary">{{ log.action }}</span></td>
-                    </tr>
-                    <tr>
-                        <th>Message</th>
-                        <td style="font-weight: 500; line-height: 1.6;">{{ log.message }}</td>
-                    </tr>
-                    <tr>
-                        <th>Status</th>
-                        <td>
-                            <span class="badge {% if log.status == 'active' %}badge-success{% else %}badge-danger{% endif %}">
-                                {{ log.status|capitalize }}
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>User Name</th>
-                        <td>{{ log.userName ?: 'Anonymous' }}</td>
-                    </tr>
-                    <tr>
-                        <th>User Role</th>
-                        <td style="color: var(--text-muted);">{{ log.userRole ?: 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Entity</th>
-                        <td style="color: var(--text-muted);">{{ log.entity ?: 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Created At</th>
-                        <td style="color: var(--text-muted);">{{ log.createdAt ? log.createdAt|date('F d, Y \\a\\t g:i A') : 'N/A' }}</td>
-                    </tr>
-                </tbody>
-            </table>
+                <table class="detail-table">
+                    <tbody>
+                        <tr>
+                            <th>Log ID</th>
+                            <td><span class="badge badge-secondary">#{{ log.id }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Action</th>
+                            <td><span class="badge badge-primary">{{ log.action }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Message</th>
+                            <td class="font-medium leading-relaxed">{{ log.message }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>
+                                <span class="badge {% if log.status == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                                    {{ log.status|capitalize }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>User Name</th>
+                            <td>{{ log.userName ?: 'Anonymous' }}</td>
+                        </tr>
+                        <tr>
+                            <th>User Role</th>
+                            <td class="text-gray-400">{{ log.userRole ?: 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Entity</th>
+                            <td class="text-gray-400">{{ log.entity ?: 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Created At</th>
+                            <td class="text-gray-400">{{ log.createdAt ? log.createdAt|date('F d, Y \a\t g:i A') : 'N/A' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-            <div class="actions">
-                <a href="{{ path('app_log_index') }}" class="btn btn-back">
-                    <i class="fas fa-arrow-left"></i> Back to List
-                </a>
+                <div class="flex flex-wrap gap-3 pt-10 border-t border-gray-700">
+                    <a href="{{ path('app_log_index') }}" class="bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white border border-gray-600 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
             </div>
         </div>
     </main>

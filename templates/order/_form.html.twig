@@ -1,30 +1,25 @@
-{{ form_start(form, {'attr': {'class': 'gg-form'}}) }}
-    <div class="gg-form-card">
-        <h2>{{ form.vars.value.id is defined ? 'Edit Order' : 'Add New Order' }}</h2>
+{{ form_start(form, {'attr': {'class': 'space-y-4'}}) }}
 
-        <div class="gg-form-grid">
-            {# Render each field individually for better styling control #}
-            {% for child in form %}
-                {% if child.vars.name not in ['_token'] %}
-                    <div class="gg-field">
-                        {{ form_label(child, null, {'label_attr': {'class': 'gg-label'}}) }}
-                        <div class="gg-field-control">
-                            {{ form_widget(child, {'attr': {'class': 'gg-input'}}) }}
-                            {{ form_errors(child) }}
-                        </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        </div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    {% for child in form %}
+        {% if child.vars.name not in ['_token'] %}
+            <div class="space-y-2 {% if child.vars.name == 'products' %}md:col-span-2{% endif %}">
+                {{ form_label(child, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                {{ form_widget(child, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
+                {{ form_errors(child) }}
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
 
-        <div class="gg-action-row">
-            <button type="submit" class="btn btn-save">
-                <i class="fas fa-save"></i> {{ button_label|default('Save') }}
-            </button>
+<div class="flex flex-wrap gap-3 pt-6 border-t border-gray-700">
+    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg shadow-purple-500/20">
+        <i class="fas fa-save"></i> {{ button_label|default('Save') }}
+    </button>
 
-            <a href="{{ app.request.headers.get('referer') ?: path('app_order_index') }}" class="btn btn-cancel">
-                <i class="fas fa-arrow-left"></i> Cancel
-            </a>
-        </div>
-    </div>
+    <a href="{{ app.request.headers.get('referer') ?: path('app_order_index') }}" class="bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white border border-gray-600 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+        <i class="fas fa-arrow-left"></i> Cancel
+    </a>
+</div>
+
 {{ form_end(form) }}

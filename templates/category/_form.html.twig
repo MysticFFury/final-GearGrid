@@ -1,147 +1,21 @@
-{{ form_start(form, { 'attr': { 'class': 'gg-form' } }) }}
+{{ form_start(form, { 'attr': { 'class': 'space-y-4' } }) }}
 
-<div class="gg-form-card">
-    <h2 class="form-title">{{ button_label|default('Save Category') }}</h2>
-
-    <div class="gg-form-grid">
-        {{ form_row(form.name) }}
-        {{ form_row(form.description) }}
-    </div>
-
-    <div class="form-actions">
-        <button type="submit" class="btn-save">
-            <i class="fas fa-save"></i> {{ button_label|default('Save') }}
-        </button>
-    </div>
+<div class="space-y-2">
+    {{ form_label(form.name, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+    {{ form_widget(form.name, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500', 'placeholder': 'Enter category name'}}) }}
+    {{ form_errors(form.name) }}
 </div>
 
-{{ form_end(form) }}}
-<style>
-/* Card container (Enhanced Neumorphic Look) */
-.gg-form-card {
-    /* Use the consistent card background from the dashboard */
-    background: #1f2a38;
-    padding: 50px; /* More generous internal padding */
-    border-radius: 20px; /* More rounded corners */
-    /* Deep, Neumorphic Shadow */
-    box-shadow: 15px 15px 40px rgba(0,0,0,0.7), -15px -15px 40px #2a3a4c;
-    max-width: 650px; /* Slightly wider card */
-    margin: 50px auto; /* Centered with vertical margin */
-    border: none; /* Removed thin border */
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother transition */
-}
+<div class="space-y-2">
+    {{ form_label(form.description, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+    {{ form_widget(form.description, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 min-h-[120px]', 'placeholder': 'Enter description (optional)'}}) }}
+    {{ form_errors(form.description) }}
+</div>
 
-.gg-form-card:hover {
-    transform: translateY(-5px); /* More dramatic lift on hover */
-    box-shadow: 15px 15px 40px rgba(0,0,0,0.8), -15px -15px 40px #2a3a4c;
-}
+<div class="flex flex-wrap gap-3 pt-4 border-t border-gray-700">
+    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg shadow-purple-500/20">
+        <i class="fas fa-save"></i> {{ button_label|default('Save') }}
+    </button>
+</div>
 
-/* Form Title (Vibrant Accent) */
-.form-title {
-    color: #e0e0e0;
-    font-size: 2.2rem; /* Larger, more prominent title */
-    font-weight: 700;
-    text-align: left; /* Aligned left for professionalism */
-    margin-bottom: 35px;
-    padding-bottom: 10px;
-    border-bottom: 3px solid #e94560; /* Vibrant accent color border */
-    width: fit-content;
-}
-
-/* Grid layout */
-.gg-form-grid {
-    display: grid; /* Use grid for better control */
-    grid-template-columns: 1fr; /* Full width for category fields */
-    gap: 20px;
-}
-
-/* Form fields (Inputs, Textareas, Selects) */
-/* Styling the elements themselves */
-.gg-form input, 
-.gg-form textarea, 
-.gg-form select {
-    width: 100%;
-    padding: 15px 18px; /* More internal padding */
-    border-radius: 12px; /* Consistent rounded inputs */
-    border: 1px solid #34495e; /* Softer border */
-    background: #1e2e3f; /* Dark input background */
-    color: #fff;
-    font-size: 1rem;
-    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); /* Pressed input look */
-    transition: all 0.3s ease;
-}
-
-/* Twig Form Label Styling (using generic label selector) */
-.gg-form label {
-    color: #17a2b8; /* Primary accent color for labels */
-    font-weight: 700;
-    margin-bottom: 8px;
-    display: block;
-    font-size: 1.05rem;
-}
-
-/* Focus Glow Effect */
-.gg-form input:focus,
-.gg-form textarea:focus,
-.gg-form select:focus {
-    outline: none;
-    border-color: #17a2b8; /* Accent border color */
-    /* Strong focus glow */
-    box-shadow: 0 0 15px rgba(23,162,184,0.7), inset 2px 2px 5px rgba(0,0,0,0.8);
-    background-color: #161c28; /* Darker background on focus */
-}
-
-.gg-form textarea {
-    min-height: 120px; /* Taller textarea */
-    resize: vertical;
-}
-
-/* Submit button (Vibrant Gradient and Stronger Shadow) */
-.form-actions {
-    margin-top: 40px;
-    display: flex;
-    justify-content: flex-start; /* Keep button on the left */
-}
-
-.btn-save {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 12px 30px; /* Larger padding */
-    border-radius: 12px;
-    font-weight: 700; /* Bolder text */
-    font-size: 1rem;
-    text-transform: uppercase;
-    border: none;
-    cursor: pointer;
-    color: #fff;
-    /* Vibrant Accent Gradient */
-    background: linear-gradient(135deg, #e94560 0%, #ff6b81 100%);
-    /* Stronger box shadow */
-    box-shadow: 0 5px 20px rgba(233, 69, 96, 0.5); 
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.btn-save:hover {
-    opacity: 1;
-    transform: translateY(-5px); /* More dramatic lift */
-    box-shadow: 0 10px 25px rgba(233, 69, 96, 0.7);
-}
-
-/* Responsive */
-@media screen and (max-width: 768px) {
-    .gg-form-card { 
-        padding: 30px 20px; 
-        margin: 20px auto;
-    }
-    .form-title { 
-        font-size: 1.8rem; 
-        width: 100%;
-        text-align: center;
-        border-bottom: none;
-    }
-    .gg-form-grid {
-        gap: 15px;
-    }
-}
-</style>
+{{ form_end(form) }}
