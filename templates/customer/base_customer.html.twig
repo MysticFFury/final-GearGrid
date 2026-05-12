@@ -39,9 +39,12 @@
         .page-wrapper {
             position: relative;
             min-height: 100vh;
-            background: 
-                radial-gradient(circle at 15% 10%, rgba(108, 99, 255, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 85% 90%, rgba(255, 101, 132, 0.08) 0%, transparent 40%);
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(108, 99, 255, 0.13) 0%, transparent 55%),
+                radial-gradient(circle at 12% 25%, rgba(108, 99, 255, 0.11) 0%, transparent 45%),
+                radial-gradient(circle at 92% 75%, rgba(255, 101, 132, 0.09) 0%, transparent 45%),
+                radial-gradient(circle at 50% 120%, rgba(15, 22, 38, 0.85) 0%, transparent 55%),
+                var(--bg-base);
             background-attachment: fixed;
             padding: 6rem 1.5rem 2rem;
             display: flex;
@@ -58,9 +61,10 @@
         /* Topnav Styles */
         .landing-topbar {
             position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            background: rgba(11, 17, 32, 0.6);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--glass-border);
+            background: rgba(11, 17, 32, 0.78);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(108, 99, 255, 0.14);
+            box-shadow: 0 4px 28px rgba(0, 0, 0, 0.22);
             transition: all 0.3s ease;
         }
         
@@ -93,28 +97,100 @@
 
         .landing-nav-link {
             display: inline-flex; align-items: center; gap: 8px;
-            text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px;
-            color: var(--text-muted); font-weight: 500; font-size: 0.9rem;
+            text-decoration: none; padding: 0.5rem 1rem; border-radius: 10px;
+            color: var(--text-muted); font-weight: 500; font-size: 0.88rem;
+            border: 1px solid transparent;
             transition: all 0.2s ease;
         }
 
-        .landing-nav-link:hover, .landing-nav-link.active {
-            color: #fff; background: var(--glass-bg);
+        .landing-nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+            border-color: transparent;
+        }
+        .landing-nav-link.active {
+            color: #e0e7ff;
+            background: rgba(108, 99, 255, 0.2);
+            border: 1px solid rgba(108, 99, 255, 0.32);
+            box-shadow: 0 0 20px rgba(108, 99, 255, 0.12);
         }
 
         .landing-header-cta {
             display: inline-flex; align-items: center; gap: 8px;
-            padding: 0.5rem 1.2rem; border-radius: 8px; text-decoration: none;
-            font-weight: 600; font-size: 0.9rem; color: #fff;
-            background: var(--primary);
-            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
-            transition: all 0.2s ease;
+            padding: 0.5rem 1.25rem; border-radius: 10px; text-decoration: none;
+            font-weight: 700; font-size: 0.88rem; color: #fff;
+            background: linear-gradient(135deg, var(--primary) 0%, #7c73ff 45%, var(--primary-hover) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 18px rgba(108, 99, 255, 0.38);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: pulse-cta 2.5s infinite;
+        }
+
+        @keyframes pulse-cta {
+            0% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(108, 99, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0); }
         }
 
         .landing-header-cta:hover {
-            background: var(--primary-hover);
+            filter: brightness(1.1);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+            box-shadow: 0 8px 26px rgba(108, 99, 255, 0.55), 0 0 20px rgba(108, 99, 255, 0.3);
+            animation: none;
+        }
+
+        /* Shared inner-page hero & panels (contact, services, cart, account, etc.) */
+        .customer-page-hero {
+            text-align: center;
+            margin-bottom: 2.25rem;
+            padding: 1.85rem 1.25rem 2.1rem;
+            border-radius: 22px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(165deg, rgba(108, 99, 255, 0.1) 0%, rgba(15, 22, 38, 0.42) 48%, rgba(255, 101, 132, 0.06) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 20px 44px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        .customer-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #c4b5fd;
+            margin-bottom: 0.85rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(108, 99, 255, 0.14);
+            border: 1px solid rgba(108, 99, 255, 0.28);
+        }
+        .customer-page-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(2rem, 4.5vw, 3.25rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.12;
+            color: #fff;
+            margin: 0 0 0.85rem;
+            text-shadow: 0 4px 28px rgba(108, 99, 255, 0.22);
+        }
+        .customer-page-title i { color: var(--primary); margin-right: 0.35rem; }
+        .customer-page-lead {
+            color: var(--text-muted);
+            font-size: 1.02rem;
+            line-height: 1.65;
+            max-width: 36rem;
+            margin: 0 auto;
+        }
+        .customer-glass-deep {
+            background: rgba(15, 22, 38, 0.62);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 36px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
         /* Typography & Layout */
@@ -132,17 +208,20 @@
 
         /* Premium Cards */
         .landing-card {
-            border-radius: 16px; background: var(--glass-bg);
-            border: 1px solid var(--glass-border); padding: 1.8rem;
+            border-radius: 18px;
+            background: rgba(15, 22, 38, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1.75rem;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative; overflow: hidden;
+            box-shadow: 0 4px 22px rgba(0, 0, 0, 0.14);
         }
 
         .landing-card:hover {
-            transform: translateY(-5px);
-            background: var(--glass-bg-hover);
-            border-color: var(--glass-border-hover);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(-6px);
+            background: rgba(18, 26, 44, 0.72);
+            border-color: rgba(108, 99, 255, 0.28);
+            box-shadow: 0 22px 48px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(108, 99, 255, 0.08);
         }
 
         .landing-card h3 { font-family: 'Oswald', sans-serif; font-size: 1.25rem; margin-bottom: 0.5rem; }
@@ -170,14 +249,17 @@
 
         /* --- GLOBAL FOOTER STYLES --- */
         .footer {
-            background: rgba(255,255,255,0.015);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 3rem 2rem 1.5rem;
+            background: rgba(15, 22, 38, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 22px; padding: 3rem 2rem 1.5rem;
             margin-top: 5rem;
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
             width: 100%;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
         .footer-top { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem; }
         .brand-col .brand { display: flex; align-items: center; gap: 10px; font-family: 'Oswald', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.8rem; color: #fff;}
@@ -297,6 +379,7 @@
                     <div class="footer-links">
                         <a href="{{ path('app_customer_landing') }}" class="footer-link">Home</a>
                         <a href="{{ path('app_customer_products') }}" class="footer-link">Products</a>
+                        <a href="{{ path('app_customer_pc_builder') }}" class="footer-link">PC Builder</a>
                         <a href="{{ path('app_customer_services') }}" class="footer-link">Services</a>
                         <a href="{{ path('app_customer_about') }}" class="footer-link">About Us</a>
                         <a href="{{ path('app_customer_contact') }}" class="footer-link">Contact</a>

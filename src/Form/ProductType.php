@@ -26,8 +26,13 @@ class ProductType extends AbstractType
                 'required' => true,
                 'attr' => ['class' => 'gg-input']
             ])
-            ->add('price')
-            ->add('quantity')
+            ->add('price');
+
+        if (!$options['edit_mode']) {
+            $builder->add('quantity');
+        }
+
+        $builder
             ->add('description')
             ->add('imageFile', FileType::class, [
                 'mapped' => false,
@@ -40,6 +45,8 @@ class ProductType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Product::class,
+            'edit_mode' => false,
         ]);
+        $resolver->setAllowedTypes('edit_mode', 'bool');
     }
 }

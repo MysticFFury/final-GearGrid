@@ -67,9 +67,21 @@ class Order
     #[ORM\JoinColumn(nullable: true)]
     private ?User $createdBy = null;
 
+    /** Customer account that owns this purchase (shop checkout or staff placing for a customer). */
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $placedBy = null;
+
+    /**
+     * @var Collection<int, OrderItem>
+     */
+    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'orderRef', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $items;
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->items = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -157,6 +169,43 @@ class Order
     public function setCreatedBy(?User $createdBy): static
     {
         $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    public function getPlacedBy(): ?User
+    {
+        return $this->placedBy;
+    }
+
+    public function setPlacedBy(?User $placedBy): static
+    {
+        $this->placedBy = $placedBy;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OrderItem>
+     */
+    public function getItems(): Collection
+    {
+        return $this->items;
+    }
+
+    public function addItem(OrderItem $item): static
+    {
+        if (!$this->items->contains($item)) {
+            $this->items->add($item);
+            $item->setOrderRef($this);
+        }
+
+        return $this;
+    }
+
+    public function removeItem(OrderItem $item): static
+    {
+        $this->items->removeElement($item);
+
         return $this;
     }
 }

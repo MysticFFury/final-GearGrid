@@ -67,7 +67,7 @@ class LogRepository extends ServiceEntityRepository
         $actions = array_column($rows, 'action');
         
         // Define preferred order for actions
-        $preferredOrder = ['LOGIN', 'LOGOUT', 'ADD', 'UPDATE', 'DELETE'];
+        $preferredOrder = ['LOGIN', 'LOGOUT', 'ADD', 'UPDATE', 'DELETE', 'STOCK_ADD', 'CREATE'];
         $orderedActions = [];
         $otherActions = [];
         

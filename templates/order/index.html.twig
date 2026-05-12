@@ -123,6 +123,18 @@
         color: #ef4444;
     }
 
+    .status-picker summary {
+        list-style: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .status-picker summary::-webkit-details-marker {
+        display: none;
+    }
+
     @media (max-width: 768px) {
         .dashboard main {
             margin-left: 0;
@@ -134,6 +146,7 @@
 
 {% block body %}
 <div class="dashboard">
+    {% set availableStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Completed', 'Cancelled'] %}
     {% include 'partials/_sidebar.html.twig' %}
 
     <main class="main-content">
@@ -209,9 +222,26 @@
                                 <td class="font-semibold">{{ order.customerName }}</td>
                                 <td class="text-green-400 font-semibold">₱{{ order.totalPrice|number_format(2, '.', ',') }}</td>
                                 <td>
-                                    <span class="status-badge status-{{ order.status|lower }}">
-                                        {{ order.status }}
-                                    </span>
+                                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                                        <details class="status-picker mt-1">
+                                            <summary>
+                                                <span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span>
+                                                <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                            </summary>
+                                            <form method="post" action="{{ path('app_order_update_status', {'id': order.id}) }}" class="mt-2 flex items-center gap-2">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('update_status_' ~ order.id) }}">
+                                                <select name="status" class="bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded-md px-2 py-1" onchange="this.form.submit()">
+                                                    {% for statusOption in availableStatuses %}
+                                                        <option value="{{ statusOption }}" {% if order.status == statusOption %}selected{% endif %}>
+                                                            {{ statusOption }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </form>
+                                        </details>
+                                    {% else %}
+                                        <span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span>
+                                    {% endif %}
                                 </td>
                                 <td class="text-gray-400">{{ order.createdAt ? order.createdAt|date('M d, Y') : 'N/A' }}</td>
                                 <td>

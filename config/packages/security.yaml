@@ -68,6 +68,9 @@ security:
     - { path: ^/user, roles: ROLE_ADMIN }
     - { path: ^/admin, roles: ROLE_ADMIN }
 
+    # Stock adjustments - Admin & Staff
+    - { path: ^/stock, roles: [ROLE_ADMIN, ROLE_STAFF] }
+
     # Products, Categories & Orders - Admin & Staff
     - { path: ^/product, roles: [ROLE_ADMIN, ROLE_STAFF] }
     - { path: ^/category, roles: [ROLE_ADMIN, ROLE_STAFF] }
@@ -82,6 +85,7 @@ security:
     # Public customer marketing pages
     - { path: ^/customer-about$, roles: PUBLIC_ACCESS }
     - { path: ^/customer-products$, roles: PUBLIC_ACCESS }
+    - { path: ^/customer-pc-builder, roles: PUBLIC_ACCESS }
     - { path: ^/customer-services$, roles: PUBLIC_ACCESS }
     - { path: ^/customer-contact, roles: PUBLIC_ACCESS }
 

@@ -17,6 +17,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/order')]
 final class OrderController extends AbstractController
 {
+    private const ALLOWED_STATUSES = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Completed', 'Cancelled'];
+
     #[Route(name: 'app_order_index', methods: ['GET'])]
     public function index(OrderRepository $orderRepository): Response
     {
@@ -36,8 +38,9 @@ final class OrderController extends AbstractController
             $selectedCustomer = $form->get('customer')->getData();
             if ($selectedCustomer instanceof User) {
                 $order->setCustomerName($selectedCustomer->getName());
+                $order->setPlacedBy($selectedCustomer);
             }
-            
+
             $order->setCreatedBy($this->getUser());
             $entityManager->persist($order);
             $entityManager->flush();
@@ -66,6 +69,15 @@ final class OrderController extends AbstractController
     #[Route('/{id}/edit', name: 'app_order_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Order $order, EntityManagerInterface $entityManager, UserRepository $userRepository, LogService $logService): Response
     {
+        // Keep legacy "products" field in sync with line items so ordered parts are preselected in edit form.
+        if ($order->getProducts()->isEmpty() && !$order->getItems()->isEmpty()) {
+            foreach ($order->getItems() as $item) {
+                if ($item->getProduct()) {
+                    $order->addProduct($item->getProduct());
+                }
+            }
+        }
+
         $form = $this->createForm(OrderType::class, $order);
         
         if ($order->getCustomerName()) {
@@ -81,6 +93,7 @@ final class OrderController extends AbstractController
             $selectedCustomer = $form->get('customer')->getData();
             if ($selectedCustomer instanceof User) {
                 $order->setCustomerName($selectedCustomer->getName());
+                $order->setPlacedBy($selectedCustomer);
             }
             // Keep existing customer name if no new customer is selected
             elseif (!$order->getCustomerName()) {
@@ -101,6 +114,38 @@ final class OrderController extends AbstractController
             'order' => $order,
             'form' => $form,
         ]);
+    }
+
+    #[Route('/{id}/status', name: 'app_order_update_status', methods: ['POST'])]
+    public function updateStatus(Request $request, Order $order, EntityManagerInterface $entityManager, LogService $logService): Response
+    {
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_STAFF')) {
+            throw $this->createAccessDeniedException('You are not allowed to update order status.');
+        }
+
+        if (!$this->isCsrfTokenValid('update_status_'.$order->getId(), $request->getPayload()->getString('_token'))) {
+            $this->addFlash('error', 'Invalid request token.');
+            return $this->redirectToRoute('app_order_show', ['id' => $order->getId()], Response::HTTP_SEE_OTHER);
+        }
+
+        $newStatus = trim($request->getPayload()->getString('status'));
+        if (!in_array($newStatus, self::ALLOWED_STATUSES, true)) {
+            $this->addFlash('error', 'Invalid status selected.');
+            return $this->redirectToRoute('app_order_show', ['id' => $order->getId()], Response::HTTP_SEE_OTHER);
+        }
+
+        $oldStatus = $order->getStatus();
+        if ($oldStatus === $newStatus) {
+            return $this->redirect($request->headers->get('referer') ?: $this->generateUrl('app_order_show', ['id' => $order->getId()]));
+        }
+
+        $order->setStatus($newStatus);
+        $entityManager->flush();
+
+        $logService->log('UPDATE', 'Order', "Updated order #{$order->getId()} status from {$oldStatus} to {$newStatus}");
+        $this->addFlash('success', "Order #{$order->getId()} status updated to {$newStatus}.");
+
+        return $this->redirect($request->headers->get('referer') ?: $this->generateUrl('app_order_show', ['id' => $order->getId()]));
     }
 
     #[Route('/{id}', name: 'app_order_delete', methods: ['POST'])]

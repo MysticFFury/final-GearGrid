@@ -1,354 +1,458 @@
-{# templates/dashboard/index.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}Dashboard | GearGrid{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root {
-            --primary: #6C63FF;
-            --primary-hover: #5b54d6;
-            --secondary: #ff6584;
-            --success: #4ade80;
-            --bg-base: #0B1120;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --glass-bg: rgba(255, 255, 255, 0.02);
-            --glass-bg-hover: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(255, 255, 255, 0.06);
-            --glass-border-hover: rgba(255, 255, 255, 0.12);
-        }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #8b5cf6;
+        --primary-hover: #7c3aed;
+        --primary-glow: rgba(139, 92, 246, 0.5);
+        --secondary: #ec4899;
+        --secondary-glow: rgba(236, 72, 153, 0.5);
+        --success: #10b981;
+        --success-glow: rgba(16, 185, 129, 0.5);
+        --info: #0ea5e9;
+        --info-glow: rgba(14, 165, 233, 0.5);
+        --bg-base: #030712;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --glass-bg: rgba(17, 24, 39, 0.6);
+        --glass-bg-hover: rgba(31, 41, 55, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --glass-border-hover: rgba(255, 255, 255, 0.15);
+    }
 
-        body {
-            background-color: var(--bg-base);
-            color: var(--text-main);
-        }
+    body {
+        background-color: var(--bg-base);
+        font-family: 'Inter', sans-serif;
+        color: var(--text-main);
+        overflow-x: hidden;
+    }
 
-        .dashboard {
-            display: flex;
-            min-height: 100vh;
-        }
+    /* Dynamic Background Orbs */
+    .bg-orbs {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+        background: var(--bg-base);
+    }
+    
+    .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0.4;
+        animation: float 20s infinite alternate ease-in-out;
+    }
 
-        .main-content {
-            flex: 1;
-            margin-left: 16rem;
-            padding: 2rem 3rem;
-            background: var(--bg-base);
-        }
+    .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(139,92,246,0.3) 0%, rgba(0,0,0,0) 70%); top: -100px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 700px; height: 700px; background: radial-gradient(circle, rgba(236,72,153,0.2) 0%, rgba(0,0,0,0) 70%); bottom: -200px; right: -100px; animation-delay: -5s; animation-duration: 25s; }
+    .orb-3 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(14,165,233,0.2) 0%, rgba(0,0,0,0) 70%); top: 40%; left: 30%; animation-delay: -10s; animation-duration: 30s; }
 
-        .content-area {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+    @keyframes float {
+        0% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(5%, 10%) scale(1.1); }
+        100% { transform: translate(-5%, 5%) scale(0.9); }
+    }
 
-        /* Stat Cards */
-        .stat-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-        }
+    .dashboard main {
+        margin-left: 260px;
+        min-height: 100vh;
+        padding: 2.5rem 3rem;
+        position: relative;
+        z-index: 1;
+    }
 
-        .stat-card:hover {
-            background: var(--glass-bg-hover);
-            border-color: var(--glass-border-hover);
-            transform: translateY(-5px);
-        }
+    /* Premium Glassmorphism Panels */
+    .panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+    
+    .panel::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        opacity: 0.5;
+    }
 
-        .icon-box {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-        }
+    /* Metric Cards */
+    .metric-card {
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
 
-        .icon-box.blue {
-            background: rgba(108, 99, 255, 0.15);
-            color: var(--primary);
-        }
+    .metric-card:hover {
+        transform: translateY(-4px);
+        background: var(--glass-bg-hover);
+        border-color: var(--glass-border-hover);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
 
-        .icon-box.green {
-            background: rgba(74, 222, 128, 0.15);
-            color: var(--success);
-        }
+    .icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        transition: transform 0.3s ease;
+    }
 
-        .icon-box.red {
-            background: rgba(255, 101, 132, 0.15);
-            color: var(--secondary);
-        }
+    .metric-card:hover .icon-wrapper {
+        transform: scale(1.1) rotate(5deg);
+    }
 
-        .icon-box.purple {
-            background: rgba(168, 85, 247, 0.15);
-            color: #a855f7;
-        }
+    .card-purple .icon-wrapper { background: rgba(139, 92, 246, 0.15); color: var(--primary); box-shadow: 0 0 20px var(--primary-glow); }
+    .card-pink .icon-wrapper { background: rgba(236, 72, 153, 0.15); color: var(--secondary); box-shadow: 0 0 20px var(--secondary-glow); }
+    .card-green .icon-wrapper { background: rgba(16, 185, 129, 0.15); color: var(--success); box-shadow: 0 0 20px var(--success-glow); }
+    .card-blue .icon-wrapper { background: rgba(14, 165, 233, 0.15); color: var(--info); box-shadow: 0 0 20px var(--info-glow); }
 
-        .trend {
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
+    /* Pill Badges */
+    .status-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        backdrop-filter: blur(8px);
+    }
 
-        .trend.up {
-            background: rgba(74, 222, 128, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(74, 222, 128, 0.2);
-        }
+    .status-pending { color: #fbbf24; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); }
+    .status-processing { color: #38bdf8; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .status-shipped { color: #a78bfa; background: rgba(167, 139, 250, 0.15); border: 1px solid rgba(167, 139, 250, 0.3); }
+    .status-delivered, .status-completed { color: #34d399; background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.3); }
+    .status-cancelled { color: #f87171; background: rgba(248, 113, 113, 0.15); border: 1px solid rgba(248, 113, 113, 0.3); }
 
-        .trend.down {
-            background: rgba(255, 101, 132, 0.1);
-            color: var(--secondary);
-            border: 1px solid rgba(255, 101, 132, 0.2);
-        }
+    /* Modern Table */
+    .premium-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px;
+    }
+    
+    .premium-table th {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0.05em;
+        padding: 0 1rem 0.5rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
 
-        .trend.neutral {
-            background: rgba(168, 85, 247, 0.1);
-            color: #a855f7;
-            border: 1px solid rgba(168, 85, 247, 0.2);
-        }
+    .premium-table tbody tr {
+        background: rgba(255, 255, 255, 0.02);
+        transition: all 0.2s ease;
+    }
 
-        /* Charts Section */
-        .chart-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-        }
+    .premium-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: scale(1.01);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
 
-        .chart-wrapper {
-            width: 100%;
-            height: 300px;
-            position: relative;
-        }
+    .premium-table td {
+        padding: 1rem;
+    }
 
-        /* Invoice Table */
-        .table-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-        }
+    .premium-table td:first-child { border-top-left-radius: 12px; border-bottom-left-radius: 12px; }
+    .premium-table td:last-child { border-top-right-radius: 12px; border-bottom-right-radius: 12px; }
 
-        .invoice-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    /* Animations */
+    .animate-up {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    
+    @keyframes fadeInUp {
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-        .invoice-table th {
-            text-align: left;
-            padding: 1rem;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--glass-border);
-        }
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; }
+    .delay-400 { animation-delay: 400ms; }
 
-        .invoice-table td {
-            padding: 1rem;
-            color: #fff;
-            font-size: 0.9rem;
-            border-bottom: 1px solid var(--glass-border);
-        }
+    /* Buttons */
+    .btn-glow-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+        box-shadow: 0 4px 15px var(--primary-glow);
+        transition: all 0.3s ease;
+    }
+    .btn-glow-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px var(--primary-glow);
+    }
 
-        .invoice-table tr:hover td {
-            background: var(--glass-bg-hover);
-        }
-
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .status-badge.paid {
-            background: rgba(74, 222, 128, 0.15);
-            color: var(--success);
-            border: 1px solid rgba(74, 222, 128, 0.2);
-        }
-
-        .status-badge.pending {
-            background: rgba(251, 191, 36, 0.15);
-            color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.2);
-        }
-
-        .status-badge.overdue {
-            background: rgba(255, 101, 132, 0.15);
-            color: var(--secondary);
-            border: 1px solid rgba(255, 101, 132, 0.2);
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-        }
-    </style>
+    @media (max-width: 1024px) {
+        .dashboard main { margin-left: 0; padding: 1.5rem; }
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-base); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+</style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    {% set deliveredCount = 0 %}
+    {% set pendingCount = 0 %}
+    {% set processingCount = 0 %}
+    {% set shippedCount = 0 %}
+    {% set cancelledCount = 0 %}
+    {% for order in recentOrders|default([]) %}
+        {% set s = order.status|lower %}
+        {% if s in ['delivered', 'completed'] %}
+            {% set deliveredCount = deliveredCount + 1 %}
+        {% elseif s == 'pending' %}
+            {% set pendingCount = pendingCount + 1 %}
+        {% elseif s == 'processing' %}
+            {% set processingCount = processingCount + 1 %}
+        {% elseif s == 'shipped' %}
+            {% set shippedCount = shippedCount + 1 %}
+        {% elseif s == 'cancelled' %}
+            {% set cancelledCount = cancelledCount + 1 %}
+        {% endif %}
+    {% endfor %}
+
     {% include 'partials/_sidebar.html.twig' %}
 
-    <main class="main-content">
-        <!-- Top Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-gray-800">
-            <div>
-                <h1 class="text-3xl font-bold text-white mb-2">Welcome Back, {{ app.user.name|default(app.user.username|default('Admin')) }} 👋</h1>
-                <p class="text-gray-400 text-sm">Here's what's happening with your store today.</p>
-            </div>
-            <div class="mt-4 md:mt-0 flex items-center gap-4">
-                <div class="relative">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Search Anything..." class="pl-10 pr-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 w-64">
-                </div>
-                <div>
-                    {% include 'partials/_user_dropdown.html.twig' %}
-                </div>
-            </div>
-        </div>
-
-        <div class="content-area">
-            <!-- Stat Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="stat-card">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="icon-box blue"><i class="fas fa-users"></i></div>
-                        <div class="trend up"><i class="fas fa-arrow-up"></i> +6.5%</div>
+    <main>
+        <div class="max-w-7xl mx-auto space-y-6">
+            
+            <!-- Header Panel -->
+            <div class="panel p-6 animate-up z-50">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <h1 class="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                                {{ isAdmin ? 'Admin Command Center' : 'Staff Workspace' }}
+                            </h1>
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">v2.0</span>
+                        </div>
+                        <p class="text-gray-400 font-medium">Welcome back, <span class="text-white">{{ app.user.name|default(app.user.username|default('User')) }}</span>. Here's what's happening today.</p>
                     </div>
-                    <div class="text-3xl font-bold text-white mb-1">{{ totalUsers|default(1456) }}</div>
-                    <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Customers</div>
-                    <div class="text-xs text-gray-500">Since last week</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="icon-box green"><i class="fas fa-dollar-sign"></i></div>
-                        <div class="trend down"><i class="fas fa-arrow-down"></i> -0.10%</div>
-                    </div>
-                    <div class="text-3xl font-bold text-white mb-1">${{ recentSales|default(3345) }}</div>
-                    <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Revenue</div>
-                    <div class="text-xs text-gray-500">Since last week</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="icon-box red"><i class="fas fa-chart-line"></i></div>
-                        <div class="trend down"><i class="fas fa-arrow-down"></i> -0.2%</div>
-                    </div>
-                    <div class="text-3xl font-bold text-white mb-1">60%</div>
-                    <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Profit</div>
-                    <div class="text-xs text-gray-500">Since last week</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="icon-box purple"><i class="fas fa-file-invoice"></i></div>
-                        <div class="trend neutral"><i class="fas fa-arrow-up"></i> +11.5%</div>
-                    </div>
-                    <div class="text-3xl font-bold text-white mb-1">{{ totalOrders|default(1135) }}</div>
-                    <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Invoices</div>
-                    <div class="text-xs text-gray-500">Since last week</div>
-                </div>
-            </div>
-
-            <!-- Charts Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <!-- Invoice Statistics Donut Chart -->
-                <div class="chart-card">
-                    <h3 class="text-lg font-semibold text-white mb-6">Invoice Statistics</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="invoiceDonutChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Sales Analytics Line Chart -->
-                <div class="chart-card">
-                    <h3 class="text-lg font-semibold text-white mb-6">Sales Analytics</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="salesLineChart"></canvas>
+                    <div class="flex flex-wrap items-center gap-4">
+                        <a href="{{ path('app_order_index') }}" class="btn-glow-primary px-5 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2">
+                            <i class="fas fa-bolt text-xs"></i> View Orders
+                        </a>
+                        <div class="ml-2 relative z-50">
+                            {% include 'partials/_user_dropdown.html.twig' %}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Invoices Table -->
-            <div class="table-card">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-semibold text-white">Recent Invoices</h3>
-                    <button class="px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-white hover:bg-gray-700/50 hover:border-gray-600 transition-colors">
-                        <i class="fas fa-filter mr-2"></i> Filter
-                    </button>
+            <!-- Metrics Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="panel metric-card card-purple p-6 animate-up delay-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-1">Products</p>
+                            <p class="text-4xl text-white font-bold tracking-tight">{{ totalProducts ?? 0 }}</p>
+                        </div>
+                        <div class="icon-wrapper">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="text-xs font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md"><i class="fas fa-arrow-up mr-1"></i> Active Inventory</span>
+                    </div>
                 </div>
-                <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Id Customers</th>
-                            <th>Customers name</th>
-                            <th>Items Name</th>
-                            <th>Order Date</th>
-                            <th>Status</th>
-                            <th>Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if recentOrders is defined and recentOrders|length > 0 %}
-                            {% for order in recentOrders %}
+                
+                <div class="panel metric-card card-pink p-6 animate-up delay-200">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-1">Categories</p>
+                            <p class="text-4xl text-white font-bold tracking-tight">{{ totalCategories ?? 0 }}</p>
+                        </div>
+                        <div class="icon-wrapper">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="text-xs font-medium text-gray-400"><i class="fas fa-tags mr-1"></i> Organized Groups</span>
+                    </div>
+                </div>
+                
+                <div class="panel metric-card card-green p-6 animate-up delay-300">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-1">Orders</p>
+                            <p class="text-4xl text-white font-bold tracking-tight">{{ totalOrders ?? 0 }}</p>
+                        </div>
+                        <div class="icon-wrapper">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="text-xs font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-md"><i class="fas fa-check-circle mr-1"></i> {{ isAdmin ? 'Global' : 'Your' }} Orders</span>
+                    </div>
+                </div>
+                
+                <div class="panel metric-card card-blue p-6 animate-up delay-400">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-1">{{ isAdmin ? 'Users' : 'Revenue' }}</p>
+                            <p class="text-4xl text-white font-bold tracking-tight">{% if isAdmin %}{{ totalUsers ?? 0 }}{% else %}₱{{ recentSales|default(0)|number_format(0, '.', ',') }}{% endif %}</p>
+                        </div>
+                        <div class="icon-wrapper">
+                            <i class="fas {{ isAdmin ? 'fa-users' : 'fa-wallet' }}"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="text-xs font-medium text-blue-400 bg-blue-400/10 px-2 py-1 rounded-md"><i class="fas {{ isAdmin ? 'fa-user-plus' : 'fa-chart-line' }} mr-1"></i> {{ isAdmin ? 'Registered' : 'Recent Sales' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts First Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-up delay-200">
+                <div class="lg:col-span-2 panel p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-lg text-white font-bold tracking-tight">Order Activity</h3>
+                            <p class="text-sm text-gray-400">Monthly breakdown of created vs completed orders</p>
+                        </div>
+                        <button class="p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5"><i class="fas fa-ellipsis-h"></i></button>
+                    </div>
+                    <div class="h-[280px] w-full">
+                        <canvas id="ordersLineChart"></canvas>
+                    </div>
+                </div>
+                <div class="panel p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg text-white font-bold tracking-tight">Status Overview</h3>
+                        <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center"><i class="fas fa-chart-pie text-gray-400"></i></div>
+                    </div>
+                    <div class="h-[220px] relative flex justify-center items-center">
+                        <canvas id="statusDonutChart"></canvas>
+                        <!-- Center text for Donut Chart -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <span class="text-2xl font-bold text-white">{{ (deliveredCount + pendingCount + processingCount + shippedCount + cancelledCount) ?: 0 }}</span>
+                            <span class="text-xs text-gray-400 uppercase tracking-wider">Total</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-up delay-300">
+                
+                <div class="lg:col-span-2 panel p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg text-white font-bold tracking-tight">Recent Transactions</h3>
+                        <a href="{{ path('app_order_index') }}" class="text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1">View All <i class="fas fa-arrow-right text-xs"></i></a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="premium-table text-left">
+                            <thead>
                                 <tr>
-                                    <td>#{{ '%06d'|format(order.id) }}</td>
-                                    <td>C{{ '%03d'|format(order.id) }}</td>
-                                    <td>{{ order.customerName|default('Unknown') }}</td>
-                                    <td>
-                                        {% if order.products|length > 0 %}
-                                            {% for product in order.products %}
-                                                {{ loop.index }}x {{ product.name }}{% if not loop.last %}, {% endif %}
-                                            {% endfor %}
-                                        {% else %}
-                                            No items
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ order.createdAt ? order.createdAt|date('d/m/Y H:i') : 'N/A' }}</td>
-                                    <td>
-                                        {% set statusLower = order.status|lower %}
-                                        {% set badgeClass = 'overdue' %}
-                                        {% if statusLower == 'processing' %}
-                                            {% set badgeClass = 'processing' %}
-                                        {% elseif statusLower == 'delivered' or statusLower == 'paid' or statusLower == 'complete' or statusLower == 'completed' %}
-                                            {% set badgeClass = 'paid' %}
-                                        {% elseif statusLower == 'shipped' %}
-                                            {% set badgeClass = 'shipped' %}
-                                        {% elseif statusLower == 'cancelled' %}
-                                            {% set badgeClass = 'overdue' %}
-                                        {% elseif statusLower == 'pending' %}
-                                            {% set badgeClass = 'pending' %}
-                                        {% endif %}
-                                        <span class="status-badge {{ badgeClass }}">
-                                            {{ order.status|default('Unknown') }}
-                                        </span>
-                                    </td>
-                                    <td>${{ order.totalPrice|default(0)|number_format(0) }}</td>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th class="text-right">Amount</th>
                                 </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="7" style="text-align: center; color: var(--text-muted);">No orders found</td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody>
+                                {% for order in recentOrders|default([])|slice(0, 5) %}
+                                    <tr>
+                                        <td class="font-semibold text-white">#{{ order.id }}</td>
+                                        <td>
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white">
+                                                    {{ order.customerName|default('U')|first|upper }}
+                                                </div>
+                                                <span class="text-gray-300">{{ order.customerName|default('Unknown Customer') }}</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="status-chip status-{{ order.status|lower }}">{{ order.status|default('Unknown') }}</span></td>
+                                        <td class="text-gray-400 text-sm">{{ order.createdAt ? order.createdAt|date('M d, Y') : 'N/A' }}</td>
+                                        <td class="text-right font-bold text-white">₱{{ order.totalPrice|default(0)|number_format(2, '.', ',') }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr><td colspan="5" class="py-12 text-center text-gray-500">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <i class="fas fa-inbox text-4xl mb-3 text-gray-600"></i>
+                                            <p>No recent orders found.</p>
+                                        </div>
+                                    </td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel p-6 flex flex-col">
+                    <h3 class="text-lg text-white font-bold tracking-tight mb-6">Quick Actions</h3>
+                    <div class="flex-1 flex flex-col gap-3 justify-center">
+                        <a href="{{ path('app_order_new') }}" class="group relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-violet-500/10 to-violet-600/5 border border-violet-500/20 hover:border-violet-500/40 transition-all duration-300">
+                            <div class="absolute inset-0 bg-violet-500/10 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300 ease-out"></div>
+                            <div class="relative flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-violet-500/20 text-violet-400 flex items-center justify-center"><i class="fas fa-plus"></i></div>
+                                <div>
+                                    <h4 class="text-white font-semibold text-sm">New Order</h4>
+                                    <p class="text-xs text-gray-400 mt-0.5">Process a manual transaction</p>
+                                </div>
+                            </div>
+                        </a>
+                        
+                        <a href="{{ path('app_product_new') }}" class="group relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-pink-500/10 to-pink-600/5 border border-pink-500/20 hover:border-pink-500/40 transition-all duration-300">
+                            <div class="absolute inset-0 bg-pink-500/10 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300 ease-out"></div>
+                            <div class="relative flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center"><i class="fas fa-box-open"></i></div>
+                                <div>
+                                    <h4 class="text-white font-semibold text-sm">Add Product</h4>
+                                    <p class="text-xs text-gray-400 mt-0.5">Expand your inventory</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="{{ path('app_log_index') }}" class="group relative overflow-hidden rounded-xl p-4 bg-gradient-to-br from-slate-500/10 to-slate-600/5 border border-slate-500/20 hover:border-slate-500/40 transition-all duration-300">
+                            <div class="absolute inset-0 bg-slate-500/10 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300 ease-out"></div>
+                            <div class="relative flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-slate-500/20 text-slate-400 flex items-center justify-center"><i class="fas fa-history"></i></div>
+                                <div>
+                                    <h4 class="text-white font-semibold text-sm">System Logs</h4>
+                                    <p class="text-xs text-gray-400 mt-0.5">View recent activity</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
@@ -356,148 +460,148 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        {% verbatim %}
-        document.addEventListener('DOMContentLoaded', function() {
-            // Invoice Statistics Donut Chart
-            const donutCtx = document.getElementById('invoiceDonutChart').getContext('2d');
-            new Chart(donutCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Total Paid', 'Total Overdue', 'Total Unpaid'],
-                    datasets: [{
-                        data: [234, 514, 345],
-                        backgroundColor: [
-                            'rgba(108, 99, 255, 0.8)',
-                            'rgba(255, 101, 132, 0.8)',
-                            'rgba(148, 163, 184, 0.8)'
-                        ],
-                        borderColor: [
-                            '#6C63FF',
-                            '#ff6584',
-                            '#94a3b8'
-                        ],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#f8fafc',
-                                padding: 20,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(11, 17, 32, 0.9)',
-                            titleColor: '#f8fafc',
-                            bodyColor: '#94a3b8',
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                            borderWidth: 1
-                        }
-                    }
-                },
-                plugins: [{
-                    id: 'centerText',
-                    beforeDraw: function(chart) {
-                        var width = chart.width,
-                            height = chart.height,
-                            ctx = chart.ctx;
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+{% set deliveredCount = 0 %}
+{% set pendingCount = 0 %}
+{% set processingCount = 0 %}
+{% set shippedCount = 0 %}
+{% set cancelledCount = 0 %}
+{% for order in recentOrders|default([]) %}
+    {% set s = order.status|lower %}
+    {% if s in ['delivered', 'completed'] %}
+        {% set deliveredCount = deliveredCount + 1 %}
+    {% elseif s == 'pending' %}
+        {% set pendingCount = pendingCount + 1 %}
+    {% elseif s == 'processing' %}
+        {% set processingCount = processingCount + 1 %}
+    {% elseif s == 'shipped' %}
+        {% set shippedCount = shippedCount + 1 %}
+    {% elseif s == 'cancelled' %}
+        {% set cancelledCount = cancelledCount + 1 %}
+    {% endif %}
+{% endfor %}
 
-                        ctx.restore();
-                        var fontSize = (height / 114).toFixed(2);
-                        ctx.font = 'bold ' + fontSize + 'em Inter';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillStyle = '#f8fafc';
+document.addEventListener('DOMContentLoaded', function() {
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'Inter', sans-serif";
 
-                        var text = '1,135',
-                            textX = Math.round((width - ctx.measureText(text).width) / 2),
-                            textY = height / 2 - 10;
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { 
+            legend: { 
+                labels: { usePointStyle: true, padding: 20, font: { weight: '500' } } 
+            },
+            tooltip: {
+                backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                titleColor: '#fff',
+                bodyColor: '#cbd5e1',
+                borderColor: 'rgba(255,255,255,0.1)',
+                borderWidth: 1,
+                padding: 12,
+                boxPadding: 6,
+                usePointStyle: true
+            }
+        },
+        scales: {
+            x: { 
+                grid: { display: false, drawBorder: false },
+                ticks: { padding: 10 }
+            },
+            y: { 
+                grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false, borderDash: [5, 5] },
+                ticks: { padding: 10 }
+            }
+        },
+        interaction: { mode: 'index', intersect: false }
+    };
 
-                        ctx.fillText(text, textX, textY);
-                        
-                        ctx.font = 'normal ' + (fontSize * 0.4).toFixed(2) + 'em Inter';
-                        ctx.fillStyle = '#94a3b8';
-                        var subtext = 'Invoices',
-                            subtextX = Math.round((width - ctx.measureText(subtext).width) / 2),
-                            subtextY = height / 2 + 15;
-                        
-                        ctx.fillText(subtext, subtextX, subtextY);
-                        ctx.save();
-                    }
-                }]
-            });
+    // Orders Line Chart
+    const lineEl = document.getElementById('ordersLineChart');
+    if (lineEl) {
+        const ctx = lineEl.getContext('2d');
+        const gradientPurple = ctx.createLinearGradient(0, 0, 0, 300);
+        gradientPurple.addColorStop(0, 'rgba(139, 92, 246, 0.4)');
+        gradientPurple.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
 
-            // Sales Analytics Line Chart
-            const lineCtx = document.getElementById('salesLineChart').getContext('2d');
-            let gradient = lineCtx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(108, 99, 255, 0.4)');
-            gradient.addColorStop(1, 'rgba(108, 99, 255, 0.0)');
+        const gradientPink = ctx.createLinearGradient(0, 0, 0, 300);
+        gradientPink.addColorStop(0, 'rgba(236, 72, 153, 0.4)');
+        gradientPink.addColorStop(1, 'rgba(236, 72, 153, 0.0)');
 
-            new Chart(lineCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                    datasets: [{
-                        label: 'Sales',
-                        data: [800, 950, 1100, 1134, 1050, 1300, 1450, 1380, 1500, 1650, 1800, 1950],
-                        borderColor: '#6C63FF',
-                        backgroundColor: gradient,
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                datasets: [
+                    { 
+                        label: 'Created Orders', 
+                        data: [28, 42, 35, 51, 48, 62, 57], 
+                        borderColor: '#8b5cf6', 
+                        backgroundColor: gradientPurple, 
+                        fill: true, 
+                        tension: 0.4, 
                         borderWidth: 3,
-                        pointBackgroundColor: '#6C63FF',
-                        pointBorderColor: '#fff',
+                        pointBackgroundColor: '#030712',
+                        pointBorderColor: '#8b5cf6',
                         pointBorderWidth: 2,
                         pointRadius: 4,
-                        pointHoverRadius: 6,
+                        pointHoverRadius: 6
+                    },
+                    { 
+                        label: 'Completed Orders', 
+                        data: [18, 30, 22, 40, 37, 48, 45], 
+                        borderColor: '#ec4899',
+                        backgroundColor: gradientPink,
                         fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(11, 17, 32, 0.9)',
-                            titleColor: '#f8fafc',
-                            bodyColor: '#94a3b8',
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                            borderWidth: 1,
-                            displayColors: false,
-                            callbacks: {
-                                label: function(context) {
-                                    return '$' + context.parsed.y;
-                                }
+                        tension: 0.4, 
+                        borderWidth: 3,
+                        pointBackgroundColor: '#030712',
+                        pointBorderColor: '#ec4899',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }
+                ]
+            },
+            options: commonOptions
+        });
+    }
+
+    // Status Donut Chart
+    const donutEl = document.getElementById('statusDonutChart');
+    if (donutEl) {
+        new Chart(donutEl.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Delivered', 'Pending', 'Processing', 'Shipped', 'Cancelled'],
+                datasets: [{
+                    data: [{{ deliveredCount }}, {{ pendingCount }}, {{ processingCount }}, {{ shippedCount }}, {{ cancelledCount }}],
+                    backgroundColor: ['#10b981', '#f59e0b', '#0ea5e9', '#8b5cf6', '#ef4444'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                cutout: '75%', 
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return ' ' + context.label + ': ' + context.parsed;
                             }
                         }
-                    },
-                    scales: {
-                        x: { 
-                            grid: { display: false }, 
-                            ticks: { color: '#94a3b8', font: { size: 11 } } 
-                        },
-                        y: { 
-                            grid: { color: 'rgba(255,255,255,0.05)' }, 
-                            ticks: { 
-                                color: '#94a3b8',
-                                callback: function(value) {
-                                    return '$' + value;
-                                }
-                            } 
-                        }
                     }
-                }
-            });
+                } 
+            }
         });
-        {% endverbatim %}
-    </script>
+    }
+});
+</script>
 {% endblock %}
+

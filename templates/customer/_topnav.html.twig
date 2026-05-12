@@ -1,4 +1,5 @@
 {# templates/customer/_topnav.html.twig #}
+{% set account_section = app.request.attributes.get('_route') in ['app_profile', 'app_profile_edit', 'app_customer_cart'] %}
 <header class="landing-topbar" aria-label="Landing navigation">
     <div class="landing-topbar__inner">
         <a class="landing-brand" href="{{ path('app_customer_landing') }}">
@@ -12,18 +13,27 @@
         <nav class="landing-nav" aria-label="Section navigation">
             <a class="landing-nav-link {{ app.request.attributes.get('_route') == 'app_customer_landing' ? 'active' : '' }}" href="{{ path('app_customer_landing') }}"><i class="fas fa-house"></i> Home</a>
             <a class="landing-nav-link {{ app.request.attributes.get('_route') == 'app_customer_products' ? 'active' : '' }}" href="{{ path('app_customer_products') }}"><i class="fas fa-box"></i> Products</a>
+            <a class="landing-nav-link {{ app.request.attributes.get('_route') == 'app_customer_pc_builder' ? 'active' : '' }}" href="{{ path('app_customer_pc_builder') }}"><i class="fas fa-gears"></i> PC Builder</a>
             <a class="landing-nav-link {{ app.request.attributes.get('_route') == 'app_customer_services' ? 'active' : '' }}" href="{{ path('app_customer_services') }}"><i class="fas fa-wand-magic-sparkles"></i> Services</a>
             <a class="landing-nav-link {{ app.request.attributes.get('_route') == 'app_customer_about' ? 'active' : '' }}" href="{{ path('app_customer_about') }}"><i class="fas fa-users"></i> About</a>
             <a class="landing-nav-link {{ app.request.attributes.get('_route') == 'app_customer_contact' ? 'active' : '' }}" href="{{ path('app_customer_contact') }}"><i class="fas fa-envelope"></i> Contact</a>
         </nav>
 
-        <a class="landing-header-cta" href="{% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}{{ path('app_product_index') }}{% else %}{{ path('app_login') }}{% endif %}">
-            <i class="fas fa-bolt"></i>
-            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
-                Dashboard
-            {% else %}
-                Log in
+        <div class="landing-customer-actions" style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; justify-content: flex-end;">
+            {% if app.user and not is_granted('ROLE_ADMIN') and not is_granted('ROLE_STAFF') %}
+                <a class="landing-nav-link {{ app.request.attributes.get('_route') == 'app_customer_cart' ? 'active' : '' }}" href="{{ path('app_customer_cart') }}" title="Cart"><i class="fas fa-basket-shopping"></i> Cart</a>
+                <a class="landing-nav-link {{ account_section and app.request.attributes.get('_route') != 'app_customer_cart' ? 'active' : '' }}" href="{{ path('app_profile') }}" title="My account"><i class="fas fa-user-circle"></i> Account</a>
             {% endif %}
-        </a>
+            <a class="landing-header-cta" href="{% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}{{ path('app_product_index') }}{% elseif app.user %}{{ path('app_customer_products') }}{% else %}{{ path('app_login') }}{% endif %}">
+                <i class="fas fa-bolt"></i>
+                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                    Dashboard
+                {% elseif app.user %}
+                    Shop
+                {% else %}
+                    Log in
+                {% endif %}
+            </a>
+        </div>
     </div>
 </header>

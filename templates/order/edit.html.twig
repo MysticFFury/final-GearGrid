@@ -30,6 +30,44 @@
         background: var(--bg-base);
     }
 
+    .form-card {
+        background: linear-gradient(180deg, rgba(31, 41, 55, 0.45) 0%, rgba(17, 24, 39, 0.35) 100%);
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 14px;
+    }
+
+    .section-title {
+        color: #cbd5e1;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .status-chip {
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        border-radius: 9999px;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.78rem;
+        color: #cbd5e1;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+    .status-chip:hover {
+        border-color: rgba(168, 85, 247, 0.7);
+        color: #e9d5ff;
+        transform: translateY(-1px);
+    }
+
+    .status-chip-active {
+        border-color: rgba(168, 85, 247, 0.95);
+        background: rgba(168, 85, 247, 0.18);
+        color: #f5d0fe;
+        box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.28) inset;
+    }
+
     @media (max-width: 768px) {
         .dashboard main {
             margin-left: 0;
@@ -41,6 +79,7 @@
 
 {% block body %}
 <div class="dashboard">
+    {% set quickStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Completed', 'Cancelled'] %}
     {% include 'partials/_sidebar.html.twig' %}
 
     <main class="main-content">
@@ -90,62 +129,88 @@
             </div>
         {% endfor %}
 
-        <div class="max-w-3xl mx-auto">
-            <div class="bg-gray-800/30 border border-gray-700 rounded-xl p-8 border-t-4 border-t-purple-500">
-                <h2 class="text-xl font-semibold text-white mb-8 flex items-center gap-3"><i class="fas fa-edit text-purple-500"></i> Edit Order</h2>
+        <div class="max-w-5xl mx-auto">
+            <div class="form-card p-8 border-t-4 border-t-purple-500">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+                    <div>
+                        <h2 class="text-xl font-semibold text-white flex items-center gap-3"><i class="fas fa-edit text-purple-400"></i> Update Order #{{ order.id }}</h2>
+                        <p class="text-sm text-gray-400 mt-2">Quickly adjust status, amount, date, and assigned products.</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs bg-gray-900/60 border border-gray-700 text-gray-300 px-3 py-2 rounded-lg">
+                        <i class="fas fa-user text-purple-400"></i>
+                        Customer: <span class="font-semibold text-white">{{ order.customerName }}</span>
+                    </div>
+                </div>
 
-                {{ form_start(form, { 'attr': { 'class': 'space-y-4' } }) }}
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div class="space-y-2">
-                        <label class="text-gray-400 text-sm uppercase tracking-wider font-medium">Customer Name</label>
-                        <input type="text" value="{{ order.customerName }}" disabled class="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-900/50 text-gray-400 cursor-not-allowed">
-                        
-                        <div style="display: none;">
-                            {{ form_widget(form.customer) }}
+                {{ form_start(form, { 'attr': { 'class': 'space-y-8', 'id': 'orderEditForm' } }) }}
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-gray-900/30 border border-gray-700 rounded-xl p-5 space-y-4">
+                        <h3 class="section-title">Order Basics</h3>
+
+                        <div class="space-y-2">
+                            <label class="text-gray-400 text-sm uppercase tracking-wider font-medium">Customer Name</label>
+                            <input type="text" value="{{ order.customerName }}" disabled class="w-full px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-900/70 text-gray-400 cursor-not-allowed">
+                            <p class="text-xs text-gray-500">Customer is read-only on this page.</p>
+                            <div style="display: none;">
+                                {{ form_widget(form.customer) }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            {{ form_label(form.totalPrice, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                            {{ form_widget(form.totalPrice, {'attr': {'class': 'w-full px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500', 'placeholder': '0.00', 'step': '0.01'}}) }}
+                            <p class="text-xs text-gray-500">Tip: set the final payable amount.</p>
+                            {{ form_errors(form.totalPrice) }}
+                        </div>
+
+                        <div class="space-y-2">
+                            {{ form_label(form.createdAt, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                            {{ form_widget(form.createdAt, {'attr': {'class': 'w-full px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
+                            {{ form_errors(form.createdAt) }}
                         </div>
                     </div>
 
-                    <div class="space-y-2">
-                        {{ form_label(form.totalPrice, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
-                        {{ form_widget(form.totalPrice, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500', 'placeholder': '0.00', 'step': '0.01'}}) }}
-                        {{ form_errors(form.totalPrice) }}
-                    </div>
+                    <div class="bg-gray-900/30 border border-gray-700 rounded-xl p-5 space-y-4">
+                        <h3 class="section-title">Status And Products</h3>
 
-                    <div class="space-y-2">
-                        {{ form_label(form.status, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
-                        {{ form_widget(form.status, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
-                        {{ form_errors(form.status) }}
-                    </div>
+                        <div class="space-y-2">
+                            {{ form_label(form.status, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                            {{ form_widget(form.status, {'attr': {'class': 'w-full px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500', 'id': 'order_status'}}) }}
+                            {{ form_errors(form.status) }}
+                        </div>
 
-                    <div class="space-y-2">
-                        {{ form_label(form.createdAt, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
-                        {{ form_widget(form.createdAt, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
-                        {{ form_errors(form.createdAt) }}
-                    </div>
+                        <div>
+                            <p class="text-xs text-gray-500 mb-2">Quick status select:</p>
+                            <div class="flex flex-wrap gap-2">
+                                {% for quickStatus in quickStatuses %}
+                                    <button type="button" class="status-chip {% if form.status.vars.value == quickStatus %}status-chip-active{% endif %}" data-status-value="{{ quickStatus }}">
+                                        {{ quickStatus }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+                        </div>
 
-                    <div class="space-y-2 md:col-span-2">
-                        {{ form_label(form.products, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
-                        {{ form_widget(form.products, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
-                        {{ form_errors(form.products) }}
+                        <div class="space-y-2 pt-2">
+                            {{ form_label(form.products, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                            {{ form_widget(form.products, {'attr': {'class': 'w-full min-h-[140px] px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
+                            <p class="text-xs text-gray-500">Hold Ctrl (Windows) to choose multiple products.</p>
+                            {{ form_errors(form.products) }}
+                        </div>
                     </div>
                 </div>
 
                 <div class="flex flex-wrap gap-3 pt-6 border-t border-gray-700">
-                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg shadow-purple-500/20">
-                        <i class="fas fa-save"></i> Update Order
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                        <i class="fas fa-save"></i> Save Changes
                     </button>
+                    <a href="{{ path('app_order_show', {'id': order.id}) }}" class="bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white border border-gray-600 px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Back to Details
+                    </a>
+                    {{ include('order/_delete_form.html.twig') }}
                 </div>
 
                 {{ form_end(form) }}
-
-                <div class="flex flex-wrap gap-3 mt-6 pt-6 border-t border-gray-700">
-                    <a href="{{ path('app_order_show', {'id': order.id}) }}" class="bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white border border-gray-600 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
-                        <i class="fas fa-arrow-left"></i> Back to Details
-                    </a>
-
-                    {{ include('order/_delete_form.html.twig') }}
-                </div>
             </div>
         </div>
     </main>
@@ -167,6 +232,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         });
     }, 5000);
+
+    const statusField = document.getElementById('order_status');
+    const chips = document.querySelectorAll('[data-status-value]');
+    if (statusField && chips.length) {
+        const syncChips = () => {
+            chips.forEach((chip) => {
+                chip.classList.toggle('status-chip-active', chip.dataset.statusValue === statusField.value);
+            });
+        };
+
+        chips.forEach((chip) => {
+            chip.addEventListener('click', () => {
+                statusField.value = chip.dataset.statusValue;
+                statusField.dispatchEvent(new Event('change'));
+                syncChips();
+            });
+        });
+
+        statusField.addEventListener('change', syncChips);
+        syncChips();
+    }
 });
 </script>
 {% endblock %}

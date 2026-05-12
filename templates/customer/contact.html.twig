@@ -5,22 +5,9 @@
 
 {% block stylesheets %}
 <style>
-    .contact-header { text-align: center; margin-bottom: 4rem; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; }
     
-    .contact-title {
-        font-family: 'Oswald', sans-serif; font-size: 4rem; margin-bottom: 1rem;
-        background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); line-height: 1.1;
-    }
-
-    .contact-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 3rem; }
-    
-    .contact-info {
-        background: linear-gradient(to bottom, rgba(255,255,255,0.03), transparent);
-        border: 1px solid var(--glass-border); border-radius: 24px; padding: 2.5rem;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    }
+    .contact-info { padding: 2rem; }
 
     .contact-info img { width: 100%; border-radius: 16px; margin-bottom: 2rem; border: 1px solid var(--glass-border-hover); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
     
@@ -35,10 +22,7 @@
 
     .contact-item span { font-size: 1.05rem; font-weight: 500; }
 
-    .form-card {
-        background: var(--glass-bg); border: 1px solid var(--glass-border);
-        border-radius: 24px; padding: 2.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    }
+    .form-card { padding: 2rem; }
 
     .flash-stack { display: grid; gap: 12px; margin: 0 auto 1.75rem; max-width: 920px; }
     .flash {
@@ -91,7 +75,6 @@
 
     @media (max-width: 992px) {
         .contact-grid { grid-template-columns: 1fr; }
-        .contact-title { font-size: 3rem; }
         .contact-form .row { grid-template-columns: 1fr; }
         .form-actions { justify-content: stretch; }
         .btn-send { width: 100%; }
@@ -117,15 +100,16 @@
             {% endfor %}
         </div>
         
-        <div class="contact-header">
-            <h2 class="contact-title">Get in Touch</h2>
-            <p style="color: var(--text-muted); font-size: 1.15rem; max-width: 600px; margin: 0 auto; line-height: 1.7;">
-                Have a question about a product, need help with an order, or want to discuss enterprise solutions? We're here to help.
+        <header class="customer-page-hero animate-up">
+            <span class="customer-kicker"><i class="fas fa-headset"></i> We reply fast</span>
+            <h2 class="customer-page-title"><i class="fas fa-envelope-open-text" aria-hidden="true"></i>Get in touch</h2>
+            <p class="customer-page-lead">
+                Questions about a product, an order, or enterprise options? Send a message and we’ll get back to you.
             </p>
-        </div>
+        </header>
 
         <div class="contact-grid">
-            <div class="contact-info animate-up delay-1">
+            <div class="contact-info customer-glass-deep animate-up delay-1">
                 <img src="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=600&q=80" alt="Contact Support">
                 
                 <h3 style="font-family: 'Oswald', sans-serif; font-size: 1.8rem; margin-bottom: 2rem; color: #fff;">Contact Details</h3>
@@ -144,7 +128,7 @@
                 </div>
             </div>
 
-            <div class="form-card animate-up delay-2">
+            <div class="form-card customer-glass-deep animate-up delay-2">
                 <h3 style="font-family: 'Oswald', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; color: #fff;">Send us a message</h3>
 
                 <p class="helper">

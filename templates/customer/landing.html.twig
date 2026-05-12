@@ -279,50 +279,62 @@
     .feature-item { display: flex; align-items: flex-start; gap: 15px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;}
     .feature-item i { color: var(--success); font-size: 1.3rem; margin-top: 2px; text-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
 
-    /* --- Hero Carousel Styles --- */
+    /* --- Premium Hero Carousel Styles --- */
     .hero-carousel-wrapper {
-        perspective: 1000px;
+        perspective: 1200px;
         width: 100%;
         margin: 0 auto;
     }
     
     .hero-glow {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        width: 100%; height: 100%; background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
-        filter: blur(80px); opacity: 0.25; z-index: -1;
+        width: 120%; height: 120%; background: radial-gradient(circle, var(--primary) 0%, transparent 60%);
+        filter: blur(100px); opacity: 0.25; z-index: -1; pointer-events: none;
     }
 
     .carousel-container {
         position: relative; border-radius: 24px; overflow: hidden;
         box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--glass-border-hover);
         transform: rotateY(-5deg) rotateX(5deg); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease;
-        aspect-ratio: 4/3; background: var(--glass-bg);
+        aspect-ratio: 4/3; background: var(--bg-base);
     }
 
     .hero-carousel-wrapper:hover .carousel-container {
         transform: rotateY(0deg) rotateX(0deg) translateY(-10px);
-        box-shadow: 0 40px 80px rgba(108, 99, 255, 0.2), 0 0 0 1px rgba(108, 99, 255, 0.4);
+        box-shadow: 0 40px 80px rgba(108, 99, 255, 0.25), 0 0 0 1px rgba(108, 99, 255, 0.4);
     }
 
-    .carousel-track { position: relative; height: 100%; width: 100%; transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
-    .carousel-slide { position: absolute; top: 0; bottom: 0; width: 100%; }
-    .carousel-slide img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.9); }
+    .carousel-track { position: relative; height: 100%; width: 100%; }
+    .carousel-slide { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        opacity: 0; visibility: hidden; z-index: 1;
+        transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1), visibility 1s; 
+    }
+    .carousel-slide.current-slide { opacity: 1; visibility: visible; z-index: 2; }
+    
+    .carousel-slide img { 
+        width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85);
+        transform: scale(1.15) rotate(1deg);
+        transition: transform 6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .carousel-slide.current-slide img { transform: scale(1) rotate(0deg); }
 
     .slide-caption {
-        position: absolute; bottom: 40px; left: 30px; background: rgba(11, 17, 32, 0.85);
-        backdrop-filter: blur(12px); padding: 12px 24px; border-radius: 12px; font-weight: 600;
-        color: #fff; border: 1px solid var(--glass-border); opacity: 0; transform: translateY(15px);
-        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        position: absolute; bottom: 40px; left: 0px; background: rgba(11, 17, 32, 0.85);
+        backdrop-filter: blur(16px); padding: 14px 28px; border-radius: 12px; font-weight: 700;
+        color: #fff; border: 1px solid rgba(255,255,255,0.1); opacity: 0; transform: translateY(30px) scale(0.9);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        font-family: 'Oswald', sans-serif; font-size: 1.25rem; letter-spacing: 1px;
     }
-    .carousel-slide.current-slide .slide-caption { opacity: 1; transform: translateY(0); }
+    .carousel-slide.current-slide .slide-caption { opacity: 1; transform: translateY(0) scale(1); left: 30px; }
 
     /* Navigation Buttons */
     .carousel-button {
         position: absolute; top: 50%; transform: translateY(-50%); background: rgba(11, 17, 32, 0.7);
-        backdrop-filter: blur(8px); color: white; border: 1px solid rgba(255,255,255,0.15);
+        backdrop-filter: blur(12px); color: white; border: 1px solid rgba(255,255,255,0.2);
         width: 48px; height: 48px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex;
-        align-items: center; justify-content: center; transition: all 0.3s ease; opacity: 0; font-size: 1.1rem;
+        align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0; font-size: 1.1rem;
     }
 
     .carousel-container:hover .carousel-button { opacity: 1; }
@@ -496,6 +508,31 @@
         .nl-btn { border-radius: 12px; width: 100%; }
         .nl-form:focus-within { box-shadow: none; border-color: transparent; }
     }
+
+    /* --- Site-wide polish (matches catalog / contact) --- */
+    .hero-badge {
+        box-shadow: 0 4px 20px rgba(108, 99, 255, 0.15);
+    }
+    .stats-strip {
+        background: rgba(15, 22, 38, 0.55);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    .category-card {
+        border-color: rgba(255, 255, 255, 0.09);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+    }
+    .testi-card {
+        background: rgba(15, 22, 38, 0.5);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+    .newsletter {
+        border-color: rgba(108, 99, 255, 0.2);
+        box-shadow: 0 24px 56px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .carousel-container {
+        border: 1px solid rgba(108, 99, 255, 0.15);
+    }
 </style>
 {% endblock %}
 
@@ -545,6 +582,10 @@
                 {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
                     <a href="{{ path('app_product_index') }}" class="landing-header-cta" style="padding: 1rem 2rem; font-size: 1.05rem; border-radius: 12px;">
                         <i class="fas fa-box-open"></i> Browse Catalog
+                    </a>
+                {% elseif app.user %}
+                    <a href="{{ path('app_customer_products') }}" class="landing-header-cta" style="padding: 1rem 2rem; font-size: 1.05rem; border-radius: 12px;">
+                        <i class="fas fa-cart-shopping"></i> Shop products
                     </a>
                 {% else %}
                     <a href="{{ path('app_login') }}" class="landing-header-cta" style="padding: 1rem 2rem; font-size: 1.05rem; border-radius: 12px;">
@@ -848,78 +889,147 @@
             
             // Setup Camera and Renderer (Transparent background)
             const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.z = 15;
+            camera.position.z = 20;
             
             const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer.domElement);
 
-            // Tech Blueprint Material Maker (creates a dark box with glowing colored wireframe edges)
-            function createBlueprintPart(geometry, colorHex) {
-                const group = new THREE.Group();
-                
-                // Solid dark core
-                const solidMat = new THREE.MeshStandardMaterial({ 
-                    color: 0x0b1120, roughness: 0.7, metalness: 0.5, transparent: true, opacity: 0.9 
-                });
-                const solidMesh = new THREE.Mesh(geometry, solidMat);
-                group.add(solidMesh);
+            // Group for mouse tracking
+            const sceneGroup = new THREE.Group();
+            scene.add(sceneGroup);
 
-                // Glowing edges
-                const edges = new THREE.EdgesGeometry(geometry);
-                const lineMat = new THREE.LineBasicMaterial({ color: colorHex, linewidth: 2 });
-                const wireframe = new THREE.LineSegments(edges, lineMat);
-                group.add(wireframe);
-
-                return group;
+            // Particle System
+            const particleGeo = new THREE.BufferGeometry();
+            const particlesCount = 700;
+            const posArray = new Float32Array(particlesCount * 3);
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 60;
             }
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particleMat = new THREE.PointsMaterial({
+                size: 0.15,
+                color: 0x6C63FF,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            const particlesMesh = new THREE.Points(particleGeo, particleMat);
+            sceneGroup.add(particlesMesh);
 
-            // Object 1: CPU (Flat Square block) - Purple
-            const cpuGeo = new THREE.BoxGeometry(2, 0.2, 2);
-            const cpu = createBlueprintPart(cpuGeo, 0x6C63FF);
-            cpu.position.set(-6, 2, -2);
-            scene.add(cpu);
+            // Create Advanced Tech Core
+            const coreGroup = new THREE.Group();
+            coreGroup.position.set(-2, 0, 0); // Position to the left behind text
+            sceneGroup.add(coreGroup);
 
-            // Object 2: GPU (Thick Rectangular Block) - Pink
-            const gpuGeo = new THREE.BoxGeometry(4, 1.2, 1);
-            const gpu = createBlueprintPart(gpuGeo, 0xff6584);
-            gpu.position.set(5, -3, -4);
-            scene.add(gpu);
+            // 1. Inner glowing core
+            const icosaGeo = new THREE.IcosahedronGeometry(2, 1);
+            const innerMat = new THREE.MeshStandardMaterial({ 
+                color: 0x6C63FF, emissive: 0x3025b3, wireframe: true, transparent: true, opacity: 0.8
+            });
+            const innerCore = new THREE.Mesh(icosaGeo, innerMat);
+            coreGroup.add(innerCore);
 
-            // Object 3: RAM (Long thin stick) - Green
-            const ramGeo = new THREE.BoxGeometry(3, 0.8, 0.15);
-            const ram = createBlueprintPart(ramGeo, 0x4ade80);
-            ram.position.set(-3, -4, 0);
-            scene.add(ram);
+            const solidIcosaMat = new THREE.MeshStandardMaterial({
+                color: 0x0b1120, roughness: 0.2, metalness: 0.9, transparent: true, opacity: 0.95
+            });
+            const solidCore = new THREE.Mesh(icosaGeo, solidIcosaMat);
+            solidCore.scale.set(0.98, 0.98, 0.98);
+            coreGroup.add(solidCore);
 
-            // Lighting to make the solid cores slightly visible
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            // 2. Outer rings
+            const ringGeo1 = new THREE.TorusGeometry(3.5, 0.05, 16, 100);
+            const ringMat = new THREE.MeshStandardMaterial({ color: 0xff6584, emissive: 0x8a1b32 });
+            const ring1 = new THREE.Mesh(ringGeo1, ringMat);
+            coreGroup.add(ring1);
+
+            const ringGeo2 = new THREE.TorusGeometry(4.5, 0.02, 16, 100);
+            const ringMat2 = new THREE.MeshStandardMaterial({ color: 0x4ade80, emissive: 0x16a34a });
+            const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
+            ring2.rotation.x = Math.PI / 2;
+            coreGroup.add(ring2);
+
+            // Floating mini chips
+            function createMiniChip(x, y, z, color) {
+                const geo = new THREE.BoxGeometry(0.8, 0.8, 0.1);
+                const edges = new THREE.EdgesGeometry(geo);
+                const mat = new THREE.LineBasicMaterial({ color: color });
+                const mesh = new THREE.LineSegments(edges, mat);
+                mesh.position.set(x, y, z);
+                
+                const sGeo = new THREE.BoxGeometry(0.78, 0.78, 0.08);
+                const sMat = new THREE.MeshBasicMaterial({ color: 0x0b1120 });
+                const sMesh = new THREE.Mesh(sGeo, sMat);
+                mesh.add(sMesh);
+                return mesh;
+            }
+            
+            const chip1 = createMiniChip(6, 4, 2, 0x6C63FF);
+            const chip2 = createMiniChip(-5, -3, 3, 0xff6584);
+            const chip3 = createMiniChip(4, -5, -2, 0x4ade80);
+            sceneGroup.add(chip1, chip2, chip3);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
             scene.add(ambientLight);
             const pointLight = new THREE.PointLight(0x6C63FF, 2, 50);
-            pointLight.position.set(5, 5, 5);
+            pointLight.position.set(-2, 0, 5);
             scene.add(pointLight);
+            
+            const pinkLight = new THREE.PointLight(0xff6584, 1.5, 50);
+            pinkLight.position.set(5, 5, 0);
+            scene.add(pinkLight);
 
-            // Animation Loop (Makes them rotate and bob up/down)
-            let time = 0;
+            // Mouse interaction
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX);
+                mouseY = (event.clientY - windowHalfY);
+            });
+
+            // Animation Loop
+            const clock = new THREE.Clock();
             function animate3D() {
                 requestAnimationFrame(animate3D);
-                time += 0.01;
+                const elapsedTime = clock.getElapsedTime();
 
-                // CPU Animation
-                cpu.rotation.x = Math.sin(time * 0.5) * 0.5;
-                cpu.rotation.y = time * 0.2;
-                cpu.position.y = 2 + Math.sin(time) * 0.5;
+                targetX = mouseX * 0.001;
+                targetY = mouseY * 0.001;
 
-                // GPU Animation
-                gpu.rotation.x = Math.cos(time * 0.3) * 0.3;
-                gpu.rotation.z = time * 0.15;
-                gpu.position.y = -3 + Math.cos(time * 0.8) * 0.5;
+                // Smoothly interpolate group rotation towards mouse position
+                sceneGroup.rotation.y += 0.05 * (targetX - sceneGroup.rotation.y);
+                sceneGroup.rotation.x += 0.05 * (targetY - sceneGroup.rotation.x);
 
-                // RAM Animation
-                ram.rotation.y = time * 0.3;
-                ram.rotation.z = Math.sin(time * 0.6) * 0.2;
-                ram.position.y = -4 + Math.sin(time * 1.2) * 0.3;
+                // Rotate components
+                innerCore.rotation.x = elapsedTime * 0.2;
+                innerCore.rotation.y = elapsedTime * 0.3;
+                solidCore.rotation.copy(innerCore.rotation);
+
+                ring1.rotation.x = elapsedTime * 0.5;
+                ring1.rotation.y = elapsedTime * 0.2;
+
+                ring2.rotation.y = elapsedTime * 0.4;
+                ring2.rotation.z = elapsedTime * 0.1;
+
+                particlesMesh.rotation.y = -elapsedTime * 0.05;
+                
+                chip1.rotation.x = elapsedTime * 0.6;
+                chip1.rotation.y = elapsedTime * 0.4;
+                chip1.position.y = 4 + Math.sin(elapsedTime * 1.5) * 0.5;
+
+                chip2.rotation.y = -elapsedTime * 0.5;
+                chip2.rotation.z = elapsedTime * 0.3;
+                chip2.position.x = -5 + Math.cos(elapsedTime * 1.2) * 0.3;
+
+                chip3.rotation.x = elapsedTime * 0.4;
+                chip3.position.y = -5 + Math.sin(elapsedTime * 2) * 0.4;
 
                 renderer.render(scene, camera);
             }
@@ -943,11 +1053,7 @@
             const dotsNav = document.getElementById('carouselNav');
             const dots = Array.from(dotsNav.children);
 
-            const setSlidePosition = (slide, index) => { slide.style.left = index * 100 + '%'; };
-            slides.forEach(setSlidePosition);
-
-            const moveToSlide = (track, currentSlide, targetSlide) => {
-                track.style.transform = 'translateX(-' + targetSlide.style.left + ')';
+            const moveToSlide = (currentSlide, targetSlide) => {
                 currentSlide.classList.remove('current-slide');
                 targetSlide.classList.add('current-slide');
             };
@@ -964,7 +1070,7 @@
                 let nextDot = currentDot.nextElementSibling;
 
                 if (!nextSlide) { nextSlide = slides[0]; nextDot = dots[0]; }
-                moveToSlide(track, currentSlide, nextSlide); updateDots(currentDot, nextDot);
+                moveToSlide(currentSlide, nextSlide); updateDots(currentDot, nextDot);
             });
 
             prevButton.addEventListener('click', e => {
@@ -974,7 +1080,7 @@
                 let prevDot = currentDot.previousElementSibling;
 
                 if (!prevSlide) { prevSlide = slides[slides.length - 1]; prevDot = dots[dots.length - 1]; }
-                moveToSlide(track, currentSlide, prevSlide); updateDots(currentDot, prevDot);
+                moveToSlide(currentSlide, prevSlide); updateDots(currentDot, prevDot);
             });
 
             dotsNav.addEventListener('click', e => {
@@ -985,7 +1091,7 @@
                 const targetIndex = dots.findIndex(dot => dot === targetDot);
                 const targetSlide = slides[targetIndex];
 
-                moveToSlide(track, currentSlide, targetSlide); updateDots(currentDot, targetDot);
+                moveToSlide(currentSlide, targetSlide); updateDots(currentDot, targetDot);
             });
 
             setInterval(() => { nextButton.click(); }, 5000);

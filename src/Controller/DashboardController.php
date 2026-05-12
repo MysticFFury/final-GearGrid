@@ -57,7 +57,7 @@ final class DashboardController extends AbstractController
             $recentSales += $order->getTotalPrice();
         }
 
-        return $this->render('dashboard/index.html.twig', [
+        $response = $this->render('dashboard/index.html.twig', [
             'totalProducts' => $totalProducts,
             'totalCategories' => $totalCategories,
             'totalOrders' => $totalOrders,
@@ -69,5 +69,15 @@ final class DashboardController extends AbstractController
             'isAdmin' => $isAdmin,
             'isStaff' => $isStaff,
         ]);
+
+        // Avoid serving stale dashboard snapshots when navigating back/forward.
+        $response->setPrivate();
+        $response->headers->addCacheControlDirective('no-store', true);
+        $response->headers->addCacheControlDirective('no-cache', true);
+        $response->headers->addCacheControlDirective('must-revalidate', true);
+        $response->setMaxAge(0);
+        $response->setSharedMaxAge(0);
+
+        return $response;
     }
 }

@@ -6,6 +6,7 @@ use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use App\Service\LogService;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -77,7 +78,7 @@ final class ProductController extends AbstractController
     #[Route('/{id}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Product $product, EntityManagerInterface $entityManager, SluggerInterface $slugger, LogService $logService): Response
     {
-        $form = $this->createForm(ProductType::class, $product);
+        $form = $this->createForm(ProductType::class, $product, ['edit_mode' => true]);
         $form->handleRequest($request);
         $oldImage = $product->getImage();
 
@@ -119,24 +120,25 @@ final class ProductController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_product_delete', methods: ['POST'])]
-    public function delete(Request $request, Product $product): Response
+    public function delete(Request $request, Product $product, EntityManagerInterface $entityManager, LogService $logService): Response
     {
         if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->request->get('_token'))) {
-            if ($product->getImage()) {
-                $path = $this->getParameter('products_directory').'/'.$product->getImage();
-                if (file_exists($path)) { @unlink($path); }
-            }
-
+            $productImage = $product->getImage();
             $productName = $product->getName();
-            $this->entityManager->remove($product);
-            $this->entityManager->flush();
-            $entityManager->remove($product);
-            $entityManager->flush();
+            try {
+                $entityManager->remove($product);
+                $entityManager->flush();
 
-            // LOG THE ACTION
-            $logService->log('DELETE', 'Product', "Deleted product: {$productName}");
+                if ($productImage) {
+                    $path = $this->getParameter('products_directory').'/'.$productImage;
+                    if (file_exists($path)) { @unlink($path); }
+                }
 
-            $this->addFlash('success', '🗑️ Product deleted successfully!');
+                $logService->log('DELETE', 'Product', "Deleted product: {$productName}");
+                $this->addFlash('success', '🗑️ Product deleted successfully!');
+            } catch (ForeignKeyConstraintViolationException) {
+                $this->addFlash('error', 'This product cannot be deleted because it is already used in existing orders.');
+            }
         }
 
         return $this->redirectToRoute('app_product_index');

@@ -6,11 +6,29 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
+    :root {
+        --glass-border: rgba(255,255,255,0.08);
+    }
+
     .dashboard main {
+        margin-left: 16rem;
         padding: 2rem 3rem;
         min-height: 100vh;
         background: #0B1120;
         font-family: 'Inter', sans-serif;
+    }
+
+    .panel {
+        background: linear-gradient(180deg, rgba(17,24,39,0.72), rgba(11,17,32,0.75));
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
     }
 </style>
 {% endblock %}
@@ -32,16 +50,8 @@
                 </nav>
             </div>
 
-            <div class="mt-4 md:mt-0 flex items-center gap-3 bg-gray-800/50 px-4 py-2 rounded-full border border-gray-700">
-                <div class="text-right">
-                    <p class="text-white font-semibold text-sm">{{ app.user.name|default('User') }}</p>
-                    <p class="text-gray-400 text-xs">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</p>
-                </div>
-                <div class="relative">
-                    <img src="https://ui-avatars.com/api/?name={{ app.user.name|default('User')|url_encode }}&background=6C63FF&color=fff" alt="User" class="w-10 h-10 rounded-full border-2 border-purple-500">
-                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-gray-900 rounded-full"></span>
-                </div>
-                <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+            <div class="mt-4 md:mt-0">
+                {% include 'partials/_user_dropdown.html.twig' %}
             </div>
         </div>
 
@@ -66,7 +76,7 @@
             {% endfor %}
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-l-4 border-purple-500 p-6">
+                <div class="panel p-6 border-l-4 border-l-purple-500">
                     <h2 class="text-xl font-semibold text-white flex items-center gap-3 mb-6">
                         <i class="fas fa-box text-purple-500"></i> Product Information
                     </h2>
@@ -109,7 +119,7 @@
                 </div>
 
                 <div class="space-y-6">
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-l-4 border-blue-500 p-6">
+                    <div class="panel p-6 border-l-4 border-l-blue-500">
                         <h2 class="text-xl font-semibold text-white flex items-center gap-3 mb-6">
                             <i class="fas fa-image text-blue-500"></i> Product Image
                         </h2>
@@ -124,7 +134,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-l-4 border-green-500 p-6">
+                    <div class="panel p-6 border-l-4 border-l-green-500">
                         <h2 class="text-xl font-semibold text-white flex items-center gap-3 mb-4">
                             <i class="fas fa-align-left text-green-500"></i> Description
                         </h2>
