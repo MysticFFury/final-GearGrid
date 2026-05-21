@@ -1,0 +1,421 @@
+{# templates/customer/base_customer.html.twig #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GearGrid{% endblock %}</title>
+    
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --primary-hover: #5b54d6;
+            --secondary: #ff6584;
+            --success: #4ade80;
+            --bg-base: #0B1120;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-bg-hover: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --glass-border-hover: rgba(255, 255, 255, 0.12);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Fixed, smooth premium background */
+        .page-wrapper {
+            position: relative;
+            min-height: 100vh;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -20%, rgba(108, 99, 255, 0.13) 0%, transparent 55%),
+                radial-gradient(circle at 12% 25%, rgba(108, 99, 255, 0.11) 0%, transparent 45%),
+                radial-gradient(circle at 92% 75%, rgba(255, 101, 132, 0.09) 0%, transparent 45%),
+                radial-gradient(circle at 50% 120%, rgba(15, 22, 38, 0.85) 0%, transparent 55%),
+                var(--bg-base);
+            background-attachment: fixed;
+            padding: 6rem 1.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .landing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            flex-grow: 1; /* Pushes footer down */
+        }
+
+        /* Topnav Styles */
+        .landing-topbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(11, 17, 32, 0.78);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(108, 99, 255, 0.14);
+            box-shadow: 0 4px 28px rgba(0, 0, 0, 0.22);
+            transition: all 0.3s ease;
+        }
+        
+        .landing-topbar__inner {
+            max-width: 1200px; margin: 0 auto; padding: 1rem 1.5rem;
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+        }
+
+        .landing-brand {
+            display: inline-flex; align-items: center; gap: 12px;
+            text-decoration: none; color: #fff; font-weight: 700;
+            font-family: 'Oswald', sans-serif; font-size: 1.35rem; letter-spacing: 0.5px;
+        }
+
+        .landing-brand .mark {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(255, 101, 132, 0.1));
+            border: 1px solid var(--glass-border-hover); font-size: 1.1rem;
+            overflow: hidden;
+        }
+
+        .landing-brand .mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .landing-nav { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
+
+        .landing-nav-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            text-decoration: none; padding: 0.5rem 1rem; border-radius: 10px;
+            color: var(--text-muted); font-weight: 500; font-size: 0.88rem;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .landing-nav-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+            border-color: transparent;
+        }
+        .landing-nav-link.active {
+            color: #e0e7ff;
+            background: rgba(108, 99, 255, 0.2);
+            border: 1px solid rgba(108, 99, 255, 0.32);
+            box-shadow: 0 0 20px rgba(108, 99, 255, 0.12);
+        }
+
+        .landing-header-cta {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 0.5rem 1.25rem; border-radius: 10px; text-decoration: none;
+            font-weight: 700; font-size: 0.88rem; color: #fff;
+            background: linear-gradient(135deg, var(--primary) 0%, #7c73ff 45%, var(--primary-hover) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 18px rgba(108, 99, 255, 0.38);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: pulse-cta 2.5s infinite;
+        }
+
+        @keyframes pulse-cta {
+            0% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(108, 99, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0); }
+        }
+
+        .landing-header-cta:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 26px rgba(108, 99, 255, 0.55), 0 0 20px rgba(108, 99, 255, 0.3);
+            animation: none;
+        }
+
+        /* Shared inner-page hero & panels (contact, services, cart, account, etc.) */
+        .customer-page-hero {
+            text-align: center;
+            margin-bottom: 2.25rem;
+            padding: 1.85rem 1.25rem 2.1rem;
+            border-radius: 22px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(165deg, rgba(108, 99, 255, 0.1) 0%, rgba(15, 22, 38, 0.42) 48%, rgba(255, 101, 132, 0.06) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 20px 44px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        .customer-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #c4b5fd;
+            margin-bottom: 0.85rem;
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(108, 99, 255, 0.14);
+            border: 1px solid rgba(108, 99, 255, 0.28);
+        }
+        .customer-page-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(2rem, 4.5vw, 3.25rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.12;
+            color: #fff;
+            margin: 0 0 0.85rem;
+            text-shadow: 0 4px 28px rgba(108, 99, 255, 0.22);
+        }
+        .customer-page-title i { color: var(--primary); margin-right: 0.35rem; }
+        .customer-page-lead {
+            color: var(--text-muted);
+            font-size: 1.02rem;
+            line-height: 1.65;
+            max-width: 36rem;
+            margin: 0 auto;
+        }
+        .customer-glass-deep {
+            background: rgba(15, 22, 38, 0.62);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 36px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        /* Typography & Layout */
+        .section-title {
+            font-family: 'Oswald', sans-serif; font-size: 2rem;
+            margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;
+        }
+        .section-title i { color: var(--primary); font-size: 1.6rem; }
+        
+        .landing-section { margin-top: 4rem; }
+
+        .landing-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;
+        }
+
+        /* Premium Cards */
+        .landing-card {
+            border-radius: 18px;
+            background: rgba(15, 22, 38, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1.75rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative; overflow: hidden;
+            box-shadow: 0 4px 22px rgba(0, 0, 0, 0.14);
+        }
+
+        .landing-card:hover {
+            transform: translateY(-6px);
+            background: rgba(18, 26, 44, 0.72);
+            border-color: rgba(108, 99, 255, 0.28);
+            box-shadow: 0 22px 48px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(108, 99, 255, 0.08);
+        }
+
+        .landing-card h3 { font-family: 'Oswald', sans-serif; font-size: 1.25rem; margin-bottom: 0.5rem; }
+        .landing-card p { color: var(--text-muted); line-height: 1.6; font-size: 0.95rem; }
+        
+        .card-icon {
+            width: 48px; height: 48px; border-radius: 12px; display: flex;
+            align-items: center; justify-content: center; font-size: 1.2rem;
+            background: rgba(108, 99, 255, 0.1); border: 1px solid rgba(108, 99, 255, 0.2);
+            color: var(--primary); margin-bottom: 1rem;
+        }
+
+        /* Entry Animations */
+        .animate-up {
+            opacity: 0; transform: translateY(20px);
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- GLOBAL FOOTER STYLES --- */
+        .footer {
+            background: rgba(15, 22, 38, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 22px; padding: 3rem 2rem 1.5rem;
+            margin-top: 5rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        .footer-top { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem; }
+        .brand-col .brand { display: flex; align-items: center; gap: 10px; font-family: 'Oswald', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.8rem; color: #fff;}
+
+        /* Updated brand-mark to hold the image logo nicely */
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, rgba(108,99,255,0.2), rgba(255,101,132,0.1));
+            border: 1px solid rgba(108,99,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-mark::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(108,99,255,0.4), rgba(255,101,132,0.3));
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .brand-mark:hover {
+            transform: scale(1.1) rotate(3deg);
+            box-shadow: 0 0 25px rgba(108,99,255,0.5), 0 0 50px rgba(108,99,255,0.3);
+            border-color: rgba(108,99,255,0.6);
+        }
+
+        .brand-mark:hover::before {
+            opacity: 1;
+        }
+
+        .brand-logo-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.5s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-mark:hover .brand-logo-img {
+            transform: scale(1.1) rotate(-3deg);
+        }
+
+        .brand-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 1.1rem; }
+        .social-row { display: flex; gap: 8px; }
+        .soc-btn {
+            width: 34px; height: 34px; border-radius: 8px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+            text-decoration: none;
+        }
+        .soc-btn:hover { background: rgba(108,99,255,0.15); color: #a5b4fc; border-color: rgba(108,99,255,0.3); transform: translateY(-2px); }
+        .footer-col-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #64748b; margin-bottom: 0.9rem; }
+        .footer-links { display: flex; flex-direction: column; gap: 0.55rem; }
+        .footer-link { font-size: 0.85rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; cursor: pointer; }
+        .footer-link:hover { color: #f8fafc; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .footer-copy { font-size: 0.78rem; color: #64748b; }
+        .footer-legal { display: flex; gap: 1.2rem; }
+        .footer-legal a { font-size: 0.78rem; color: #64748b; text-decoration: none; cursor: pointer; transition: color 0.2s;}
+        .footer-legal a:hover { color: var(--text-muted); }
+
+        @media (max-width: 992px) {
+            .footer-top { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .landing-topbar__inner { flex-wrap: wrap; padding: 1rem; }
+            .landing-nav { width: 100%; justify-content: center; }
+            .landing-header-cta { margin-left: auto; margin-right: auto; }
+            .page-wrapper { padding-top: 8rem; }
+            .footer-top { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; text-align: center; justify-content: center; }
+        }
+    </style>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+    {% include 'customer/_topnav.html.twig' %}
+    
+    <div class="page-wrapper">
+        <div class="landing-container">
+            {% block body %}{% endblock %}
+        </div>
+
+        {# --- GLOBAL FOOTER --- #}
+        <footer class="footer animate-up delay-3">
+            <div class="footer-top">
+                <div class="brand-col">
+                    <div class="brand">
+                        <div class="brand-mark">
+                            {# Using your uploaded PNG logo here #}
+                            <img src="{{ asset('images/geargrid-logo.png') }}" alt="GearGrid Logo" class="brand-logo-img">
+                        </div>
+                        GearGrid
+                    </div>
+                    <div class="brand-desc">Your one-stop platform for premium PC hardware. Built by enthusiasts, for builders.</div>
+                    <div class="social-row">
+                        <a href="#" class="soc-btn"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="soc-btn"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="soc-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="soc-btn"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <div class="footer-col-title">Navigate</div>
+                    <div class="footer-links">
+                        <a href="{{ path('app_customer_landing') }}" class="footer-link">Home</a>
+                        <a href="{{ path('app_customer_products') }}" class="footer-link">Products</a>
+                        <a href="{{ path('app_customer_pc_builder') }}" class="footer-link">PC Builder</a>
+                        <a href="{{ path('app_customer_services') }}" class="footer-link">Services</a>
+                        <a href="{{ path('app_customer_about') }}" class="footer-link">About Us</a>
+                        <a href="{{ path('app_customer_contact') }}" class="footer-link">Contact</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="footer-col-title">Support</div>
+                    <div class="footer-links">
+                        <a href="#" class="footer-link">Track My Order</a>
+                        <a href="#" class="footer-link">Returns & Refunds</a>
+                        <a href="#" class="footer-link">Warranty Info</a>
+                        <a href="#" class="footer-link">FAQs</a>
+                        <a href="#" class="footer-link">Live Chat</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="footer-col-title">Contact</div>
+                    <div class="footer-links">
+                        <span class="footer-link"><i class="fas fa-location-dot" style="margin-right:5px; color:var(--primary);"></i>San Miguel Bacong Neg. Or</span>
+                        <span class="footer-link"><i class="fas fa-phone" style="margin-right:5px; color:var(--primary);"></i> +1 (555) 123-4567</span>
+                        <span class="footer-link"><i class="fas fa-envelope" style="margin-right:5px; color:var(--primary);"></i> support@geargrid.com</span>
+                        <span class="footer-link" style="margin-top:0.5rem; color:#4ade80; font-size:0.78rem;">
+                            <i class="fas fa-circle" style="font-size: 8px; margin-right: 4px;"></i> Open Mon–Sat, 9am–6pm
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span class="footer-copy">© 2026 GearGrid. All rights reserved.</span>
+                <div class="footer-legal">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Settings</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

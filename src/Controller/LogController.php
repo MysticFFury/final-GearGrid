@@ -9,39 +9,46 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/log')]
+#[IsGranted('ROLE_ADMIN')]
 final class LogController extends AbstractController
 {
+    // List all logs
     #[Route(name: 'app_log_index', methods: ['GET'])]
-    public function index(LogRepository $logRepository): Response
+    public function index(Request $request, LogRepository $logRepository): Response
     {
+        $userFilter = $request->query->get('user');
+        $actionFilter = $request->query->get('action');
+        $fromInput = $request->query->get('from');
+        $toInput = $request->query->get('to');
+
+        $from = $fromInput ? (new \DateTimeImmutable($fromInput))->setTime(0, 0, 0) : null;
+        $to = $toInput ? (new \DateTimeImmutable($toInput))->setTime(23, 59, 59) : null;
+
         return $this->render('log/index.html.twig', [
-            'logs' => $logRepository->findAll(),
+            'logs' => $logRepository->findFiltered($userFilter, $actionFilter, $from, $to),
+            'actions' => $logRepository->findDistinctActions(),
+            'users' => $logRepository->findDistinctUsers(),
+            'filters' => [
+                'user' => $userFilter,
+                'action' => $actionFilter,
+                'from' => $fromInput,
+                'to' => $toInput,
+            ],
         ]);
     }
 
+    // Create new log
     #[Route('/new', name: 'app_log_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(): Response
     {
-        $log = new Log();
-        $form = $this->createForm(LogType::class, $log);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($log);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_log_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('log/new.html.twig', [
-            'log' => $log,
-            'form' => $form,
-        ]);
+        throw $this->createAccessDeniedException('Logs are read-only.');
     }
 
+    // Show log
     #[Route('/{id}', name: 'app_log_show', methods: ['GET'])]
     public function show(Log $log): Response
     {
@@ -50,32 +57,24 @@ final class LogController extends AbstractController
         ]);
     }
 
+    // Edit log
     #[Route('/{id}/edit', name: 'app_log_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Log $log, EntityManagerInterface $entityManager): Response
+    public function edit(): Response
     {
-        $form = $this->createForm(LogType::class, $log);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_log_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('log/edit.html.twig', [
-            'log' => $log,
-            'form' => $form,
-        ]);
+        throw $this->createAccessDeniedException('Logs are read-only.');
     }
 
+    // Delete log
     #[Route('/{id}', name: 'app_log_delete', methods: ['POST'])]
-    public function delete(Request $request, Log $log, EntityManagerInterface $entityManager): Response
+    public function delete(): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$log->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($log);
-            $entityManager->flush();
-        }
+        throw $this->createAccessDeniedException('Logs are read-only.');
+    }
 
-        return $this->redirectToRoute('app_log_index', [], Response::HTTP_SEE_OTHER);
+    // Toggle status
+    #[Route('/{id}/toggle', name: 'app_log_toggle', methods: ['POST'])]
+    public function toggle(): Response
+    {
+        throw $this->createAccessDeniedException('Logs are read-only.');
     }
 }

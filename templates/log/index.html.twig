@@ -3,111 +3,177 @@
 {% block title %}Logs | GearGrid Admin{% endblock %}
 
 {% block stylesheets %}
-<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-.dashboard main { padding: 2rem; }
+    :root {
+        --primary: #6C63FF;
+        --primary-hover: #5b54d6;
+        --secondary: #ff6584;
+        --success: #4ade80;
+        --bg-base: #0B1120;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --glass-bg: rgba(255, 255, 255, 0.02);
+        --glass-bg-hover: rgba(255, 255, 255, 0.04);
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-border-hover: rgba(255, 255, 255, 0.12);
+        --danger: #dc3545;
+        --card-bg: rgba(255, 255, 255, 0.02);
+    }
 
-.top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-.top-header h1 { font-family: 'Oswald', sans-serif; color: #fff; }
+    .dashboard main {
+        margin-left: 16rem;
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: var(--bg-base);
+    }
 
-.profile img { width: 40px; height: 40px; border-radius: 50%; margin-right: 0.5rem; }
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-.table-card {
-    background: #1e1e2f;
-    padding: 1.5rem;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    margin-top: 1rem;
-}
+    .styled-table thead {
+        background: rgba(255, 255, 255, 0.03);
+    }
 
-table.dataTable thead th {
-    color: #fff;
-    font-weight: bold;
-    border-bottom: 1px solid #444;
-}
+    .styled-table th {
+        padding: 1rem 1.2rem;
+        text-align: left;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1.5px;
+        border-bottom: 2px solid var(--glass-border);
+    }
 
-table.dataTable tbody td {
-    color: #e0e0e0;
-    border-bottom: 1px solid #333;
-}
+    .styled-table td {
+        padding: 1.2rem 1.2rem;
+        color: #fff;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 0.9rem;
+    }
 
-.btn-show, .btn-edit, .btn-add {
-    padding: 0.3rem 0.6rem;
-    border-radius: 8px;
-    color: #fff;
-    text-decoration: none;
-    margin-right: 0.3rem;
-    font-weight: bold;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
+    .styled-table tbody tr {
+        transition: all 0.2s ease;
+    }
 
-.btn-show { background: #6C63FF; }
-.btn-edit { background: #ff6584; }
-.btn-add { background: #00c6ff; margin-left: 1rem; }
+    .styled-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
 
-.btn-show:hover, .btn-edit:hover, .btn-add:hover { opacity: 0.85; }
+    .styled-table tbody tr:last-child td {
+        border-bottom: none;
+    }
 
-.content-actions {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    justify-content: space-between;
-}
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
 
-.search-input {
-    padding: 0.5rem 0.8rem;
-    border-radius: 8px;
-    border: 1px solid #444;
-    background: #2a2a3f;
-    color: #fff;
-    width: 250px;
-}
+    .badge-id {
+        color: var(--secondary);
+        font-family: monospace;
+        background: rgba(255,101,132,0.1);
+    }
 
-.search-input::placeholder { color: #aaa; }
+    .badge-action {
+        background: rgba(108, 99, 255, 0.2);
+        color: var(--primary);
+    }
+
+    .badge-status-active {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+    }
+
+    .badge-status-inactive {
+        background: rgba(220, 53, 69, 0.2);
+        color: #ff6b6b;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
     {% include 'partials/_sidebar.html.twig' %}
+
     <main class="main-content">
-        <div class="top-header">
-            <h1>Logs</h1>
-            <div class="profile">
-                <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="User">
-                <span>John Ralf</span>
+        <!-- Top Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-gray-800">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Activity Logs</h1>
+                <nav class="flex items-center gap-2 text-sm text-gray-400">
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-purple-400 transition-colors">Dashboard</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <span class="text-pink-400 font-semibold">Logs</span>
+                </nav>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center gap-3 bg-gray-800/50 px-4 py-2 rounded-full border border-gray-700">
+                <div class="text-right">
+                    <p class="text-white font-semibold text-sm">{{ app.user.name|default(app.user.username|default('Admin')) }}</p>
+                    <p class="text-gray-400 text-xs">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</p>
+                </div>
+                <div class="relative">
+                    <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User" class="w-10 h-10 rounded-lg border-2 border-purple-500">
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-gray-900 rounded-full"></span>
+                </div>
+                <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
             </div>
         </div>
 
         <div class="content-area">
-            <div class="content-header">
-                <h1>Activity Logs</h1>
-                <div class="content-actions">
-                    <input type="text" id="logSearch" class="search-input" placeholder="🔍 Search logs...">
-                    <a href="{{ path('app_log_new') }}" class="btn-add">
-                        <i class="fas fa-plus"></i> Create Log
-                    </a>
-                </div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold text-white flex items-center gap-3"><i class="fas fa-file-alt text-purple-500"></i> Log List</h2>
             </div>
 
-            <div class="table-card">
+            <form method="get" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-6 p-6 bg-gray-800/30 border border-gray-700 rounded-xl">
+                <input type="text" name="user" value="{{ filters.user }}" placeholder="🔍 Filter by user" class="px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500">
+                <select name="action" class="px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500">
+                    <option value="">All Actions</option>
+                    {% for action in actions %}
+                        <option value="{{ action }}" {% if filters.action == action %}selected{% endif %}>
+                            {{ action }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <input type="date" name="from" value="{{ filters.from }}" placeholder="From date" class="px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500">
+                <input type="date" name="to" value="{{ filters.to }}" placeholder="To date" class="px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500">
+                <div class="flex gap-3 md:col-span-2 lg:col-span-4 justify-end">
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <a href="{{ path('app_log_index') }}" class="bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white border border-gray-600 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                        <i class="fas fa-undo"></i> Reset
+                    </a>
+                </div>
+            </form>
+
+            <div class="bg-gray-800/30 border border-gray-700 rounded-xl p-6 border-t-4 border-t-purple-500">
                 <table id="logTable" class="display styled-table" style="width:100%;">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Action</th>
                             <th>Message</th>
+                            <th>Status</th>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Entity</th>
                             <th>Created At</th>
                             <th>Actions</th>
                         </tr>
@@ -115,22 +181,30 @@ table.dataTable tbody td {
                     <tbody>
                         {% for log in logs %}
                             <tr>
-                                <td>{{ log.id }}</td>
-                                <td>{{ log.action }}</td>
-                                <td>{{ log.message }}</td>
-                                <td>{{ log.createdAt ? log.createdAt|date('Y-m-d H:i:s') : '-' }}</td>
+                                <td><span class="badge badge-id">#{{ log.id }}</span></td>
+                                <td><span class="badge badge-action">{{ log.action }}</span></td>
+                                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ log.message }}</td>
                                 <td>
-                                    <a href="{{ path('app_log_show', {'id': log.id}) }}" class="btn-show">
-                                        <i class="fas fa-eye"></i> Show
-                                    </a>
-                                    <a href="{{ path('app_log_edit', {'id': log.id}) }}" class="btn-edit">
-                                        <i class="fas fa-edit"></i> Edit
+                                    <span class="badge {% if log.status == 'active' %}badge-status-active{% else %}badge-status-inactive{% endif %}">
+                                        {{ log.status|capitalize }}
+                                    </span>
+                                </td>
+                                <td>{{ log.userName ?: 'Anonymous' }}</td>
+                                <td class="text-gray-400">{{ log.userRole ?: '-' }}</td>
+                                <td class="text-gray-400">{{ log.entity ?: '-' }}</td>
+                                <td class="text-gray-400">{{ log.createdAt ? log.createdAt|date('M d, Y H:i') : '-' }}</td>
+                                <td>
+                                    <a href="{{ path('app_log_show', {'id': log.id}) }}" class="bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-600/30 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+                                        <i class="fas fa-eye"></i> View
                                     </a>
                                 </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="5" style="text-align:center;">No logs found.</td>
+                                <td colspan="9" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-file-alt text-4xl mb-3 opacity-50 block"></i>
+                                    No logs found.
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -150,12 +224,17 @@ $(document).ready(function() {
         pageLength: 10,
         lengthMenu: [5, 10, 25, 50],
         order: [[0, 'desc']],
-        columnDefs: [{ orderable: false, targets: 4 }],
-        autoWidth: false
-    });
-
-    $('#logSearch').on('keyup', function () {
-        table.search(this.value).draw();
+        columnDefs: [{ orderable: false, targets: 8 }],
+        autoWidth: false,
+        dom: 'lrtip',
+        language: {
+            search: "",
+            searchPlaceholder: "Search...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ logs",
+            infoEmpty: "No logs available",
+            infoFiltered: "(filtered from _MAX_ total logs)"
+        }
     });
 });
 </script>

@@ -3,55 +3,256 @@
 {% block title %}Edit Order | GearGrid Admin{% endblock %}
 
 {% block stylesheets %}
-<!-- Font Awesome for Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
 
-<!-- Google Fonts for Oswald -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #6C63FF;
+        --primary-hover: #5b54d6;
+        --secondary: #ff6584;
+        --success: #4ade80;
+        --bg-base: #0B1120;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --glass-bg: rgba(255, 255, 255, 0.02);
+        --glass-bg-hover: rgba(255, 255, 255, 0.04);
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-border-hover: rgba(255, 255, 255, 0.12);
+        --danger: #dc3545;
+        --card-bg: rgba(255, 255, 255, 0.02);
+    }
 
-<!-- Optional: Custom CSS -->
-<link rel="stylesheet" href="{{ asset('css/admin_product_edit.css') }}">
+    .dashboard main {
+        margin-left: 16rem;
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: var(--bg-base);
+    }
+
+    .form-card {
+        background: linear-gradient(180deg, rgba(31, 41, 55, 0.45) 0%, rgba(17, 24, 39, 0.35) 100%);
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 14px;
+    }
+
+    .section-title {
+        color: #cbd5e1;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .status-chip {
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        border-radius: 9999px;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.78rem;
+        color: #cbd5e1;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+    .status-chip:hover {
+        border-color: rgba(168, 85, 247, 0.7);
+        color: #e9d5ff;
+        transform: translateY(-1px);
+    }
+
+    .status-chip-active {
+        border-color: rgba(168, 85, 247, 0.95);
+        background: rgba(168, 85, 247, 0.18);
+        color: #f5d0fe;
+        box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.28) inset;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
-    <!-- Sidebar -->
+    {% set quickStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Completed', 'Cancelled'] %}
     {% include 'partials/_sidebar.html.twig' %}
 
-    <!-- Main Content -->
     <main class="main-content">
         <!-- Top Header -->
-        <div class="top-header">
-            <h1>Edit Order</h1>
-            <div class="user-info">
-                <div class="profile">
-                    <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="User">
-                    <span>John Ralf</span>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-gray-800">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Edit Order</h1>
+                <nav class="flex items-center gap-2 text-sm text-gray-400">
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-purple-400 transition-colors">Dashboard</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <a href="{{ path('app_order_index') }}" class="hover:text-purple-400 transition-colors">Orders</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <a href="{{ path('app_order_show', {'id': order.id}) }}" class="hover:text-purple-400 transition-colors">Order #{{ order.id }}</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <span class="text-pink-400 font-semibold">Edit</span>
+                </nav>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center gap-3 bg-gray-800/50 px-4 py-2 rounded-full border border-gray-700">
+                <div class="text-right">
+                    <p class="text-white font-semibold text-sm">{{ app.user.name|default(app.user.username|default('Admin')) }}</p>
+                    <p class="text-gray-400 text-xs">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</p>
                 </div>
+                <div class="relative">
+                    <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User" class="w-10 h-10 rounded-lg border-2 border-purple-500">
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-gray-900 rounded-full"></span>
+                </div>
+                <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
             </div>
         </div>
 
-        <!-- Form Container -->
-        <div class="form-container">
-            <div class="form-card">
-                <h2>Order Details</h2>
-                {{ include('order/_form.html.twig', {'button_label': 'Update'}) }}
+        {# Flash Messages #}
+        {% for message in app.flashes('success') %}
+            <div class="mb-6 p-4 rounded-lg flex items-center justify-between gap-3 bg-green-500/20 text-green-400 border border-green-500/30 shadow-lg shadow-green-500/20 max-w-3xl mx-auto">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-check-circle"></i> {{ message }}
+                </span>
+                <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-white cursor-pointer text-xl opacity-80 px-1">&times;</button>
             </div>
+        {% endfor %}
 
-            <div class="action-buttons">
-                <a href="{{ path('app_order_index') }}" class="btn btn-back">
-                    <i class="fas fa-arrow-left"></i> Back to List
-                </a>
-                {{ include('order/_delete_form.html.twig') }}
+        {% for message in app.flashes('error') %}
+            <div class="mb-6 p-4 rounded-lg flex items-center justify-between gap-3 bg-red-500/20 text-red-400 border border-red-500/30 shadow-lg shadow-red-500/20 max-w-3xl mx-auto">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-exclamation-circle"></i> {{ message }}
+                </span>
+                <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-white cursor-pointer text-xl opacity-80 px-1">&times;</button>
+            </div>
+        {% endfor %}
+
+        <div class="max-w-5xl mx-auto">
+            <div class="form-card p-8 border-t-4 border-t-purple-500">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+                    <div>
+                        <h2 class="text-xl font-semibold text-white flex items-center gap-3"><i class="fas fa-edit text-purple-400"></i> Update Order #{{ order.id }}</h2>
+                        <p class="text-sm text-gray-400 mt-2">Quickly adjust status, amount, date, and assigned products.</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs bg-gray-900/60 border border-gray-700 text-gray-300 px-3 py-2 rounded-lg">
+                        <i class="fas fa-user text-purple-400"></i>
+                        Customer: <span class="font-semibold text-white">{{ order.customerName }}</span>
+                    </div>
+                </div>
+
+                {{ form_start(form, { 'attr': { 'class': 'space-y-8', 'id': 'orderEditForm' } }) }}
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-gray-900/30 border border-gray-700 rounded-xl p-5 space-y-4">
+                        <h3 class="section-title">Order Basics</h3>
+
+                        <div class="space-y-2">
+                            <label class="text-gray-400 text-sm uppercase tracking-wider font-medium">Customer Name</label>
+                            <input type="text" value="{{ order.customerName }}" disabled class="w-full px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-900/70 text-gray-400 cursor-not-allowed">
+                            <p class="text-xs text-gray-500">Customer is read-only on this page.</p>
+                            <div style="display: none;">
+                                {{ form_widget(form.customer) }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            {{ form_label(form.totalPrice, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                            {{ form_widget(form.totalPrice, {'attr': {'class': 'w-full px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500', 'placeholder': '0.00', 'step': '0.01'}}) }}
+                            <p class="text-xs text-gray-500">Tip: set the final payable amount.</p>
+                            {{ form_errors(form.totalPrice) }}
+                        </div>
+
+                        <div class="space-y-2">
+                            {{ form_label(form.createdAt, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                            {{ form_widget(form.createdAt, {'attr': {'class': 'w-full px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
+                            {{ form_errors(form.createdAt) }}
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-900/30 border border-gray-700 rounded-xl p-5 space-y-4">
+                        <h3 class="section-title">Status And Products</h3>
+
+                        <div class="space-y-2">
+                            {{ form_label(form.status, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                            {{ form_widget(form.status, {'attr': {'class': 'w-full px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500', 'id': 'order_status'}}) }}
+                            {{ form_errors(form.status) }}
+                        </div>
+
+                        <div>
+                            <p class="text-xs text-gray-500 mb-2">Quick status select:</p>
+                            <div class="flex flex-wrap gap-2">
+                                {% for quickStatus in quickStatuses %}
+                                    <button type="button" class="status-chip {% if form.status.vars.value == quickStatus %}status-chip-active{% endif %}" data-status-value="{{ quickStatus }}">
+                                        {{ quickStatus }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2">
+                            {{ form_label(form.products, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                            {{ form_widget(form.products, {'attr': {'class': 'w-full min-h-[140px] px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
+                            <p class="text-xs text-gray-500">Hold Ctrl (Windows) to choose multiple products.</p>
+                            {{ form_errors(form.products) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3 pt-6 border-t border-gray-700">
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a href="{{ path('app_order_show', {'id': order.id}) }}" class="bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white border border-gray-600 px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Back to Details
+                    </a>
+                    {{ include('order/_delete_form.html.twig') }}
+                </div>
+
+                {{ form_end(form) }}
             </div>
         </div>
     </main>
-
-    <!-- Footer -->
-    <footer style="text-align:center; padding:1rem; color:#aaa; font-size:0.9rem;">
-        &copy; {{ "now"|date("Y") }} GearGrid Admin Panel. All Rights Reserved.
-    </footer>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+// Auto-dismiss flash messages after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(function(message) {
+            message.style.transition = 'opacity 0.5s';
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 500);
+        });
+    }, 5000);
+
+    const statusField = document.getElementById('order_status');
+    const chips = document.querySelectorAll('[data-status-value]');
+    if (statusField && chips.length) {
+        const syncChips = () => {
+            chips.forEach((chip) => {
+                chip.classList.toggle('status-chip-active', chip.dataset.statusValue === statusField.value);
+            });
+        };
+
+        chips.forEach((chip) => {
+            chip.addEventListener('click', () => {
+                statusField.value = chip.dataset.statusValue;
+                statusField.dispatchEvent(new Event('change'));
+                syncChips();
+            });
+        });
+
+        statusField.addEventListener('change', syncChips);
+        syncChips();
+    }
+});
+</script>
 {% endblock %}

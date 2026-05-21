@@ -1,0 +1,202 @@
+{% extends 'customer/base_customer.html.twig' %}
+
+{% block title %}Cart | GearGrid{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .cart-page-intro { margin-bottom: 1.75rem; }
+
+    .cart-layout { display: grid; grid-template-columns: 1fr 320px; gap: 2rem; align-items: start; }
+    @media (max-width: 900px) { .cart-layout { grid-template-columns: 1fr; } }
+
+    .cart-lines {
+        overflow: hidden;
+    }
+    .cart-line {
+        display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center;
+        padding: 1rem 1.25rem; border-bottom: 1px solid var(--glass-border);
+    }
+    .cart-line:last-child { border-bottom: none; }
+    .cart-line-name { font-weight: 600; color: #fff; }
+    .cart-line-price { color: var(--text-muted); font-size: 0.88rem; }
+    .qty-controls { display: inline-flex; align-items: center; border: 1px solid var(--glass-border); border-radius: 10px; overflow: hidden; }
+    .qty-controls button {
+        background: transparent; border: none; color: #fff; width: 36px; height: 36px; cursor: pointer; font-size: 1.1rem;
+    }
+    .qty-controls button:hover { background: rgba(108,99,255,0.25); }
+    .qty-controls span { min-width: 36px; text-align: center; font-weight: 700; border-left: 1px solid var(--glass-border); border-right: 1px solid var(--glass-border); }
+    .line-remove { background: transparent; border: 1px solid rgba(248,113,113,0.35); color: #f87171; border-radius: 8px; padding: 0.35rem 0.65rem; cursor: pointer; font-size: 0.8rem; margin-left: 0.75rem; }
+    .line-remove:hover { background: rgba(248,113,113,0.12); }
+
+    .cart-empty {
+        padding: 3rem 2rem; text-align: center; color: var(--text-muted);
+    }
+    .cart-empty a { color: var(--primary); font-weight: 600; }
+
+    .cart-summary {
+        padding: 1.5rem;
+        position: sticky; top: 6.5rem;
+    }
+    .cart-summary h2 { font-family: 'Oswald', sans-serif; font-size: 1.2rem; color: #fff; margin-bottom: 1rem; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.95rem; color: var(--text-muted); }
+    .summary-total { display: flex; justify-content: space-between; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--glass-border); font-weight: 700; font-size: 1.15rem; color: var(--success); }
+
+    .btn-checkout {
+        width: 100%; margin-top: 1.25rem; padding: 0.9rem; border-radius: 14px; border: none; cursor: pointer;
+        background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: #fff; font-weight: 700; font-family: inherit; font-size: 0.95rem;
+        box-shadow: 0 8px 24px rgba(108,99,255,0.38);
+    }
+    .btn-checkout:hover { filter: brightness(1.06); transform: translateY(-1px); }
+    .btn-checkout:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .flash { margin-bottom: 1rem; padding: 0.85rem 1rem; border-radius: 10px; font-size: 0.9rem; }
+    .flash.err { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.35); color: #f87171; }
+</style>
+{% endblock %}
+
+{% block body %}
+<header class="customer-page-hero cart-page-intro animate-up">
+    <span class="customer-kicker"><i class="fas fa-basket-shopping"></i> Checkout</span>
+    <h1 class="customer-page-title"><i class="fas fa-cart-shopping" aria-hidden="true"></i>Your cart</h1>
+    <p class="customer-page-lead">Review items and quantities, then place your order. Purchases show under <strong style="color:#e2e8f0;">My account</strong>.</p>
+</header>
+
+{% for message in app.flashes('error') %}
+    <div class="flash err animate-up"><i class="fas fa-exclamation-circle"></i> {{ message }}</div>
+{% endfor %}
+
+<div class="cart-layout animate-up delay-1">
+    <div class="cart-lines customer-glass-deep" id="cartLines">
+        <div class="cart-empty" id="cartEmpty">
+            <p>Your cart is empty.</p>
+            <p style="margin-top: 0.75rem;"><a href="{{ path('app_customer_products') }}">Continue shopping</a></p>
+        </div>
+    </div>
+
+    <aside class="cart-summary customer-glass-deep" id="cartSummary" style="display: none;">
+        <h2>Summary</h2>
+        <div class="summary-row"><span>Items</span><span id="summaryCount">0</span></div>
+        <div class="summary-total"><span>Total</span><span id="summaryTotal">₱0.00</span></div>
+
+        <form method="post" action="{{ path('app_customer_checkout') }}" id="checkoutForm">
+            <input type="hidden" name="_token" value="{{ csrf_token('customer_checkout') }}">
+            <input type="hidden" name="lines" id="checkoutLines" value="">
+            <button type="submit" class="btn-checkout" id="checkoutBtn" disabled>
+                <i class="fas fa-lock"></i> Place order
+            </button>
+        </form>
+        <p style="margin-top: 1rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+            By placing an order you confirm items and totals. Stock is checked at checkout.
+        </p>
+    </aside>
+</div>
+
+<script>
+(function () {
+    const STORAGE_KEY = 'geargrid_cart_v1';
+
+    function loadCart() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            const data = raw ? JSON.parse(raw) : [];
+            return Array.isArray(data) ? data : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveCart(lines) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+    }
+
+    function formatMoney(n) {
+        return '₱' + Number(n).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function render() {
+        const lines = loadCart();
+        const wrap = document.getElementById('cartLines');
+        const empty = document.getElementById('cartEmpty');
+        const summary = document.getElementById('cartSummary');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const summaryCount = document.getElementById('summaryCount');
+        const summaryTotal = document.getElementById('summaryTotal');
+        const checkoutLines = document.getElementById('checkoutLines');
+
+        wrap.querySelectorAll('.cart-line').forEach(el => el.remove());
+
+        let total = 0;
+        let count = 0;
+
+        lines.forEach((line, idx) => {
+            const lineTotal = (Number(line.priceNum) || 0) * (Number(line.qty) || 0);
+            total += lineTotal;
+            count += Number(line.qty) || 0;
+
+            const div = document.createElement('div');
+            div.className = 'cart-line';
+            div.innerHTML = `
+                <div>
+                    <div class="cart-line-name"></div>
+                    <div class="cart-line-price"></div>
+                </div>
+                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+                    <div class="qty-controls">
+                        <button type="button" data-act="dec" data-i="${idx}" aria-label="Decrease">−</button>
+                        <span>${line.qty}</span>
+                        <button type="button" data-act="inc" data-i="${idx}" aria-label="Increase">+</button>
+                    </div>
+                    <button type="button" class="line-remove" data-i="${idx}">Remove</button>
+                </div>
+                <div style="font-weight:700;color:var(--success);text-align:right;">${formatMoney(lineTotal)}</div>
+            `;
+            div.querySelector('.cart-line-name').textContent = line.name || 'Product';
+            div.querySelector('.cart-line-price').textContent = formatMoney(line.priceNum) + ' each';
+            wrap.insertBefore(div, empty);
+        });
+
+        empty.style.display = lines.length ? 'none' : 'block';
+        summary.style.display = lines.length ? 'block' : 'none';
+        checkoutBtn.disabled = lines.length === 0;
+        summaryCount.textContent = String(count);
+        summaryTotal.textContent = formatMoney(total);
+        checkoutLines.value = JSON.stringify(lines.map(l => ({
+            productId: l.productId,
+            quantity: l.qty
+        })));
+    }
+
+    document.getElementById('cartLines').addEventListener('click', function (e) {
+        const rm = e.target.closest('.line-remove');
+        const btn = e.target.closest('button[data-act]');
+        let lines = loadCart();
+
+        if (rm) {
+            const i = parseInt(rm.getAttribute('data-i'), 10);
+            lines.splice(i, 1);
+            saveCart(lines);
+            render();
+            return;
+        }
+
+        if (btn) {
+            const i = parseInt(btn.getAttribute('data-i'), 10);
+            const act = btn.getAttribute('data-act');
+            if (!lines[i]) return;
+            if (act === 'inc') lines[i].qty += 1;
+            if (act === 'dec') lines[i].qty = Math.max(1, lines[i].qty - 1);
+            saveCart(lines);
+            render();
+        }
+    });
+
+    document.getElementById('checkoutForm').addEventListener('submit', function () {
+        document.getElementById('checkoutLines').value = JSON.stringify(
+            loadCart().map(l => ({ productId: l.productId, quantity: l.qty }))
+        );
+    });
+
+    render();
+})();
+</script>
+{% endblock %}

@@ -3,70 +3,161 @@
 {% block title %}Add New Order | GearGrid Admin{% endblock %}
 
 {% block stylesheets %}
-<!-- Font Awesome for Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
 
-<!-- Google Fonts for Oswald -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #6C63FF;
+        --primary-hover: #5b54d6;
+        --secondary: #ff6584;
+        --success: #4ade80;
+        --bg-base: #0B1120;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --glass-bg: rgba(255, 255, 255, 0.02);
+        --glass-bg-hover: rgba(255, 255, 255, 0.04);
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-border-hover: rgba(255, 255, 255, 0.12);
+        --danger: #dc3545;
+        --card-bg: rgba(255, 255, 255, 0.02);
+    }
 
-<!-- Optional: Custom CSS -->
-<link rel="stylesheet" href="{{ asset('css/admin_product_new.css') }}">
+    .dashboard main {
+        margin-left: 16rem;
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: var(--bg-base);
+    }
+
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
-    <!-- Sidebar -->
     {% include 'partials/_sidebar.html.twig' %}
 
-    <!-- Main Content -->
     <main class="main-content">
         <!-- Top Header -->
-        <div class="top-header">
-            <h1>Add New Order</h1>
-            <div class="user-info">
-                <div class="profile">
-                    <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="User">
-                    <span>John Ralf</span>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-gray-800">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Add New Order</h1>
+                <nav class="flex items-center gap-2 text-sm text-gray-400">
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-purple-400 transition-colors">Dashboard</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <a href="{{ path('app_order_index') }}" class="hover:text-purple-400 transition-colors">Orders</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <span class="text-pink-400 font-semibold">New Order</span>
+                </nav>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center gap-3 bg-gray-800/50 px-4 py-2 rounded-full border border-gray-700">
+                <div class="text-right">
+                    <p class="text-white font-semibold text-sm">{{ app.user.name|default(app.user.username|default('Admin')) }}</p>
+                    <p class="text-gray-400 text-xs">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</p>
                 </div>
+                <div class="relative">
+                    <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User" class="w-10 h-10 rounded-lg border-2 border-purple-500">
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-gray-900 rounded-full"></span>
+                </div>
+                <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
             </div>
         </div>
 
-        <!-- Form Container -->
-        <div class="form-container">
-            <div class="form-card">
-                <h2>Order Details</h2>
+        {# Flash Messages #}
+        {% for message in app.flashes('success') %}
+            <div class="mb-6 p-4 rounded-lg flex items-center justify-between gap-3 bg-green-500/20 text-green-400 border border-green-500/30 shadow-lg shadow-green-500/20 max-w-3xl mx-auto">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-check-circle"></i> {{ message }}
+                </span>
+                <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-white cursor-pointer text-xl opacity-80 px-1">&times;</button>
+            </div>
+        {% endfor %}
 
-                {{ form_start(form, {'attr': {'class': 'order-form'}}) }}
-                <div class="form-grid">
-                    <div>
-                        {{ form_row(form.customerName, {'label': 'Customer Name', 'attr': {'placeholder': 'Enter customer name'}}) }}
-                        {{ form_errors(form.customerName) }}
+        {% for message in app.flashes('error') %}
+            <div class="mb-6 p-4 rounded-lg flex items-center justify-between gap-3 bg-red-500/20 text-red-400 border border-red-500/30 shadow-lg shadow-red-500/20 max-w-3xl mx-auto">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-exclamation-circle"></i> {{ message }}
+                </span>
+                <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-white cursor-pointer text-xl opacity-80 px-1">&times;</button>
+            </div>
+        {% endfor %}
+
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-gray-800/30 border border-gray-700 rounded-xl p-8 border-t-4 border-t-purple-500">
+                <h2 class="text-xl font-semibold text-white mb-8 flex items-center gap-3"><i class="fas fa-shopping-cart text-purple-500"></i> Create New Order</h2>
+
+                {{ form_start(form, { 'attr': { 'class': 'space-y-4' } }) }}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="space-y-2">
+                        {{ form_label(form.customer, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                        {{ form_widget(form.customer, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500', 'placeholder': 'Select a customer', 'autofocus': true}}) }}
+                        {{ form_errors(form.customer) }}
                     </div>
-                    <div>
-                        {{ form_row(form.totalPrice, {'label': 'Total Price (₱)', 'attr': {'placeholder': '0.00', 'type': 'number', 'step': '0.01'}}) }}
+
+                    <div class="space-y-2">
+                        {{ form_label(form.totalPrice, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                        {{ form_widget(form.totalPrice, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500', 'placeholder': '0.00', 'step': '0.01'}}) }}
                         {{ form_errors(form.totalPrice) }}
                     </div>
-                    <div>
-                        {{ form_row(form.status, {'label': 'Status', 'attr': {'placeholder': 'Select status'}}) }}
+
+                    <div class="space-y-2">
+                        {{ form_label(form.status, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                        {{ form_widget(form.status, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
                         {{ form_errors(form.status) }}
                     </div>
-                    {# Optional notes field
-                    <div class="full-width">
-                        {{ form_row(form.notes, {'label': 'Notes', 'attr': {'placeholder': 'Additional notes'}}) }}
-                        {{ form_errors(form.notes) }}
+
+                    <div class="space-y-2">
+                        {{ form_label(form.createdAt, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                        {{ form_widget(form.createdAt, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
+                        {{ form_errors(form.createdAt) }}
                     </div>
-                    #}
+
+                    <div class="space-y-2 md:col-span-2">
+                        {{ form_label(form.products, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                        {{ form_widget(form.products, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
+                        {{ form_errors(form.products) }}
+                    </div>
                 </div>
 
-                <div class="action-buttons">
-                    <button type="submit" class="btn btn-save"><i class="fas fa-save"></i> Save Order</button>
-                    <a href="{{ path('app_order_index') }}" class="btn btn-back"><i class="fas fa-arrow-left"></i> Cancel</a>
+                <div class="flex flex-wrap gap-3 pt-6 border-t border-gray-700">
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                        <i class="fas fa-save"></i> Save Order
+                    </button>
+                    
+                    <a href="{{ path('app_order_index') }}" class="bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white border border-gray-600 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Cancel
+                    </a>
                 </div>
+
                 {{ form_end(form) }}
             </div>
         </div>
     </main>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+// Auto-dismiss flash messages after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(function(message) {
+            message.style.transition = 'opacity 0.5s';
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 500);
+        });
+    }, 5000);
+});
+</script>
 {% endblock %}

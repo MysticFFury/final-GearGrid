@@ -3,92 +3,207 @@
 {% block title %}Orders | GearGrid Admin{% endblock %}
 
 {% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+
 <style>
-    .table-card {
-        background: #1e1e2f;
-        padding: 1.5rem;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        margin-top: 1rem;
+    :root {
+        --primary: #6C63FF;
+        --primary-hover: #5b54d6;
+        --secondary: #ff6584;
+        --success: #4ade80;
+        --bg-base: #0B1120;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --glass-bg: rgba(255, 255, 255, 0.02);
+        --glass-bg-hover: rgba(255, 255, 255, 0.04);
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-border-hover: rgba(255, 255, 255, 0.12);
+        --danger: #dc3545;
+        --card-bg: rgba(255, 255, 255, 0.02);
     }
 
-    table.dataTable thead th {
+    .dashboard main {
+        margin-left: 16rem;
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: var(--bg-base);
+    }
+
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .styled-table thead {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .styled-table th {
+        padding: 1rem 1.2rem;
+        text-align: left;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1.5px;
+        border-bottom: 2px solid var(--glass-border);
+    }
+
+    .styled-table td {
+        padding: 1.2rem 1.2rem;
         color: #fff;
-        font-weight: bold;
-        border-bottom: 1px solid #444;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    table.dataTable tbody td {
-        color: #e0e0e0;
-        border-bottom: 1px solid #333;
+    .styled-table tbody tr {
+        transition: all 0.2s ease;
     }
 
-    .btn-view, .btn-edit, .btn-add {
-        padding: 0.3rem 0.6rem;
-        border-radius: 8px;
-        color: #fff;
-        text-decoration: none;
-        margin-right: 0.3rem;
-        font-weight: bold;
-        transition: all 0.2s;
+    .styled-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .styled-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .badge-secondary {
+        color: var(--secondary);
+        font-family: monospace;
+        background: rgba(255,101,132,0.1);
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+    }
+
+    .status-processing {
+        background: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+    }
+
+    .status-shipped {
+        background: rgba(139, 92, 246, 0.2);
+        color: #8b5cf6;
+    }
+
+    .status-delivered {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+    }
+
+    .status-completed {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+    }
+
+    .status-cancelled {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+    }
+
+    .status-picker summary {
+        list-style: none;
+        cursor: pointer;
         display: inline-flex;
         align-items: center;
-        gap: 4px;
+        gap: 0.35rem;
     }
 
-    .btn-view { background: #6C63FF; }
-    .btn-edit { background: #ff6584; }
-    .btn-add { background: #00c6ff; margin-left: 1rem; }
-
-    .btn-view:hover, .btn-edit:hover, .btn-add:hover { opacity: 0.85; }
-
-    .content-actions {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-        justify-content: space-between;
+    .status-picker summary::-webkit-details-marker {
+        display: none;
     }
 
-    .search-input {
-        padding: 0.5rem 0.8rem;
-        border-radius: 8px;
-        border: 1px solid #444;
-        background: #2a2a3f;
-        color: #fff;
-        width: 250px;
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
     }
-
-    .search-input::placeholder { color: #aaa; }
 </style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
+    {% set availableStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Completed', 'Cancelled'] %}
     {% include 'partials/_sidebar.html.twig' %}
+
     <main class="main-content">
-        <div class="top-header">
-            <h1>Orders</h1>
-            <div class="user-info">
-                <div class="profile">
-                    <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="">
-                    <span>John Ralf</span>
+        <!-- Top Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-gray-800">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Orders</h1>
+                <nav class="flex items-center gap-2 text-sm text-gray-400">
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-purple-400 transition-colors">Dashboard</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <span class="text-pink-400 font-semibold">Orders</span>
+                </nav>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center gap-3 bg-gray-800/50 px-4 py-2 rounded-full border border-gray-700">
+                <div class="text-right">
+                    <p class="text-white font-semibold text-sm">{{ app.user.name|default(app.user.username|default('Admin')) }}</p>
+                    <p class="text-gray-400 text-xs">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</p>
                 </div>
+                <div class="relative">
+                    <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User" class="w-10 h-10 rounded-lg border-2 border-purple-500">
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-gray-900 rounded-full"></span>
+                </div>
+                <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
             </div>
         </div>
 
         <div class="content-area">
-            <div class="content-header">
-                <h1>Order List</h1>
-                <div class="content-actions">
-                    <input type="text" id="orderSearch" class="search-input" placeholder="🔍 Search orders...">
-                    <a href="{{ path('app_order_new') }}" class="btn-add">
+            {# Flash Messages #}
+            {% for message in app.flashes('success') %}
+                <div class="mb-6 p-4 rounded-lg flex items-center justify-between gap-3 bg-green-500/20 text-green-400 border border-green-500/30 shadow-lg shadow-green-500/20">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-white cursor-pointer text-xl opacity-80 px-1">&times;</button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="mb-6 p-4 rounded-lg flex items-center justify-between gap-3 bg-red-500/20 text-red-400 border border-red-500/30 shadow-lg shadow-red-500/20">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-white cursor-pointer text-xl opacity-80 px-1">&times;</button>
+                </div>
+            {% endfor %}
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <h2 class="text-xl font-semibold text-white flex items-center gap-3"><i class="fas fa-shopping-cart text-purple-500"></i> Order List</h2>
+                <div class="flex items-center gap-3">
+                    <input type="text" id="orderSearch" placeholder="🔍 Search orders..." class="px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 w-64">
+                    <a href="{{ path('app_order_new') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg shadow-purple-500/20">
                         <i class="fas fa-plus"></i> Add Order
                     </a>
                 </div>
             </div>
 
-            <div class="table-card">
+            <div class="bg-gray-800/30 border border-gray-700 rounded-xl p-6 border-t-4 border-t-purple-500">
                 <table id="orderTable" class="display styled-table" style="width:100%;">
                     <thead>
                         <tr>
@@ -103,19 +218,52 @@
                     <tbody>
                         {% for order in orders %}
                             <tr>
-                                <td>{{ order.id }}</td>
-                                <td>{{ order.customerName }}</td>
-                                <td>₱{{ order.totalPrice|number_format(2, '.', ',') }}</td>
-                                <td>{{ order.status }}</td>
-                                <td>{{ order.createdAt ? order.createdAt|date('Y-m-d H:i:s') : '-' }}</td>
+                                <td><span class="badge badge-secondary">#{{ order.id }}</span></td>
+                                <td class="font-semibold">{{ order.customerName }}</td>
+                                <td class="text-green-400 font-semibold">₱{{ order.totalPrice|number_format(2, '.', ',') }}</td>
                                 <td>
-                                    <a href="{{ path('app_order_show', {'id': order.id}) }}" class="btn-view"><i class="fas fa-eye"></i> View</a>
-                                    <a href="{{ path('app_order_edit', {'id': order.id}) }}" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
+                                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                                        <details class="status-picker mt-1">
+                                            <summary>
+                                                <span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span>
+                                                <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+                                            </summary>
+                                            <form method="post" action="{{ path('app_order_update_status', {'id': order.id}) }}" class="mt-2 flex items-center gap-2">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('update_status_' ~ order.id) }}">
+                                                <select name="status" class="bg-gray-900 border border-gray-700 text-gray-200 text-xs rounded-md px-2 py-1" onchange="this.form.submit()">
+                                                    {% for statusOption in availableStatuses %}
+                                                        <option value="{{ statusOption }}" {% if order.status == statusOption %}selected{% endif %}>
+                                                            {{ statusOption }}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </form>
+                                        </details>
+                                    {% else %}
+                                        <span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-gray-400">{{ order.createdAt ? order.createdAt|date('M d, Y') : 'N/A' }}</td>
+                                <td>
+                                    <div class="flex flex-wrap gap-2">
+                                        <a href="{{ path('app_order_show', {'id': order.id}) }}" class="bg-purple-600/20 text-purple-400 border border-purple-600/30 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 hover:bg-purple-600/30">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                                            <a href="{{ path('app_order_edit', {'id': order.id}) }}" class="bg-purple-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 shadow-md hover:bg-purple-700">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            {{ include('order/_delete_form.html.twig', { 'order': order }) }}
+                                        {% endif %}
+                                    </div>
                                 </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="6" style="text-align:center;">No orders found.</td>
+                                <td colspan="6" class="text-center py-8 text-gray-400">
+                                    <i class="fas fa-inbox text-3xl mb-2 block opacity-50"></i>
+                                    No orders found.
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -136,12 +284,29 @@ $(document).ready(function() {
         lengthMenu: [5, 10, 25, 50],
         order: [[0, 'desc']],
         columnDefs: [{ orderable: false, targets: 5 }],
-        autoWidth: false
+        autoWidth: false,
+        dom: 'lrtip',
+        language: {
+            search: "",
+            searchPlaceholder: "Search...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ orders",
+            infoEmpty: "No orders available",
+            infoFiltered: "(filtered from _MAX_ total orders)"
+        }
     });
 
+    // Wire up the custom search input to the DataTables filter
     $('#orderSearch').on('keyup', function () {
         table.search(this.value).draw();
     });
+
+    // Auto-dismiss flash messages after 5 seconds
+    setTimeout(function() {
+        $('.flash-message').fadeOut('slow', function() {
+            $(this).remove();
+        });
+    }, 5000);
 });
 </script>
 {% endblock %}

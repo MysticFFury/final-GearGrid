@@ -1,0 +1,194 @@
+{% extends 'customer/base_customer.html.twig' %}
+
+{% block title %}PC Builder Checker | GearGrid{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .builder-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.5rem; }
+    .builder-card {
+        background: rgba(15, 22, 38, 0.62);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        padding: 1.15rem;
+    }
+    .builder-title { font-family: 'Oswald', sans-serif; font-size: 1.5rem; margin-bottom: 0.3rem; color: #fff; }
+    .builder-sub { color: #94a3b8; font-size: 0.92rem; margin-bottom: 1rem; }
+    .slot-row { margin-bottom: 0.8rem; }
+    .slot-label { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 0.38rem; }
+    .slot-select {
+        width: 100%;
+        background: rgba(7, 11, 22, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        color: #f8fafc;
+        padding: 0.62rem 0.7rem;
+        font-size: 0.9rem;
+    }
+    .slot-select:focus { outline: none; border-color: rgba(108, 99, 255, 0.6); box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2); }
+    .btn-check {
+        width: 100%;
+        margin-top: 0.35rem;
+        border: 0;
+        border-radius: 12px;
+        padding: 0.8rem 0.9rem;
+        color: #fff;
+        font-weight: 700;
+        background: linear-gradient(135deg, #6c63ff, #5b54d6);
+        cursor: pointer;
+    }
+    .status-pill {
+        display: inline-flex; align-items: center; gap: 0.45rem;
+        font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+        border-radius: 999px; padding: 0.3rem 0.7rem; margin-bottom: 0.8rem;
+    }
+    .status-compatible { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.35); }
+    .status-warning { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.35); }
+    .status-partial { background: rgba(96, 165, 250, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.35); }
+    .metric-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin-bottom: 0.9rem; }
+    .metric {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 0.7rem;
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .metric-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; }
+    .metric-value { margin-top: 0.25rem; color: #fff; font-weight: 700; }
+    .issues { margin: 0; padding-left: 1.1rem; color: #cbd5e1; }
+    .issues li { margin-bottom: 0.35rem; }
+    @media (max-width: 900px) { .builder-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block body %}
+<section class="landing-section animate-up">
+    <header class="customer-page-hero">
+        <span class="customer-kicker"><i class="fas fa-gears"></i> Smart build planning</span>
+        <h1 class="customer-page-title"><i class="fas fa-microchip"></i> PC Builder Checker</h1>
+        <p class="customer-page-lead">Pick parts from your live store inventory and check if your build looks compatible.</p>
+    </header>
+
+    <div class="builder-grid">
+        <div class="builder-card">
+            <h2 class="builder-title">Choose Components</h2>
+            <p class="builder-sub">All options come from your current products table, so new admin/staff products appear here automatically.</p>
+
+            {% for slot in slotOrder %}
+                <div class="slot-row">
+                    <label for="slot_{{ slot }}" class="slot-label">{{ slot|replace({'_':' '})|title }}</label>
+                    <select id="slot_{{ slot }}" class="slot-select" data-slot="{{ slot }}">
+                        <option value="">Select {{ slot|replace({'_':' '})|title }}</option>
+                        {% for part in catalog[slot]|default([]) %}
+                            <option value="{{ part.id }}">{{ part.label }} - ₱{{ part.price|number_format(2, '.', ',') }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endfor %}
+
+            <button id="checkBuildBtn" class="btn-check"><i class="fas fa-circle-check"></i> Check Compatibility</button>
+        </div>
+
+        <div class="builder-card">
+            <h2 class="builder-title">Build Result</h2>
+            <p class="builder-sub">Run checker after selecting your parts.</p>
+            <div id="statusPill" class="status-pill status-partial">Waiting for selection</div>
+
+            <div class="metric-row">
+                <div class="metric">
+                    <div class="metric-label">Estimated Load</div>
+                    <div class="metric-value" id="loadMetric">-</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Recommended PSU</div>
+                    <div class="metric-value" id="psuMetric">-</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Total Price</div>
+                    <div class="metric-value" id="priceMetric">-</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Build Completeness</div>
+                    <div class="metric-value" id="completeMetric">-</div>
+                </div>
+            </div>
+
+            <h3 style="font-size:0.9rem; color:#e2e8f0; margin-bottom:0.5rem;">Checker Notes</h3>
+            <ul id="issuesList" class="issues">
+                <li>Select parts, then click "Check Compatibility".</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const selects = Array.from(document.querySelectorAll('[data-slot]'));
+    const btn = document.getElementById('checkBuildBtn');
+    const statusPill = document.getElementById('statusPill');
+    const loadMetric = document.getElementById('loadMetric');
+    const psuMetric = document.getElementById('psuMetric');
+    const priceMetric = document.getElementById('priceMetric');
+    const completeMetric = document.getElementById('completeMetric');
+    const issuesList = document.getElementById('issuesList');
+
+    const setStatus = (status, label) => {
+        statusPill.className = 'status-pill';
+        if (status === 'compatible') {
+            statusPill.classList.add('status-compatible');
+        } else if (status === 'warning') {
+            statusPill.classList.add('status-warning');
+        } else {
+            statusPill.classList.add('status-partial');
+        }
+        statusPill.textContent = label || status;
+    };
+
+    const getSelection = () => {
+        const selection = {};
+        selects.forEach((s) => {
+            if (s.value) {
+                selection[s.dataset.slot] = s.value;
+            }
+        });
+        return selection;
+    };
+
+    btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        btn.textContent = 'Checking...';
+        try {
+            const res = await fetch('{{ path('app_customer_pc_builder_check') }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ selection: getSelection() })
+            });
+            const data = await res.json();
+
+            setStatus(data.status, data.label);
+            loadMetric.textContent = `${data.estimatedLoadWatts ?? '-'} W`;
+            psuMetric.textContent = `${data.recommendedPsuWatts ?? '-'} W`;
+            priceMetric.textContent = `₱${Number(data.totalPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            completeMetric.textContent = data.complete ? 'Complete' : 'Incomplete';
+
+            issuesList.innerHTML = '';
+            const issues = Array.isArray(data.issues) ? data.issues : [];
+            if (issues.length === 0) {
+                issuesList.innerHTML = '<li>No issues detected.</li>';
+            } else {
+                issues.forEach((issue) => {
+                    const li = document.createElement('li');
+                    li.textContent = issue.message || 'Issue found';
+                    issuesList.appendChild(li);
+                });
+            }
+        } catch (e) {
+            setStatus('warning', 'Checker error');
+            issuesList.innerHTML = '<li>Could not run checker. Please try again.</li>';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-circle-check"></i> Check Compatibility';
+        }
+    });
+});
+</script>
+{% endblock %}
+

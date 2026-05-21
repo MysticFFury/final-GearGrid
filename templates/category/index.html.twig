@@ -1,0 +1,229 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Categories | GearGrid Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    :root {
+        --primary: #6C63FF;
+        --secondary: #ff6584;
+        --bg-base: #0B1120;
+        --glass-border: rgba(255,255,255,0.08);
+    } 
+
+    .dashboard main {
+        margin-left: 16rem;
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: var(--bg-base);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .panel {
+        background: linear-gradient(180deg, rgba(17,24,39,0.72), rgba(11,17,32,0.75));
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+    }
+    
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_processing,
+    .dataTables_wrapper .dataTables_paginate {
+        color: #94a3b8 !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: #94a3b8 !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+        background: #6C63FF !important;
+        color: #fff !important;
+        border: none !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: rgba(108, 99, 255, 0.2) !important;
+        color: #6C63FF !important;
+        border: none !important;
+    }
+    
+    table.dataTable tbody tr {
+        background-color: transparent !important;
+    }
+    
+    table.dataTable tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.03) !important;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    {% include 'partials/_sidebar.html.twig' %}
+
+    <main class="main-content">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-700">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Categories</h1>
+                <nav class="flex items-center gap-2 text-sm text-gray-400">
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-purple-500 transition-colors">Dashboard</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <span class="text-purple-500 font-semibold">Categories</span>
+                </nav>
+            </div>
+
+            <div class="mt-4 md:mt-0">
+                {% include 'partials/_user_dropdown.html.twig' %}
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            {# Flash Messages #}
+            {% for message in app.flashes('success') %}
+                <div class="bg-green-500/20 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg flex items-center justify-between gap-3 shadow-lg shadow-green-500/10">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-green-400 cursor-pointer text-xl opacity-80 hover:opacity-100">&times;</button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="bg-red-500/20 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg flex items-center justify-between gap-3 shadow-lg shadow-red-500/10">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-red-400 cursor-pointer text-xl opacity-80 hover:opacity-100">&times;</button>
+                </div>
+            {% endfor %}
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <h2 class="text-xl font-semibold text-white flex items-center gap-3">
+                    <i class="fas fa-tags text-purple-500"></i> Category List
+                </h2>
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <input type="text" id="categorySearch" class="px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 w-full md:w-64" placeholder="🔍 Search categories...">
+                    <a href="{{ path('app_category_new') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20">
+                        <i class="fas fa-plus"></i> Add Category
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="panel p-4">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider">Total Categories</p>
+                    <p class="text-2xl font-bold text-white mt-2">{{ categories|length }}</p>
+                </div>
+                <div class="panel p-4">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider">With Description</p>
+                    <p class="text-2xl font-bold text-green-400 mt-2">{{ categories|filter(c => c.description)|length }}</p>
+                </div>
+                <div class="panel p-4">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider">Without Description</p>
+                    <p class="text-2xl font-bold text-pink-400 mt-2">{{ categories|filter(c => not c.description)|length }}</p>
+                </div>
+            </div>
+
+            <div class="panel overflow-hidden">
+                <div class="p-6">
+                    <table id="categoryTable" class="display w-full">
+                        <thead>
+                            <tr>
+                                <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider pb-3">ID</th>
+                                <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider pb-3">Name</th>
+                                <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider pb-3">Description</th>
+                                <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider pb-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            {% for category in categories %}
+                                <tr class="transition-colors">
+                                    <td class="py-4">
+                                        <span class="text-pink-500 font-mono bg-pink-500/10 px-3 py-1 rounded-md text-sm">#{{ category.id }}</span>
+                                    </td>
+                                    <td class="py-4 font-semibold text-white">{{ category.name }}</td>
+                                    <td class="py-4 text-gray-300">
+                                        {% if category.description %}
+                                            {{ category.description|length > 50 ? category.description|slice(0, 50) ~ '...' : category.description }}
+                                        {% else %}
+                                            <span class="text-gray-400">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-4">
+                                        <div class="flex flex-wrap gap-2">
+                                            <a href="{{ path('app_category_show', {'id': category.id}) }}" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-md text-sm font-medium hover:bg-purple-500/30 transition-colors flex items-center gap-1">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                                                <a href="{{ path('app_category_edit', {'id': category.id}) }}" class="bg-purple-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors flex items-center gap-1 shadow-md">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                {{ include('category/_delete_form.html.twig', { 'category': category }) }}
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-8 text-gray-400">
+                                        <i class="fas fa-tags text-3xl mb-2 opacity-50 block"></i>
+                                        No categories found.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    const table = $('#categoryTable').DataTable({
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50],
+        order: [[0, 'desc']],
+        columnDefs: [{ orderable: false, targets: 3 }],
+        autoWidth: false,
+        dom: 'lrtip',
+        language: {
+            search: "",
+            searchPlaceholder: "Search...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ categories",
+            infoEmpty: "No categories available",
+            infoFiltered: "(filtered from _MAX_ total categories)"
+        }
+    });
+
+    $('#categorySearch').on('keyup', function () {
+        table.search(this.value).draw();
+    });
+
+    setTimeout(function() {
+        $('.flash-message').fadeOut('slow', function() {
+            $(this).remove();
+        });
+    }, 5000);
+});
+</script>
+{% endblock %}

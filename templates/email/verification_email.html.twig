@@ -1,0 +1,141 @@
+{# templates/email/verification_email.html.twig #}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .email-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #6C63FF;
+            padding-bottom: 20px;
+        }
+        .logo {
+            font-family: 'Oswald', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #6C63FF;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #0B1120;
+            margin-bottom: 15px;
+            font-family: 'Oswald', sans-serif;
+        }
+        p {
+            margin: 0 0 15px 0;
+            color: #555;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #6C63FF, #ff6584);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: transform 0.2s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        .token-section {
+            background: #f0f0f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            margin-top: 25px;
+        }
+        .token-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .token {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            color: #333;
+        }
+        .footer {
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            color: #999;
+            font-size: 13px;
+        }
+        .duration-notice {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            color: #856404;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="email-wrapper">
+            <div class="header">
+                <h2 class="logo">⚙️ GearGrid</h2>
+            </div>
+
+            <div class="content">
+                <h1>Welcome, {{ user.name }}!</h1>
+                <p>Thank you for creating a GearGrid account. To get started, please verify your email address by clicking the button below:</p>
+
+                <a href="{{ verificationUrl }}" class="cta-button">Verify Email Address</a>
+
+                <div class="duration-notice">
+                    ⏱️ This verification link expires in 24 hours. After that, you'll need to request a new verification email.
+                </div>
+
+                <p>Or copy and paste this link in your browser:</p>
+                <div class="token-section">
+                    <div class="token-label">Verification Link</div>
+                    <div class="token">{{ verificationUrl }}</div>
+                </div>
+
+                <p>If you didn't create this account, please ignore this email.</p>
+
+                <p style="margin-top: 30px;">
+                    Best regards,<br>
+                    <strong>The GearGrid Team</strong>
+                </p>
+            </div>
+
+            <div class="footer">
+                <p>GearGrid © 2026 - All rights reserved</p>
+                <p>This is an automated message, please do not reply to this email.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,34 +1,168 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log{% endblock %}
+{% block title %}Log Details | GearGrid Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    :root {
+        --primary: #6C63FF;
+        --primary-hover: #5b54d6;
+        --secondary: #ff6584;
+        --success: #4ade80;
+        --bg-base: #0B1120;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --glass-bg: rgba(255, 255, 255, 0.02);
+        --glass-bg-hover: rgba(255, 255, 255, 0.04);
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-border-hover: rgba(255, 255, 255, 0.12);
+        --danger: #dc3545;
+        --card-bg: rgba(255, 255, 255, 0.02);
+    }
+
+    .dashboard main {
+        margin-left: 16rem;
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: var(--bg-base);
+    }
+
+    .detail-table { width: 100%; border-collapse: collapse; margin-bottom: 3rem; }
+    .detail-table tr { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .detail-table tr:last-child { border: none; }
+    .detail-table th {
+        text-align: left; padding: 1.5rem 0; color: var(--text-muted);
+        font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1.5px; width: 35%;
+    }
+    .detail-table td { padding: 1.5rem 0; color: #fff; font-size: 1.1rem; }
+
+    .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .badge-primary {
+        background: rgba(108, 99, 255, 0.2);
+        color: var(--primary);
+    }
+
+    .badge-success {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+    }
+
+    .badge-danger {
+        background: rgba(220, 53, 69, 0.2);
+        color: #ff6b6b;
+    }
+
+    .badge-secondary {
+        color: var(--secondary);
+        font-family: monospace;
+        background: rgba(255,101,132,0.1);
+    }
+
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-    <h1>Log</h1>
+<div class="dashboard">
+    {% include 'partials/_sidebar.html.twig' %}
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ log.id }}</td>
-            </tr>
-            <tr>
-                <th>Action</th>
-                <td>{{ log.action }}</td>
-            </tr>
-            <tr>
-                <th>Message</th>
-                <td>{{ log.message }}</td>
-            </tr>
-            <tr>
-                <th>CreatedAt</th>
-                <td>{{ log.createdAt ? log.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <main class="main-content">
+        <!-- Top Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 pb-6 border-b border-gray-800">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Log Details</h1>
+                <nav class="flex items-center gap-2 text-sm text-gray-400">
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-purple-400 transition-colors">Dashboard</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <a href="{{ path('app_log_index') }}" class="hover:text-purple-400 transition-colors">Logs</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <span class="text-pink-400 font-semibold">Log #{{ log.id }}</span>
+                </nav>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center gap-3 bg-gray-800/50 px-4 py-2 rounded-full border border-gray-700">
+                <div class="text-right">
+                    <p class="text-white font-semibold text-sm">{{ app.user.name|default(app.user.username|default('Admin')) }}</p>
+                    <p class="text-gray-400 text-xs">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Staff{% endif %}</p>
+                </div>
+                <div class="relative">
+                    <img src="https://ui-avatars.com/api/?name={{ app.user.name|default(app.user.username|default('Admin'))|url_encode }}&background=6C63FF&color=fff" alt="User" class="w-10 h-10 rounded-lg border-2 border-purple-500">
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-gray-900 rounded-full"></span>
+                </div>
+                <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+            </div>
+        </div>
 
-    <a href="{{ path('app_log_index') }}">back to list</a>
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-gray-800/30 border border-gray-700 rounded-xl p-8 border-t-4 border-t-purple-500">
+                <h2 class="text-xl font-semibold text-white mb-8 flex items-center gap-3"><i class="fas fa-file-alt text-purple-500"></i> Log Information</h2>
 
-    <a href="{{ path('app_log_edit', {'id': log.id}) }}">edit</a>
+                <table class="detail-table">
+                    <tbody>
+                        <tr>
+                            <th>Log ID</th>
+                            <td><span class="badge badge-secondary">#{{ log.id }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Action</th>
+                            <td><span class="badge badge-primary">{{ log.action }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Message</th>
+                            <td class="font-medium leading-relaxed">{{ log.message }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>
+                                <span class="badge {% if log.status == 'active' %}badge-success{% else %}badge-danger{% endif %}">
+                                    {{ log.status|capitalize }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>User Name</th>
+                            <td>{{ log.userName ?: 'Anonymous' }}</td>
+                        </tr>
+                        <tr>
+                            <th>User Role</th>
+                            <td class="text-gray-400">{{ log.userRole ?: 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Entity</th>
+                            <td class="text-gray-400">{{ log.entity ?: 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th>Created At</th>
+                            <td class="text-gray-400">{{ log.createdAt ? log.createdAt|date('F d, Y \a\t g:i A') : 'N/A' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-    {{ include('log/_delete_form.html.twig') }}
+                <div class="flex flex-wrap gap-3 pt-10 border-t border-gray-700">
+                    <a href="{{ path('app_log_index') }}" class="bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 hover:text-white border border-gray-600 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
 {% endblock %}

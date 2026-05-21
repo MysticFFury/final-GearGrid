@@ -1,0 +1,140 @@
+{# {% extends 'base.html.twig' %}
+
+{% block title %}About Us | GearGrid{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* Reusing your exact branding variables for consistency */
+    :root {
+        --primary: #6C63FF;
+        --secondary: #ff6584;
+        --text-muted: #a8b4c3;
+        --glass-border: rgba(255, 255, 255, 0.12);
+    }
+
+    .landing-page {
+        min-height: 100vh;
+        color: #fff;
+        padding: 3.25rem 1.25rem 5rem;
+        background: radial-gradient(circle at 20% 20%, rgba(108, 99, 255, 0.18), transparent 38%),
+                    radial-gradient(circle at 85% 0%, rgba(255, 101, 132, 0.14), transparent 30%),
+                    linear-gradient(135deg, rgba(11, 17, 32, 1) 0%, rgba(15, 22, 36, 1) 45%, rgba(11, 20, 35, 1) 100%);
+    }
+
+    .landing-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .section-title {
+        text-align: center;
+        font-family: 'Oswald', sans-serif;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+        text-align: center;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0 auto 3rem auto;
+        line-height: 1.7;
+    }
+
+    /* Responsive Grid for the Team */
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+
+    .team-card {
+        border-radius: 18px;
+        border: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.03);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+        transition: transform 0.3s ease;
+    }
+
+    .team-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .team-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), rgba(139, 127, 255, 1));
+        margin: 0 auto 1.25rem auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #fff;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .team-card h3 {
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.35rem;
+        margin: 0 0 0.5rem;
+    }
+
+    .team-card p {
+        color: var(--secondary);
+        font-weight: 600;
+        margin: 0 0 1rem;
+        font-size: 0.95rem;
+    }
+
+    .team-card .bio {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<main class="landing-page">
+    <div class="landing-container">
+        
+        <h1 class="section-title">Meet the Team</h1>
+        <p class="section-subtitle">We are a dedicated group of developers and designers committed to building the best hardware management platform on the web.</p>
+
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-avatar">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+                <h3>Your Name</h3>
+                <p>Lead Developer</p>
+                <p class="bio">Specializes in Symfony architecture, security, and full-stack implementation.</p>
+            </div>
+
+            <div class="team-card">
+                <div class="team-avatar" style="background: linear-gradient(135deg, var(--secondary), #ff8a9f);">
+                    <i class="fas fa-user-ninja"></i>
+                </div>
+                <h3>Alex Smith</h3>
+                <p>Frontend Engineer</p>
+                <p class="bio">Focuses on responsive design, mobile-first layouts, and user experience.</p>
+            </div>
+
+            <div class="team-card">
+                <div class="team-avatar" style="background: linear-gradient(135deg, #4ade80, #22c55e);">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h3>Jordan Lee</h3>
+                <p>Database Administrator</p>
+                <p class="bio">Ensures smooth API connections and maintains the hosted cloud infrastructure.</p>
+            </div>
+        </div>
+
+    </div>
+</main>
+{% endblock %} #}

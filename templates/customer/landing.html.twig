@@ -1,0 +1,1110 @@
+{% extends 'customer/base_customer.html.twig' %}
+
+{% block title %}Welcome | GearGrid{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* --- Loading Screen --- */
+    #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0B1120 0%, #1a1f35 50%, #0B1120 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.8s ease, visibility 0.8s ease;
+        overflow: hidden;
+    }
+
+    #loading-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    /* Animated Background Particles */
+    .loading-particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: #6C63FF;
+        border-radius: 50%;
+        opacity: 0.6;
+        animation: float-particle 8s infinite ease-in-out;
+        box-shadow: 0 0 10px #6C63FF, 0 0 20px #6C63FF;
+    }
+
+    .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; animation-duration: 6s; }
+    .particle:nth-child(2) { left: 20%; top: 80%; animation-delay: 1s; animation-duration: 8s; }
+    .particle:nth-child(3) { left: 30%; top: 30%; animation-delay: 2s; animation-duration: 7s; }
+    .particle:nth-child(4) { left: 40%; top: 70%; animation-delay: 0.5s; animation-duration: 9s; }
+    .particle:nth-child(5) { left: 50%; top: 40%; animation-delay: 1.5s; animation-duration: 5s; }
+    .particle:nth-child(6) { left: 60%; top: 60%; animation-delay: 2.5s; animation-duration: 8s; }
+    .particle:nth-child(7) { left: 70%; top: 25%; animation-delay: 3s; animation-duration: 6s; }
+    .particle:nth-child(8) { left: 80%; top: 75%; animation-delay: 0.8s; animation-duration: 7s; }
+    .particle:nth-child(9) { left: 90%; top: 45%; animation-delay: 1.2s; animation-duration: 9s; }
+    .particle:nth-child(10) { left: 15%; top: 55%; animation-delay: 2.2s; animation-duration: 6s; }
+
+    @keyframes float-particle {
+        0%, 100% {
+            transform: translateY(0) translateX(0) scale(1);
+            opacity: 0.6;
+        }
+        25% {
+            transform: translateY(-30px) translateX(15px) scale(1.2);
+            opacity: 0.8;
+        }
+        50% {
+            transform: translateY(-60px) translateX(-10px) scale(1);
+            opacity: 0.4;
+        }
+        75% {
+            transform: translateY(-30px) translateX(20px) scale(1.1);
+            opacity: 0.7;
+        }
+    }
+
+    /* Glowing Ring Animation */
+    .loading-ring {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin-bottom: 2rem;
+    }
+
+    .loading-ring::before,
+    .loading-ring::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        border: 2px solid transparent;
+    }
+
+    .loading-ring::before {
+        width: 100%;
+        height: 100%;
+        border-top-color: #6C63FF;
+        border-right-color: #6C63FF;
+        animation: spin 1.5s linear infinite;
+        box-shadow: 0 0 20px rgba(108, 99, 255, 0.5);
+    }
+
+    .loading-ring::after {
+        width: 70%;
+        height: 70%;
+        border-bottom-color: #ff6584;
+        border-left-color: #ff6584;
+        animation: spin-reverse 1s linear infinite;
+        box-shadow: 0 0 15px rgba(255, 101, 132, 0.5);
+    }
+
+    .loading-logo-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .loading-logo-center img {
+        width: 50px;
+        height: 50px;
+        animation: pulse-glow 2s ease-in-out infinite;
+        filter: drop-shadow(0 0 15px rgba(108, 99, 255, 0.8));
+    }
+
+    .loading-logo-center h2 {
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.8rem;
+        color: #fff;
+        letter-spacing: 3px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: fadeInUp 1s ease-out;
+    }
+
+    /* Progress Bar */
+    .loading-progress {
+        width: 200px;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        margin-top: 2rem;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .loading-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #6C63FF, #ff6584, #6C63FF);
+        background-size: 200% 100%;
+        border-radius: 10px;
+        animation: progress-slide 2s ease-in-out infinite, shimmer 1.5s linear infinite;
+        box-shadow: 0 0 10px rgba(108, 99, 255, 0.8);
+    }
+
+    .loading-text {
+        margin-top: 1.5rem;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        animation: fadeIn 2s ease-in-out;
+        font-weight: 500;
+    }
+
+    .loading-text span {
+        color: #6C63FF;
+        animation: text-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes spin-reverse {
+        to { transform: translate(-50%, -50%) rotate(-360deg); }
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(108, 99, 255, 0.8)); }
+        50% { transform: scale(1.1); filter: drop-shadow(0 0 25px rgba(108, 99, 255, 1)); }
+    }
+
+    @keyframes progress-slide {
+        0% { width: 0%; }
+        50% { width: 100%; }
+        100% { width: 0%; }
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes text-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    /* --- Hero Layout --- */
+    .hero-section {
+        position: relative; /* Needed for the 3D canvas positioning */
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 5rem;
+        align-items: center;
+        margin-top: 3rem;
+        padding-bottom: 4rem;
+    }
+    
+    /* The container for our 3D background */
+    #canvas-container {
+        position: absolute;
+        top: -10%;
+        left: -10%;
+        width: 120%;
+        height: 120%;
+        z-index: 0;
+        pointer-events: none; /* Prevents 3D from blocking clicks on buttons */
+    }
+
+    /* Keep content above the 3D canvas */
+    .hero-content, .hero-carousel-wrapper {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 8px 16px; border-radius: 30px;
+        background: linear-gradient(135deg, rgba(108, 99, 255, 0.15), rgba(108, 99, 255, 0.05)); 
+        border: 1px solid rgba(108, 99, 255, 0.3);
+        color: #a5b4fc; font-weight: 600; font-size: 0.85rem; margin-bottom: 1.5rem;
+        text-transform: uppercase; letter-spacing: 1px;
+    }
+    
+    .hero-title {
+        font-family: 'Oswald', sans-serif; font-size: 4.5rem; line-height: 1.1; margin-bottom: 1.5rem;
+        /* Premium text gradient */
+        background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+    }
+    
+    .hero-subtitle {
+        color: var(--text-muted); font-size: 1.15rem; line-height: 1.8; margin-bottom: 2.5rem; max-width: 90%;
+    }
+    
+    .feature-list { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 2.5rem;}
+    .feature-item { display: flex; align-items: flex-start; gap: 15px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;}
+    .feature-item i { color: var(--success); font-size: 1.3rem; margin-top: 2px; text-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
+
+    /* --- Premium Hero Carousel Styles --- */
+    .hero-carousel-wrapper {
+        perspective: 1200px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    
+    .hero-glow {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        width: 120%; height: 120%; background: radial-gradient(circle, var(--primary) 0%, transparent 60%);
+        filter: blur(100px); opacity: 0.25; z-index: -1; pointer-events: none;
+    }
+
+    .carousel-container {
+        position: relative; border-radius: 24px; overflow: hidden;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--glass-border-hover);
+        transform: rotateY(-5deg) rotateX(5deg); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease;
+        aspect-ratio: 4/3; background: var(--bg-base);
+    }
+
+    .hero-carousel-wrapper:hover .carousel-container {
+        transform: rotateY(0deg) rotateX(0deg) translateY(-10px);
+        box-shadow: 0 40px 80px rgba(108, 99, 255, 0.25), 0 0 0 1px rgba(108, 99, 255, 0.4);
+    }
+
+    .carousel-track { position: relative; height: 100%; width: 100%; }
+    .carousel-slide { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        opacity: 0; visibility: hidden; z-index: 1;
+        transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1), visibility 1s; 
+    }
+    .carousel-slide.current-slide { opacity: 1; visibility: visible; z-index: 2; }
+    
+    .carousel-slide img { 
+        width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85);
+        transform: scale(1.15) rotate(1deg);
+        transition: transform 6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .carousel-slide.current-slide img { transform: scale(1) rotate(0deg); }
+
+    .slide-caption {
+        position: absolute; bottom: 40px; left: 0px; background: rgba(11, 17, 32, 0.85);
+        backdrop-filter: blur(16px); padding: 14px 28px; border-radius: 12px; font-weight: 700;
+        color: #fff; border: 1px solid rgba(255,255,255,0.1); opacity: 0; transform: translateY(30px) scale(0.9);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        font-family: 'Oswald', sans-serif; font-size: 1.25rem; letter-spacing: 1px;
+    }
+    .carousel-slide.current-slide .slide-caption { opacity: 1; transform: translateY(0) scale(1); left: 30px; }
+
+    /* Navigation Buttons */
+    .carousel-button {
+        position: absolute; top: 50%; transform: translateY(-50%); background: rgba(11, 17, 32, 0.7);
+        backdrop-filter: blur(12px); color: white; border: 1px solid rgba(255,255,255,0.2);
+        width: 48px; height: 48px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex;
+        align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0; font-size: 1.1rem;
+    }
+
+    .carousel-container:hover .carousel-button { opacity: 1; }
+    .carousel-button:hover { background: var(--primary); transform: translateY(-50%) scale(1.1); border-color: var(--primary); box-shadow: 0 0 20px rgba(108, 99, 255, 0.5); }
+    .carousel-btn-prev { left: 20px; }
+    .carousel-btn-next { right: 20px; }
+
+    /* Pagination Dots */
+    .carousel-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; background: rgba(0,0,0,0.4); padding: 6px 12px; border-radius: 20px; backdrop-filter: blur(4px); }
+    .carousel-dot { border: none; width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.4); cursor: pointer; transition: all 0.4s ease; }
+    .carousel-dot.current-slide { background: var(--primary); width: 24px; border-radius: 10px; box-shadow: 0 0 10px var(--primary); }
+
+    /* --- STATS STRIP --- */
+    .stats-strip {
+        display: grid; grid-template-columns: repeat(4, 1fr);
+        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); 
+        border: 1px solid var(--glass-border);
+        border-radius: 24px; padding: 2.5rem 1.5rem; margin-top: 6rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+        backdrop-filter: blur(10px);
+    }
+    .stat { text-align: center; padding: 0.5rem; border-right: 1px solid var(--glass-border); transition: transform 0.3s; cursor: default; }
+    .stat:hover { transform: translateY(-5px); }
+    .stat:last-child { border-right: none; }
+    .stat-num { font-family: 'Oswald', sans-serif; font-size: 2.8rem; color: #fff; font-weight: 700; line-height: 1.2; text-shadow: 0 4px 15px rgba(108, 99, 255, 0.3); }
+    .stat-lbl { font-size: 0.9rem; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
+    /* --- SHOP BY CATEGORY --- */
+    .category-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 2rem; }
+    .category-card {
+        position: relative; overflow: hidden;
+        background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
+        border-radius: 20px; text-decoration: none; color: #fff;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        height: 200px; display: flex; flex-direction: column;
+    }
+    .category-card:hover {
+        transform: translateY(-8px); border-color: rgba(108, 99, 255, 0.4);
+        box-shadow: 0 20px 40px rgba(108, 99, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .category-pattern {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        opacity: 0.3; transition: opacity 0.3s ease;
+    }
+    .category-card:hover .category-pattern { opacity: 0.5; }
+    
+    /* Custom patterns for each category */
+    .pattern-cpu {
+        background: linear-gradient(135deg, #6C63FF 0%, #4338ca 50%, #3730a3 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+    }
+    .pattern-gpu {
+        background: linear-gradient(135deg, #ff6584 0%, #dc2626 50%, #991b1b 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+    }
+    .pattern-ram {
+        background: linear-gradient(135deg, #4ade80 0%, #16a34a 50%, #15803d 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+    }
+    .pattern-storage {
+        background: linear-gradient(135deg, #00c6ff 0%, #0ea5e9 50%, #0284c7 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+    }
+    .pattern-mobo {
+        background: linear-gradient(135deg, #a55eea 0%, #9333ea 50%, #7c3aed 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+    }
+    .pattern-psu {
+        background: linear-gradient(135deg, #f7b731 0%, #f59e0b 50%, #d97706 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .category-content {
+        position: relative; z-index: 1; padding: 2rem; display: flex; flex-direction: column; height: 100%; justify-content: flex-end;
+        background: linear-gradient(to top, rgba(11, 17, 32, 0.9), transparent);
+    }
+    .cat-icon {
+        width: 60px; height: 60px; border-radius: 16px; background: rgba(255,255,255,0.1);
+        display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+        color: var(--primary); transition: all 0.3s ease; margin-bottom: 1rem;
+        border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+    }
+    .category-card:hover .cat-icon { background: var(--primary); color: #fff; transform: scale(1.1) translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 30px rgba(108, 99, 255, 0.4); }
+    .category-card h4 { font-family: 'Oswald', sans-serif; font-size: 1.4rem; margin: 0; font-weight: 600; letter-spacing: 0.5px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    .category-desc { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4; }
+
+    /* --- CORE FEATURES --- */
+    @keyframes float-icon {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+        100% { transform: translateY(0px); }
+    }
+    .landing-card .card-icon i { animation: float-icon 3s ease-in-out infinite; }
+
+    /* --- TESTIMONIALS --- */
+    .testi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem; }
+    .testi-card {
+        background: linear-gradient(to bottom, rgba(255,255,255,0.03), transparent);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px; padding: 2.5rem 2rem; position: relative;
+        transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+    .testi-card:hover { 
+        border-color: rgba(108,99,255,0.5); 
+        transform: translateY(-8px); 
+        box-shadow: 0 15px 35px rgba(108,99,255,0.15), inset 0 1px 0 rgba(255,255,255,0.1); 
+    }
+    .quote-deco { font-size: 5rem; line-height: 1; color: var(--primary); opacity: 0.1; font-family: Georgia, serif; position: absolute; top: 1rem; left: 1.5rem; }
+    .stars { display: flex; gap: 4px; margin-bottom: 1.5rem; position: relative; z-index: 1;}
+    .star { width: 16px; height: 16px; fill: #fbbf24; filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.4)); }
+    .testi-text { font-size: 1.05rem; color: var(--text-main); line-height: 1.8; font-style: italic; margin-bottom: 2rem; position: relative; z-index: 1; }
+    .testi-author { display: flex; align-items: center; gap: 15px; border-top: 1px solid var(--glass-border); padding-top: 1.5rem; }
+    .avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.1); }
+    .av-purple { background: linear-gradient(135deg, rgba(108,99,255,0.4), rgba(108,99,255,0.1)); color: #fff; border-color: var(--primary); }
+    .av-green  { background: linear-gradient(135deg, rgba(74,222,128,0.3), rgba(74,222,128,0.1)); color: #fff; border-color: var(--success); }
+    .av-pink   { background: linear-gradient(135deg, rgba(255,101,132,0.3), rgba(255,101,132,0.1)); color: #fff; border-color: var(--secondary); }
+    .aname { font-size: 1.05rem; font-weight: 600; color: #fff; margin-bottom: 2px;}
+    .abadge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; color: #4ade80; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.25); padding: 4px 10px; border-radius: 10px; }
+
+    /* --- SEAMLESS NEWSLETTER --- */
+    .newsletter {
+        background: linear-gradient(135deg, rgba(108,99,255,0.1), rgba(255,101,132,0.05)), url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=');
+        border: 1px solid var(--glass-border-hover); border-radius: 30px;
+        padding: 5rem 3rem; text-align: center; margin-top: 6rem;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+        position: relative; overflow: hidden;
+    }
+    
+    .newsletter::before {
+        content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 60%);
+        pointer-events: none;
+    }
+
+    .nl-title { font-family: 'Oswald', sans-serif; font-size: 2.8rem; margin-bottom: 1rem; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+    .nl-sub { color: var(--text-muted); font-size: 1.15rem; margin-bottom: 2.5rem; max-width: 550px; margin-left: auto; margin-right: auto; line-height: 1.6;}
+    
+    /* The Pill Form */
+    .nl-form { 
+        display: flex; background: rgba(11, 17, 32, 0.6); border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 50px; padding: 6px; max-width: 550px; margin: 0 auto; 
+        transition: border-color 0.3s, box-shadow 0.3s; backdrop-filter: blur(10px);
+    }
+    .nl-form:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(108,99,255,0.2); }
+    .nl-input { flex: 1; background: transparent; border: none; padding: 1rem 1.5rem; color: #fff; font-size: 1.05rem; font-family: inherit; outline: none; }
+    .nl-input::placeholder { color: #64748b; }
+    .nl-btn { background: var(--primary); color: #fff; border: none; padding: 1rem 2.2rem; border-radius: 40px; font-weight: 700; font-size: 1.05rem; cursor: pointer; white-space: nowrap; transition: transform 0.2s, background 0.2s; }
+    .nl-btn:hover { background: var(--primary-hover); transform: scale(1.02); }
+
+    @media (max-width: 992px) {
+        .hero-section { grid-template-columns: 1fr; gap: 3rem; }
+        .hero-title { font-size: 3.5rem; }
+        .carousel-container { transform: none; }
+        .stats-strip { grid-template-columns: 1fr 1fr; gap: 2rem 1rem; }
+        .stat { border-right: none; border-bottom: 1px solid var(--glass-border); padding-bottom: 1rem; }
+        .stat:nth-child(3), .stat:nth-child(4) { border-bottom: none; padding-bottom: 0; }
+        .testi-grid { grid-template-columns: 1fr; }
+        .nl-form { flex-direction: column; border-radius: 16px; background: transparent; border: none; gap: 10px; }
+        .nl-input { background: rgba(11, 17, 32, 0.6); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; }
+        .nl-btn { border-radius: 12px; width: 100%; }
+        .nl-form:focus-within { box-shadow: none; border-color: transparent; }
+    }
+
+    /* --- Site-wide polish (matches catalog / contact) --- */
+    .hero-badge {
+        box-shadow: 0 4px 20px rgba(108, 99, 255, 0.15);
+    }
+    .stats-strip {
+        background: rgba(15, 22, 38, 0.55);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    .category-card {
+        border-color: rgba(255, 255, 255, 0.09);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+    }
+    .testi-card {
+        background: rgba(15, 22, 38, 0.5);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+    .newsletter {
+        border-color: rgba(108, 99, 255, 0.2);
+        box-shadow: 0 24px 56px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .carousel-container {
+        border: 1px solid rgba(108, 99, 255, 0.15);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <!-- Animated Particles -->
+        <div class="loading-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+
+        <!-- Glowing Ring with Logo -->
+        <div class="loading-ring">
+            <div class="loading-logo-center">
+                <h2>GEARGRID</h2>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+
+        <!-- Loading Text -->
+        <p class="loading-text">Initializing <span>•</span></p>
+    </div>
+
+    <section class="hero-section animate-up">
+        <div id="canvas-container"></div>
+
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-microchip"></i> Next-Gen Hardware Platform</div>
+            <h1 class="hero-title">Equip Your Setup.<br>Manage Your Gear.</h1>
+            <p class="hero-subtitle">The ultimate destination for browsing top-tier computer components, tracking real-time orders, and keeping your workflow perfectly organized.</p>
+            
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                    <a href="{{ path('app_product_index') }}" class="landing-header-cta" style="padding: 1rem 2rem; font-size: 1.05rem; border-radius: 12px;">
+                        <i class="fas fa-box-open"></i> Browse Catalog
+                    </a>
+                {% elseif app.user %}
+                    <a href="{{ path('app_customer_products') }}" class="landing-header-cta" style="padding: 1rem 2rem; font-size: 1.05rem; border-radius: 12px;">
+                        <i class="fas fa-cart-shopping"></i> Shop products
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="landing-header-cta" style="padding: 1rem 2rem; font-size: 1.05rem; border-radius: 12px;">
+                        <i class="fas fa-right-to-bracket"></i> Sign In to Shop
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span><strong>Seamless Experience:</strong> A unified, lightning-fast interface across all your mobile and desktop devices.</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span><strong>Live Order Tracking:</strong> Keep tabs on your recent purchases with detailed, real-time status updates.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-carousel-wrapper animate-up delay-1">
+            <div class="hero-glow"></div>
+            
+            <div class="carousel-container" id="heroCarousel">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-slide current-slide">
+                        <img src="https://images.unsplash.com/photo-1603481546238-487240415921?auto=format&fit=crop&w=800&q=80" alt="High-end PC Build">
+                        <div class="slide-caption">Ultimate Liquid Cooling</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=800&q=80" alt="Gaming Setup">
+                        <div class="slide-caption">Next-Gen GPUs</div>
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&w=800&q=80" alt="Workstation">
+                        <div class="slide-caption">Creator Workstations</div>
+                    </div>
+                </div>
+
+                <button class="carousel-button carousel-btn-prev" id="btnPrev">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-button carousel-btn-next" id="btnNext">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+
+                <div class="carousel-nav" id="carouselNav">
+                    <button class="carousel-dot current-slide"></button>
+                    <button class="carousel-dot"></button>
+                    <button class="carousel-dot"></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# SECTION 2: STATS STRIP #}
+    <section class="landing-section animate-up delay-1">
+        <div class="stats-strip">
+            <div class="stat"><div class="stat-num">12K+</div><div class="stat-lbl">Products Sold</div></div>
+            <div class="stat"><div class="stat-num">98%</div><div class="stat-lbl">Satisfaction Rate</div></div>
+            <div class="stat"><div class="stat-num">4.9<i class="fas fa-star" style="font-size:1.8rem; margin-left:6px; color: #fbbf24;"></i></div><div class="stat-lbl">Avg Rating</div></div>
+            <div class="stat"><div class="stat-num">24/7</div><div class="stat-lbl">Expert Support</div></div>
+        </div>
+    </section>
+
+    {# SECTION 3: CORE FEATURES #}
+    <section class="landing-section animate-up delay-2">
+        <h2 class="section-title"><i class="fas fa-wand-magic-sparkles"></i> Core Features</h2>
+        <div class="landing-grid">
+            <div class="landing-card">
+                <div class="card-icon"><i class="fas fa-layer-group"></i></div>
+                <h3>Smart Catalog</h3>
+                <p>Easily filter and find the exact components and tools you need for your next build.</p>
+            </div>
+            <div class="landing-card">
+                <div class="card-icon" style="color: var(--success); background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.2);">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <h3>Quick Orders</h3>
+                <p>Our streamlined checkout process gets your gear secured in seconds.</p>
+            </div>
+            <div class="landing-card">
+                <div class="card-icon" style="color: var(--secondary); background: rgba(255, 101, 132, 0.1); border-color: rgba(255, 101, 132, 0.2);">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Activity Dashboard</h3>
+                <p>Monitor your entire order history from a single, responsive panel.</p>
+            </div>
+        </div>
+    </section>
+
+    {# SECTION 4: POPULAR CATEGORIES #}
+    <section class="landing-section animate-up delay-2">
+        <h2 class="section-title" style="margin-top: 1.5rem;"><i class="fas fa-tags"></i> Shop by Category</h2>
+        <div class="category-grid">
+            <a href="{{ path('app_customer_products') }}" class="category-card">
+                <div class="category-pattern pattern-cpu"></div>
+                <div class="category-content">
+                    <div class="cat-icon"><i class="fas fa-microchip"></i></div>
+                    <h4>Processors</h4>
+                    <p class="category-desc">Latest Intel & AMD CPUs for ultimate performance</p>
+                </div>
+            </a>
+            <a href="{{ path('app_customer_products') }}" class="category-card">
+                <div class="category-pattern pattern-gpu"></div>
+                <div class="category-content">
+                    <div class="cat-icon" style="color: #ff6584;"><i class="fas fa-desktop"></i></div>
+                    <h4>Graphics Cards</h4>
+                    <p class="category-desc">RTX 40 Series & Radeon RX 7000 series</p>
+                </div>
+            </a>
+            <a href="{{ path('app_customer_products') }}" class="category-card">
+                <div class="category-pattern pattern-ram"></div>
+                <div class="category-content">
+                    <div class="cat-icon" style="color: #4ade80;"><i class="fas fa-memory"></i></div>
+                    <h4>Memory</h4>
+                    <p class="category-desc">DDR5 & DDR4 RAM kits for all budgets</p>
+                </div>
+            </a>
+            <a href="{{ path('app_customer_products') }}" class="category-card">
+                <div class="category-pattern pattern-storage"></div>
+                <div class="category-content">
+                    <div class="cat-icon" style="color: #00c6ff;"><i class="fas fa-hdd"></i></div>
+                    <h4>Storage</h4>
+                    <p class="category-desc">NVMe SSDs & SATA drives for speed & capacity</p>
+                </div>
+            </a>
+            <a href="{{ path('app_customer_products') }}" class="category-card">
+                <div class="category-pattern pattern-mobo"></div>
+                <div class="category-content">
+                    <div class="cat-icon" style="color: #a55eea;"><i class="fas fa-microchip"></i></div>
+                    <h4>Motherboards</h4>
+                    <p class="category-desc">ASUS, MSI, Gigabyte boards for every build</p>
+                </div>
+            </a>
+            <a href="{{ path('app_customer_products') }}" class="category-card">
+                <div class="category-pattern pattern-psu"></div>
+                <div class="category-content">
+                    <div class="cat-icon" style="color: #f7b731;"><i class="fas fa-bolt"></i></div>
+                    <h4>Power Supplies</h4>
+                    <p class="category-desc">80+ Gold & Platinum PSUs for stable power</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    {# SECTION 5: TESTIMONIALS #}
+    <section class="landing-section animate-up delay-3">
+        <h2 class="section-title" style="justify-content: center; font-size: 2.8rem; margin-top: 2rem;"><i class="fas fa-comments"></i> What Our Builders Say</h2>
+        <div class="testi-grid">
+            <div class="testi-card">
+                <div class="quote-deco">"</div>
+                <div class="stars">
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                </div>
+                <p class="testi-text">Ordered an i9 build on a Friday. Arrived assembled and stress-tested by Monday. The packaging was immaculate. Only store I trust for high-end parts.</p>
+                <div class="testi-author">
+                    <div class="avatar av-purple">JR</div>
+                    <div>
+                        <div class="aname">James Reyes</div>
+                        <div class="abadge"><i class="fas fa-check-circle"></i> Verified Buyer</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testi-card">
+                <div class="quote-deco">"</div>
+                <div class="stars">
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                </div>
+                <p class="testi-text">Their automated compatibility check saved me from buying the wrong generation of RAM. The team even flagged the issue before shipping it out. Amazing detail.</p>
+                <div class="testi-author">
+                    <div class="avatar av-green">MC</div>
+                    <div>
+                        <div class="aname">Maria Cruz</div>
+                        <div class="abadge"><i class="fas fa-check-circle"></i> System Builder</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testi-card">
+                <div class="quote-deco">"</div>
+                <div class="stars">
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                    <svg class="star" viewBox="0 0 16 16"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9L4 12l.7-4L1.8 5.2l4-.6z"/></svg>
+                </div>
+                <p class="testi-text">Deployed 40 designer workstations through GearGrid's enterprise program. Smooth setup from start to finish, and the bulk hardware pricing was completely unbeatable.</p>
+                <div class="testi-author">
+                    <div class="avatar av-pink">KD</div>
+                    <div>
+                        <div class="aname">Kevin De Leon</div>
+                        <div class="abadge"><i class="fas fa-building"></i> Enterprise Client</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# SECTION 6: SERVICES PREVIEW #}
+    <section class="landing-section animate-up delay-2">
+        <h2 class="section-title" style="justify-content: center; font-size: 2.8rem; margin-top: 2rem;"><i class="fas fa-star"></i> Our Premium Services</h2>
+        <div class="landing-grid">
+            <div class="landing-card">
+                <div class="card-icon"><i class="fas fa-screwdriver-wrench"></i></div>
+                <h3>Custom PC Assembly</h3>
+                <p>Professional assembly with cable management and stress testing by certified technicians.</p>
+                <div style="margin-top: 1rem;">
+                    <span style="color: var(--primary); font-weight: 600; font-size: 0.9rem;">500+ Builds/Month</span>
+                </div>
+            </div>
+            <div class="landing-card">
+                <div class="card-icon" style="color: var(--success); background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.2);">
+                    <i class="fas fa-puzzle-piece"></i>
+                </div>
+                <h3>Compatibility Checks</h3>
+                <p>Expert verification ensures 100% hardware compatibility before shipping.</p>
+                <div style="margin-top: 1rem;">
+                    <span style="color: var(--success); font-weight: 600; font-size: 0.9rem;">10K+ Checks/Day</span>
+                </div>
+            </div>
+            <div class="landing-card">
+                <div class="card-icon" style="color: var(--secondary); background: rgba(255, 101, 132, 0.1); border-color: rgba(255, 101, 132, 0.2);">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <h3>Diagnostics & Repair</h3>
+                <p>Deep-level diagnostics, component repair, and thermal optimization services.</p>
+                <div style="margin-top: 1rem;">
+                    <span style="color: var(--secondary); font-weight: 600; font-size: 0.9rem;">48hr Turnaround</span>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="{{ path('app_customer_services') }}" style="display: inline-flex; align-items: center; gap: 10px; background: rgba(108, 99, 255, 0.1); color: var(--primary); border: 1px solid rgba(108, 99, 255, 0.3); padding: 0.8rem 1.8rem; border-radius: 30px; font-weight: 600; text-decoration: none; transition: all 0.3s ease;">
+                <i class="fas fa-arrow-right"></i> View All Services
+            </a>
+        </div>
+    </section>
+
+    {# SECTION 7: WHY CHOOSE US #}
+    <section class="landing-section animate-up delay-2">
+        <h2 class="section-title" style="justify-content: center; font-size: 2.8rem; margin-top: 2rem;"><i class="fas fa-trophy"></i> Why Choose GearGrid</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;">
+            <div style="background: linear-gradient(to bottom, rgba(255,255,255,0.03), transparent); border: 1px solid var(--glass-border); border-radius: 20px; padding: 2rem; text-align: center; transition: transform 0.3s ease;">
+                <div style="width: 60px; height: 60px; border-radius: 15px; background: rgba(108, 99, 255, 0.15); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 1rem;">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 1rem; font-family: 'Oswald', sans-serif;">Free Express Shipping</h3>
+                <p style="color: var(--text-muted); line-height: 1.6;">Free express shipping on all orders over $500. Get your gear delivered within 2-3 business days.</p>
+            </div>
+            <div style="background: linear-gradient(to bottom, rgba(255,255,255,0.03), transparent); border: 1px solid var(--glass-border); border-radius: 20px; padding: 2rem; text-align: center; transition: transform 0.3s ease;">
+                <div style="width: 60px; height: 60px; border-radius: 15px; background: rgba(74, 222, 128, 0.15); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 1rem;">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 1rem; font-family: 'Oswald', sans-serif;">Extended Warranty</h3>
+                <p style="color: var(--text-muted); line-height: 1.6;">Comprehensive warranty coverage up to 5 years with 24/7 customer support.</p>
+            </div>
+            <div style="background: linear-gradient(to bottom, rgba(255,255,255,0.03), transparent); border: 1px solid var(--glass-border); border-radius: 20px; padding: 2rem; text-align: center; transition: transform 0.3s ease;">
+                <div style="width: 60px; height: 60px; border-radius: 15px; background: rgba(255, 101, 132, 0.15); color: var(--secondary); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 1rem;">
+                    <i class="fas fa-undo"></i>
+                </div>
+                <h3 style="color: #fff; font-size: 1.3rem; margin-bottom: 1rem; font-family: 'Oswald', sans-serif;">30-Day Returns</h3>
+                <p style="color: var(--text-muted); line-height: 1.6;">Hassle-free returns within 30 days. No questions asked, full refund guarantee.</p>
+            </div>
+        </div>
+    </section>
+
+    {# SECTION 8: NEWSLETTER #}
+    <section class="landing-section animate-up delay-3">
+        <div class="newsletter">
+            <div class="nl-title">Stay in the Loop</div>
+            <div class="nl-sub">Join 50,000+ builders getting notified about new product drops, flash hardware deals, and exclusive build guides.</div>
+            
+            <div class="nl-form">
+                <input class="nl-input" type="email" placeholder="Enter your email address...">
+                <button class="nl-btn">Subscribe <i class="fas fa-paper-plane" style="margin-left:6px;"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            /* ====================================================
+               THREE.JS FLOATING HARDWARE BACKGROUND 
+               ==================================================== */
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            
+            // Setup Camera and Renderer (Transparent background)
+            const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 20;
+            
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Group for mouse tracking
+            const sceneGroup = new THREE.Group();
+            scene.add(sceneGroup);
+
+            // Particle System
+            const particleGeo = new THREE.BufferGeometry();
+            const particlesCount = 700;
+            const posArray = new Float32Array(particlesCount * 3);
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 60;
+            }
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particleMat = new THREE.PointsMaterial({
+                size: 0.15,
+                color: 0x6C63FF,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            const particlesMesh = new THREE.Points(particleGeo, particleMat);
+            sceneGroup.add(particlesMesh);
+
+            // Create Advanced Tech Core
+            const coreGroup = new THREE.Group();
+            coreGroup.position.set(-2, 0, 0); // Position to the left behind text
+            sceneGroup.add(coreGroup);
+
+            // 1. Inner glowing core
+            const icosaGeo = new THREE.IcosahedronGeometry(2, 1);
+            const innerMat = new THREE.MeshStandardMaterial({ 
+                color: 0x6C63FF, emissive: 0x3025b3, wireframe: true, transparent: true, opacity: 0.8
+            });
+            const innerCore = new THREE.Mesh(icosaGeo, innerMat);
+            coreGroup.add(innerCore);
+
+            const solidIcosaMat = new THREE.MeshStandardMaterial({
+                color: 0x0b1120, roughness: 0.2, metalness: 0.9, transparent: true, opacity: 0.95
+            });
+            const solidCore = new THREE.Mesh(icosaGeo, solidIcosaMat);
+            solidCore.scale.set(0.98, 0.98, 0.98);
+            coreGroup.add(solidCore);
+
+            // 2. Outer rings
+            const ringGeo1 = new THREE.TorusGeometry(3.5, 0.05, 16, 100);
+            const ringMat = new THREE.MeshStandardMaterial({ color: 0xff6584, emissive: 0x8a1b32 });
+            const ring1 = new THREE.Mesh(ringGeo1, ringMat);
+            coreGroup.add(ring1);
+
+            const ringGeo2 = new THREE.TorusGeometry(4.5, 0.02, 16, 100);
+            const ringMat2 = new THREE.MeshStandardMaterial({ color: 0x4ade80, emissive: 0x16a34a });
+            const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
+            ring2.rotation.x = Math.PI / 2;
+            coreGroup.add(ring2);
+
+            // Floating mini chips
+            function createMiniChip(x, y, z, color) {
+                const geo = new THREE.BoxGeometry(0.8, 0.8, 0.1);
+                const edges = new THREE.EdgesGeometry(geo);
+                const mat = new THREE.LineBasicMaterial({ color: color });
+                const mesh = new THREE.LineSegments(edges, mat);
+                mesh.position.set(x, y, z);
+                
+                const sGeo = new THREE.BoxGeometry(0.78, 0.78, 0.08);
+                const sMat = new THREE.MeshBasicMaterial({ color: 0x0b1120 });
+                const sMesh = new THREE.Mesh(sGeo, sMat);
+                mesh.add(sMesh);
+                return mesh;
+            }
+            
+            const chip1 = createMiniChip(6, 4, 2, 0x6C63FF);
+            const chip2 = createMiniChip(-5, -3, 3, 0xff6584);
+            const chip3 = createMiniChip(4, -5, -2, 0x4ade80);
+            sceneGroup.add(chip1, chip2, chip3);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+            scene.add(ambientLight);
+            const pointLight = new THREE.PointLight(0x6C63FF, 2, 50);
+            pointLight.position.set(-2, 0, 5);
+            scene.add(pointLight);
+            
+            const pinkLight = new THREE.PointLight(0xff6584, 1.5, 50);
+            pinkLight.position.set(5, 5, 0);
+            scene.add(pinkLight);
+
+            // Mouse interaction
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX);
+                mouseY = (event.clientY - windowHalfY);
+            });
+
+            // Animation Loop
+            const clock = new THREE.Clock();
+            function animate3D() {
+                requestAnimationFrame(animate3D);
+                const elapsedTime = clock.getElapsedTime();
+
+                targetX = mouseX * 0.001;
+                targetY = mouseY * 0.001;
+
+                // Smoothly interpolate group rotation towards mouse position
+                sceneGroup.rotation.y += 0.05 * (targetX - sceneGroup.rotation.y);
+                sceneGroup.rotation.x += 0.05 * (targetY - sceneGroup.rotation.x);
+
+                // Rotate components
+                innerCore.rotation.x = elapsedTime * 0.2;
+                innerCore.rotation.y = elapsedTime * 0.3;
+                solidCore.rotation.copy(innerCore.rotation);
+
+                ring1.rotation.x = elapsedTime * 0.5;
+                ring1.rotation.y = elapsedTime * 0.2;
+
+                ring2.rotation.y = elapsedTime * 0.4;
+                ring2.rotation.z = elapsedTime * 0.1;
+
+                particlesMesh.rotation.y = -elapsedTime * 0.05;
+                
+                chip1.rotation.x = elapsedTime * 0.6;
+                chip1.rotation.y = elapsedTime * 0.4;
+                chip1.position.y = 4 + Math.sin(elapsedTime * 1.5) * 0.5;
+
+                chip2.rotation.y = -elapsedTime * 0.5;
+                chip2.rotation.z = elapsedTime * 0.3;
+                chip2.position.x = -5 + Math.cos(elapsedTime * 1.2) * 0.3;
+
+                chip3.rotation.x = elapsedTime * 0.4;
+                chip3.position.y = -5 + Math.sin(elapsedTime * 2) * 0.4;
+
+                renderer.render(scene, camera);
+            }
+            animate3D();
+
+            // Handle Window Resize
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+
+
+            /* ====================================================
+               CAROUSEL LOGIC
+               ==================================================== */
+            const track = document.getElementById('carouselTrack');
+            const slides = Array.from(track.children);
+            const nextButton = document.getElementById('btnNext');
+            const prevButton = document.getElementById('btnPrev');
+            const dotsNav = document.getElementById('carouselNav');
+            const dots = Array.from(dotsNav.children);
+
+            const moveToSlide = (currentSlide, targetSlide) => {
+                currentSlide.classList.remove('current-slide');
+                targetSlide.classList.add('current-slide');
+            };
+
+            const updateDots = (currentDot, targetDot) => {
+                currentDot.classList.remove('current-slide');
+                targetDot.classList.add('current-slide');
+            };
+
+            nextButton.addEventListener('click', e => {
+                const currentSlide = track.querySelector('.current-slide');
+                let nextSlide = currentSlide.nextElementSibling;
+                const currentDot = dotsNav.querySelector('.current-slide');
+                let nextDot = currentDot.nextElementSibling;
+
+                if (!nextSlide) { nextSlide = slides[0]; nextDot = dots[0]; }
+                moveToSlide(currentSlide, nextSlide); updateDots(currentDot, nextDot);
+            });
+
+            prevButton.addEventListener('click', e => {
+                const currentSlide = track.querySelector('.current-slide');
+                let prevSlide = currentSlide.previousElementSibling;
+                const currentDot = dotsNav.querySelector('.current-slide');
+                let prevDot = currentDot.previousElementSibling;
+
+                if (!prevSlide) { prevSlide = slides[slides.length - 1]; prevDot = dots[dots.length - 1]; }
+                moveToSlide(currentSlide, prevSlide); updateDots(currentDot, prevDot);
+            });
+
+            dotsNav.addEventListener('click', e => {
+                const targetDot = e.target.closest('button');
+                if (!targetDot) return;
+                const currentSlide = track.querySelector('.current-slide');
+                const currentDot = dotsNav.querySelector('.current-slide');
+                const targetIndex = dots.findIndex(dot => dot === targetDot);
+                const targetSlide = slides[targetIndex];
+
+                moveToSlide(currentSlide, targetSlide); updateDots(currentDot, targetDot);
+            });
+
+            setInterval(() => { nextButton.click(); }, 5000);
+
+            // Loading Screen Logic
+            window.addEventListener('load', function() {
+                const loadingScreen = document.getElementById('loading-screen');
+                setTimeout(function() {
+                    loadingScreen.classList.add('hidden');
+                    setTimeout(function() {
+                        loadingScreen.style.display = 'none';
+                    }, 800);
+                }, 1500);
+            });
+        });
+    </script>
+{% endblock %}

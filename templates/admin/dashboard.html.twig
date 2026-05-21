@@ -1,0 +1,130 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+    <!-- Quick Stats Cards -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+        <div class="flex items-center">
+            <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
+                <i class="fas fa-box text-blue-600 dark:text-blue-300 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm text-gray-600 dark:text-gray-400">Total Products</p>
+                <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ total_products ?? 0 }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-green-500">
+        <div class="flex items-center">
+            <div class="p-3 bg-green-100 dark:bg-green-900 rounded-full">
+                <i class="fas fa-tags text-green-600 dark:text-green-300 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm text-gray-600 dark:text-gray-400">Total Categories</p>
+                <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ total_categories ?? 0 }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+        <div class="flex items-center">
+            <div class="p-3 bg-yellow-100 dark:bg-yellow-900 rounded-full">
+                <i class="fas fa-shopping-cart text-yellow-600 dark:text-yellow-300 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm text-gray-600 dark:text-gray-400">Total Orders</p>
+                <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ total_orders ?? 0 }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-red-500">
+        <div class="flex items-center">
+            <div class="p-3 bg-red-100 dark:bg-red-900 rounded-full">
+                <i class="fas fa-users text-red-600 dark:text-red-300 text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm text-gray-600 dark:text-gray-400">Total Users</p>
+                <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ total_users ?? 0 }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Activity Quick View -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-purple-500 md:col-span-2 lg:col-span-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="p-3 bg-purple-100 dark:bg-purple-900 rounded-full">
+                    <i class="fas fa-chart-line text-purple-600 dark:text-purple-300 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Recent Stock Activity</p>
+                    <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ recent_stock_changes ?? 0 }} changes today</p>
+                </div>
+            </div>
+            <a href="{{ path('app_stock_log_index') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                <i class="fas fa-eye mr-2"></i>View All Stock Logs
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity Section -->
+<div class="mt-8">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <i class="fas fa-clock mr-2"></i>Recent Activity
+        </h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Recent Products -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Recent Products</h3>
+                {% if recent_products|length > 0 %}
+                    <div class="space-y-2">
+                        {% for product in recent_products|slice(0, 5) %}
+                            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                                <div>
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ product.name }}</span>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">by {{ product.createdBy.name ?? 'Unknown' }}</span>
+                                </div>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ product.createdAt|date('M j, Y') }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500 dark:text-gray-400">No recent products</p>
+                {% endif %}
+            </div>
+
+            <!-- Recent Stock Changes -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Recent Stock Changes</h3>
+                {% if recent_stock_logs|length > 0 %}
+                    <div class="space-y-2">
+                        {% for stockLog in recent_stock_logs|slice(0, 5) %}
+                            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                                <div>
+                                    <span class="font-medium text-gray-900 dark:text-white">{{ stockLog.product.name }}</span>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">by {{ stockLog.userName }}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm px-2 py-1 rounded 
+                                        {% if stockLog.action == 'STOCK_INCREASE' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200{% endif %}
+                                        {% if stockLog.action == 'STOCK_DECREASE' %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200{% endif %}">
+                                        {% if stockLog.quantityChange > 0 %}+{% endif %}{{ stockLog.quantityChange }}
+                                    </span>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">{{ stockLog.createdAt|date('H:i') }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500 dark:text-gray-400">No recent stock changes</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

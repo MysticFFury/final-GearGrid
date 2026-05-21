@@ -3,123 +3,209 @@
 {% block title %}Products | GearGrid Admin{% endblock %}
 
 {% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-    .table-card {
-        background: #1e1e2f;
-        padding: 1.5rem;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        margin-top: 1rem;
+    :root {
+        --primary: #6C63FF;
+        --secondary: #ff6584;
+        --success: #4ade80;
+        --bg-base: #0B1120;
+        --text-muted: #94a3b8;
+        --glass-border: rgba(255,255,255,0.08);
     }
 
-    table.dataTable thead th {
-        color: #fff;
-        font-weight: bold;
-        border-bottom: 1px solid #444;
+    .dashboard main {
+        margin-left: 16rem;
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: var(--bg-base);
+        font-family: 'Inter', sans-serif;
     }
 
-    table.dataTable tbody td {
-        color: #e0e0e0;
-        border-bottom: 1px solid #333;
+    .panel {
+        background: linear-gradient(180deg, rgba(17,24,39,0.72), rgba(11,17,32,0.75));
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+    }
+    
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_processing,
+    .dataTables_wrapper .dataTables_paginate {
+        color: #94a3b8 !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: #94a3b8 !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+        background: #6C63FF !important;
+        color: #fff !important;
+        border: none !important;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: rgba(108, 99, 255, 0.2) !important;
+        color: #6C63FF !important;
+        border: none !important;
+    }
+    
+    table.dataTable tbody tr {
+        background-color: transparent !important;
+    }
+    
+    table.dataTable tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.03) !important;
     }
 
-    .btn-view, .btn-edit, .btn-add {
-        padding: 0.3rem 0.6rem;
-        border-radius: 8px;
-        color: #fff;
-        text-decoration: none;
-        margin-right: 0.3rem;
-        font-weight: bold;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
     }
-
-    .btn-view { background: #6C63FF; }
-    .btn-edit { background: #ff6584; }
-    .btn-add { background: #00c6ff; margin-left: 1rem; }
-
-    .btn-view:hover, .btn-edit:hover, .btn-add:hover { opacity: 0.85; }
-
-    .content-actions {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-        justify-content: space-between;
-    }
-
-    .search-input {
-        padding: 0.5rem 0.8rem;
-        border-radius: 8px;
-        border: 1px solid #444;
-        background: #2a2a3f;
-        color: #fff;
-        width: 250px;
-    }
-
-    .search-input::placeholder { color: #aaa; }
 </style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
     {% include 'partials/_sidebar.html.twig' %}
+
     <main class="main-content">
-        <div class="top-header">
-            <h1>Products</h1>
-            <div class="user-info">
-                <div class="profile">
-                    <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="">
-                    <span>John Ralf</span>
-                </div>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-700">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Products</h1>
+                <nav class="flex items-center gap-2 text-sm text-gray-400">
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-purple-500 transition-colors">Dashboard</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <span class="text-purple-500 font-semibold">Products</span>
+                </nav>
+            </div>
+
+            <div class="mt-4 md:mt-0">
+                {% include 'partials/_user_dropdown.html.twig' %}
             </div>
         </div>
 
-        <div class="content-area">
-            <div class="content-header">
-                <h1>Product List</h1>
-                <div class="content-actions">
-                    <input type="text" id="productSearch" class="search-input" placeholder="🔍 Search products...">
-                    <a href="{{ path('app_product_new') }}" class="btn-add">
+        <div class="space-y-4">
+            {# Flash Messages #}
+            {% for message in app.flashes('success') %}
+                <div class="bg-green-500/20 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg flex items-center justify-between gap-3 shadow-lg shadow-green-500/10">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-green-400 cursor-pointer text-xl opacity-80 hover:opacity-100">&times;</button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="bg-red-500/20 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg flex items-center justify-between gap-3 shadow-lg shadow-red-500/10">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-red-400 cursor-pointer text-xl opacity-80 hover:opacity-100">&times;</button>
+                </div>
+            {% endfor %}
+
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <h2 class="text-xl font-semibold text-white flex items-center gap-3">
+                    <i class="fas fa-box text-purple-500"></i> Product List
+                </h2>
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <input type="text" id="productSearch" class="px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 w-full md:w-64" placeholder="🔍 Search products...">
+                    <a href="{{ path('app_product_new') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20">
                         <i class="fas fa-plus"></i> Add Product
                     </a>
                 </div>
             </div>
 
-            <div class="table-card">
-                <table id="productTable" class="display styled-table" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for product in products %}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="panel p-4">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider">Total Products</p>
+                    <p class="text-2xl font-bold text-white mt-2">{{ products|length }}</p>
+                </div>
+                <div class="panel p-4">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider">Low Stock (<=5)</p>
+                    <p class="text-2xl font-bold text-pink-400 mt-2">{{ products|filter(p => p.quantity <= 5)|length }}</p>
+                </div>
+                <div class="panel p-4">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider">Healthy Stock (>5)</p>
+                    <p class="text-2xl font-bold text-green-400 mt-2">{{ products|filter(p => p.quantity > 5)|length }}</p>
+                </div>
+            </div>
+
+            <div class="panel overflow-hidden">
+                <div class="p-6">
+                    <table id="productTable" class="display w-full">
+                        <thead>
                             <tr>
-                                <td>{{ product.id }}</td>
-                                <td>{{ product.name }}</td>
-                                <td>{{ product.category ?: '-' }}</td>
-                                <td>₱{{ product.price|number_format(2, '.', ',') }}</td>
-                                <td>{{ product.quantity }}</td>
-                                <td>
-                                    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="btn-view"><i class="fas fa-eye"></i> View</a>
-                                    <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
-                                </td>
+                                <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider pb-3">ID</th>
+                                <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider pb-3">Name</th>
+                                <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider pb-3">Category</th>
+                                <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider pb-3">Price</th>
+                                <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider pb-3">Quantity</th>
+                                <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider pb-3">Actions</th>
                             </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="6" style="text-align:center;">No products found.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            {% for product in products %}
+                                <tr class="transition-colors">
+                                    <td class="py-4">
+                                        <span class="text-pink-500 font-mono bg-pink-500/10 px-3 py-1 rounded-md text-sm">#{{ product.id }}</span>
+                                    </td>
+                                    <td class="py-4">
+                                        <div class="flex items-center gap-3">
+                                            {% if product.image %}
+                                                <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="{{ product.name }}" class="w-10 h-10 rounded-lg object-cover border border-gray-700">
+                                            {% else %}
+                                                <div class="w-10 h-10 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center text-gray-500">
+                                                    <i class="fas fa-box text-xs"></i>
+                                                </div>
+                                            {% endif %}
+                                            <span class="font-semibold text-white">{{ product.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-4">
+                                        {% if product.category %}
+                                            <span class="text-purple-500 bg-purple-500/10 px-3 py-1 rounded-md text-sm">{{ product.category.name }}</span>
+                                        {% else %}
+                                            <span class="text-gray-400">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-4 text-green-400 font-semibold">₱{{ product.price|number_format(2, '.', ',') }}</td>
+                                    <td class="py-4">
+                                        <span class="bg-green-500/10 text-green-400 px-3 py-1 rounded-md font-semibold">{{ product.quantity }}</span>
+                                    </td>
+                                    <td class="py-4">
+                                        <div class="flex flex-wrap gap-2">
+                                            <a href="{{ path('app_product_show', {'id': product.id}) }}" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1.5 rounded-md text-sm font-medium hover:bg-purple-500/30 transition-colors flex items-center gap-1">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                                                <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="bg-purple-600 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors flex items-center gap-1 shadow-md">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                {{ include('product/_delete_form.html.twig', { 'product': product }) }}
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-8 text-gray-400">
+                                        <i class="fas fa-box-open text-3xl mb-2 opacity-50 block"></i>
+                                        No products found.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
@@ -136,12 +222,27 @@ $(document).ready(function() {
         lengthMenu: [5, 10, 25, 50],
         order: [[0, 'desc']],
         columnDefs: [{ orderable: false, targets: 5 }],
-        autoWidth: false
+        autoWidth: false,
+        dom: 'lrtip',
+        language: {
+            search: "",
+            searchPlaceholder: "Search...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ products",
+            infoEmpty: "No products available",
+            infoFiltered: "(filtered from _MAX_ total products)"
+        }
     });
 
     $('#productSearch').on('keyup', function () {
         table.search(this.value).draw();
     });
+
+    setTimeout(function() {
+        $('.flash-message').fadeOut('slow', function() {
+            $(this).remove();
+        });
+    }, 5000);
 });
 </script>
 {% endblock %}

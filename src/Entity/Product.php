@@ -3,47 +3,87 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Put(),
+        new Delete()
+    ],
+    normalizationContext: [
+        'groups' => ['product:read']
+    ],
+    denormalizationContext: [
+        'groups' => ['product:write']
+    ]
+)]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['product:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['product:read', 'product:write'])]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(['product:read', 'product:write'])]
     private ?float $price = null;
 
     #[ORM\Column]
+    #[Groups(['product:read', 'product:write'])]
     private ?int $quantity = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['product:read', 'product:write'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['product:read'])] // Usually, users shouldn't edit the creation date!
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: "string", length: 255, nullable: true)]
-    private ?string $image = null; // <-- moved inside the class
+    #[Groups(['product:read', 'product:write'])]
+    private ?string $image = null;
 
     /**
      * @var Collection<int, Order>
      */
     #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'products')]
+    // We omit the groups here for now to prevent infinite loops when fetching products
     private Collection $orders;
+
+    #[ORM\ManyToOne(targetEntity: Category::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['product:read', 'product:write'])]
+    private ?Category $category = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['product:read'])]
+    private ?User $createdBy = null;
 
     public function __construct()
     {
         $this->orders = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable(); // optional: automatically set creation time
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -141,18 +181,26 @@ class Product
         }
         return $this;
     }
-    #[ORM\Column(length: 255, nullable: true)]
-        private ?string $category = null;
 
-public function getCategory(): ?string
-{
-    return $this->category;
-}
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
 
-public function setCategory(?string $category): static
-{
-    $this->category = $category;
-    return $this;
-}
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
+        return $this;
+    }
 
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
 }

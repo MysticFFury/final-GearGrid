@@ -2,12 +2,81 @@
 
 {% block title %}Edit Log{% endblock %}
 
-{% block body %}
-    <h1>Edit Log</h1>
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
 
-    {{ include('log/_form.html.twig', {'button_label': 'Update'}) }}
+<style>
+    :root {
+        --primary: #6C63FF;
+        --primary-hover: #5b54d6;
+        --secondary: #ff6584;
+        --success: #4ade80;
+        --bg-base: #0B1120;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --glass-bg: rgba(255, 255, 255, 0.02);
+        --glass-bg-hover: rgba(255, 255, 255, 0.04);
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-border-hover: rgba(255, 255, 255, 0.12);
+        --danger: #dc3545;
+        --card-bg: rgba(255, 255, 255, 0.02);
+    }
 
-    <a href="{{ path('app_log_index') }}">back to list</a>
+    .dashboard main {
+        margin-left: 16rem;
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: var(--bg-base);
+    }
 
-    {{ include('log/_delete_form.html.twig') }}
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
+    }
+</style>
 {% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    {% include 'partials/_sidebar.html.twig' %}
+    <main class="main-content">
+        <div class="form-card">
+            <h2>Edit Log #{{ log.id }}</h2>
+
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <div style="margin-top: 1rem;">
+                    <button class="btn-save"><i class="fas fa-save"></i> Update</button>
+                    <a href="{{ path('app_log_index') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Back</a>
+                </div>
+            {{ form_end(form) }}
+
+            <div style="margin-top: 1rem;">
+                <form method="post" action="{{ path('app_log_delete', {'id': log.id}) }}" 
+                      onsubmit="return confirm('Are you sure you want to delete this log?');" style="display:inline-block;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ log.id) }}">
+                    <button class="btn-delete"><i class="fas fa-trash"></i> Delete</button>
+                </form>
+                <form method="post" action="{{ path('app_log_toggle', {'id': log.id}) }}" style="display:inline-block;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ log.id) }}">
+                    <button class="btn-toggle">{{ log.status == 'active' ? 'Deactivate' : 'Activate' }}</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+axw-3xl mx-auto">
+            <div lss="bg-gay-800/30 borer border-gray-700 rounded-xl p-8 border-t-4 border-t-purple-500     class="text-xl font-semibold text-white mb-8 flex items-center gap-3"<i class="fas fa-edit text-purple-500"></i>     , { 'attr': { 'class': 'space-y-4' } }        cassflex flex-wap ap3 p-6 brder-tbodr-gray-700    type="submit" g-purple-600 hover:bg-purple-700 ext-white px-4 py-2 roudedlg font-medium tranition-colors flex items-center gp-2 shadow-lg shadow-purpl-500/20
+                            
+                            g-gray-700/50 hover:bg-gray-600/50 ext-gray-300 hover:text-white border border-gray-600 px-4 py-2 rounded-lg fotmedium trnsition-colors flex items-enter gap-2
+                            
+                                    clas="flex fx-wrp ap-3 mt6 p-6 brder-tbodr-gray-700            bg-red-600 hover:g-red-700 text-whie px-4 py-2 rounded-lg fotmeium transition-colors flex itms-cner gap-2 shadow-lg shadow-rd-500/20
+                            
+                                        bg-pink-600 hover:g-pink-700 text-whie px-4 py-2 rounded-lg fotmedium transiion-colrs flex items-center ap-2 shadow-g shadow-pink-500/20
+                            
+                            >
+                </div

@@ -1,39 +1,122 @@
+# config/packages/security.yaml
+
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
-    password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
-    providers:
-        users_in_memory: { memory: null }
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-        main:
-            lazy: true
-            provider: users_in_memory
+  # Password hashing
+  password_hashers:
+    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
+  # User providers
+  providers:
+    app_user_provider:
+      entity:
+        class: App\Entity\User
+        property: email
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+  # Firewalls
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+    api_platform:
+      pattern: ^/api
+      stateless: true
+      provider: app_user_provider
+      jwt: ~
 
+    main:
+      lazy: true
+      provider: app_user_provider
+
+      # 1. We changed this to a list so it supports BOTH login methods
+      custom_authenticator:
+        - App\Security\LoginAuthenticator
+        - App\Security\GoogleAuthenticator
+
+      # 2. We add an entry_point so Symfony knows to redirect unauthenticated
+      # users to your standard login page (LoginAuthenticator) by default
+      entry_point: App\Security\LoginAuthenticator
+
+      user_checker: App\Security\UserChecker
+      logout:
+        path: app_logout 
+      remember_me:
+        secret: "%kernel.secret%"
+        lifetime: 604800
+        path: /
+
+  # Access control
+  access_control:
+    # 3. ADDED THIS: We must allow unauthenticated users to hit the Google connect routes!
+    - { path: ^/connect/google, roles: PUBLIC_ACCESS }
+
+    - { path: ^/login$, roles: PUBLIC_ACCESS }
+    - { path: ^/logout$, roles: PUBLIC_ACCESS }
+    - { path: ^/register$, roles: PUBLIC_ACCESS }
+    - { path: ^/verify-email/, roles: PUBLIC_ACCESS }
+    - { path: ^/resend-verification-email$, roles: PUBLIC_ACCESS }
+    
+    # API authentication endpoints
+    - { path: ^/api/login$, roles: PUBLIC_ACCESS }
+    - { path: ^/api/register$, roles: PUBLIC_ACCESS }
+    - { path: ^/api/google$, roles: PUBLIC_ACCESS }
+
+    # Dashboard - Admin & Staff
+    - { path: ^/dashboard, roles: [ROLE_ADMIN, ROLE_STAFF] }
+
+    # Admin-only areas (staff cannot access)
+    - { path: ^/log, roles: ROLE_ADMIN }
+    - { path: ^/user, roles: ROLE_ADMIN }
+    - { path: ^/admin, roles: ROLE_ADMIN }
+
+    # Stock adjustments - Admin & Staff
+    - { path: ^/stock, roles: [ROLE_ADMIN, ROLE_STAFF] }
+
+    # Products, Categories & Orders - Admin & Staff
+    - { path: ^/product, roles: [ROLE_ADMIN, ROLE_STAFF] }
+    - { path: ^/category, roles: [ROLE_ADMIN, ROLE_STAFF] }
+    - { path: ^/order, roles: [ROLE_ADMIN, ROLE_STAFF] }
+
+    # Profile - All authenticated users
+    - { path: ^/profile, roles: ROLE_USER }
+
+    # Customer landing page should be public
+    - { path: ^/customer-landing$, roles: PUBLIC_ACCESS }
+
+    # Public customer marketing pages
+    - { path: ^/customer-about$, roles: PUBLIC_ACCESS }
+    - { path: ^/customer-products$, roles: PUBLIC_ACCESS }
+    - { path: ^/customer-pc-builder, roles: PUBLIC_ACCESS }
+    - { path: ^/customer-services$, roles: PUBLIC_ACCESS }
+    - { path: ^/customer-contact, roles: PUBLIC_ACCESS }
+
+    # API documentation and public endpoints
+    - { path: ^/api/?$, roles: PUBLIC_ACCESS }
+    - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+    - { path: ^/api/contexts, roles: PUBLIC_ACCESS }
+    - { path: ^/api/products, roles: PUBLIC_ACCESS }
+    - { path: ^/api/categories, roles: PUBLIC_ACCESS }
+    - { path: ^/api/customer/contact$, roles: PUBLIC_ACCESS }
+    - { path: ^/api/customer/pc-builder/catalog$, roles: PUBLIC_ACCESS }
+    - { path: ^/customer-pc-builder/check$, roles: PUBLIC_ACCESS }
+
+    # Mobile admin API (JWT)
+    - { path: ^/api/admin/users, roles: ROLE_ADMIN }
+    - { path: ^/api/admin/logs, roles: ROLE_ADMIN }
+    - { path: ^/api/admin, roles: [ROLE_ADMIN, ROLE_STAFF] }
+
+    # All other API routes require authentication
+    - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
+    # Any other pages require login
+    - { path: ^/, roles: ROLE_USER }
+
+# Test environment overrides
 when@test:
-    security:
-        password_hashers:
-            # By default, password hashers are resource intensive and take time. This is
-            # important to generate secure password hashes. In tests however, secure hashes
-            # are not important, waste resources and increase test times. The following
-            # reduces the work factor to the lowest possible values.
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+  security:
+    password_hashers:
+      Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+        algorithm: auto
+        cost: 4 # for bcrypt
+        time_cost: 3 # for argon2i/argon2id
+        memory_cost: 10

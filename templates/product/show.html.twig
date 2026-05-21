@@ -4,77 +4,179 @@
 
 {% block stylesheets %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    :root {
+        --glass-border: rgba(255,255,255,0.08);
+    }
 
-{# Your external CSS file #}
-<link rel="stylesheet" href="{{ asset('css/admin_product_show.css') }}">
+    .dashboard main {
+        margin-left: 16rem;
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: #0B1120;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .panel {
+        background: linear-gradient(180deg, rgba(17,24,39,0.72), rgba(11,17,32,0.75));
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
-    
-    <!-- Sidebar -->
     {% include 'partials/_sidebar.html.twig' %}
 
-    <!-- Main Content -->
     <main class="main-content">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-700">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Product Details</h1>
+                <nav class="flex items-center gap-2 text-sm text-gray-400">
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-purple-500 transition-colors">Dashboard</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <a href="{{ path('app_product_index') }}" class="hover:text-purple-500 transition-colors">Products</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <span class="text-purple-500 font-semibold">{{ product.name }}</span>
+                </nav>
+            </div>
 
-        <div class="top-header">
-            <h1>Product Details</h1>
-
-            <div class="user-info">
-                <div class="profile">
-                    <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="User">
-                    <span>John Ralf</span>
-                </div>
+            <div class="mt-4 md:mt-0">
+                {% include 'partials/_user_dropdown.html.twig' %}
             </div>
         </div>
 
-        <div class="product-container">
-            <div class="product-card">
+        <div class="space-y-4">
+            {# Flash Messages #}
+            {% for message in app.flashes('success') %}
+                <div class="bg-green-500/20 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg flex items-center justify-between gap-3 shadow-lg shadow-green-500/10">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-green-400 cursor-pointer text-xl opacity-80 hover:opacity-100">&times;</button>
+                </div>
+            {% endfor %}
 
-                <!-- Product Image -->
-                <div class="product-image">
-                    {% if product.image %}
-                        <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="{{ product.name }}">
-                    {% else %}
-                        <i class="fas fa-image" style="font-size: 3rem; color: #17a2b8;"></i>
-                    {% endif %}
+            {% for message in app.flashes('error') %}
+                <div class="bg-red-500/20 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg flex items-center justify-between gap-3 shadow-lg shadow-red-500/10">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-red-400 cursor-pointer text-xl opacity-80 hover:opacity-100">&times;</button>
+                </div>
+            {% endfor %}
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="panel p-6 border-l-4 border-l-purple-500">
+                    <h2 class="text-xl font-semibold text-white flex items-center gap-3 mb-6">
+                        <i class="fas fa-box text-purple-500"></i> Product Information
+                    </h2>
+
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start border-b border-gray-700 pb-4">
+                            <span class="text-gray-400 text-sm uppercase tracking-wider">Reference ID</span>
+                            <span class="text-pink-500 font-mono bg-pink-500/10 px-3 py-1 rounded-md text-sm">#{{ product.id }}</span>
+                        </div>
+
+                        <div class="flex justify-between items-start border-b border-gray-700 pb-4">
+                            <span class="text-gray-400 text-sm uppercase tracking-wider">Product Name</span>
+                            <span class="text-white font-semibold">{{ product.name }}</span>
+                        </div>
+
+                        <div class="flex justify-between items-start border-b border-gray-700 pb-4">
+                            <span class="text-gray-400 text-sm uppercase tracking-wider">Category</span>
+                            {% if product.category %}
+                                <span class="text-purple-500 bg-purple-500/10 px-3 py-1 rounded-md text-sm">{{ product.category.name }}</span>
+                            {% else %}
+                                <span class="text-gray-400">No category assigned</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex justify-between items-start border-b border-gray-700 pb-4">
+                            <span class="text-gray-400 text-sm uppercase tracking-wider">Price</span>
+                            <span class="text-green-400 font-semibold text-lg">₱{{ product.price|number_format(2, '.', ',') }}</span>
+                        </div>
+
+                        <div class="flex justify-between items-start border-b border-gray-700 pb-4">
+                            <span class="text-gray-400 text-sm uppercase tracking-wider">Quantity</span>
+                            <span class="bg-green-500/10 text-green-400 px-3 py-1 rounded-md font-semibold">{{ product.quantity }} units</span>
+                        </div>
+
+                        <div class="flex justify-between items-start border-b border-gray-700 pb-4">
+                            <span class="text-gray-400 text-sm uppercase tracking-wider">Created Date</span>
+                            <span class="text-gray-300">{{ product.createdAt|date('F d, Y \\a\\t g:i A') }}</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Product Info Section -->
-                <div class="product-info">
-
-                    <h2>{{ product.name }}</h2>
-
-                    <p><strong>Category:</strong> {{ product.category }}</p>
-                    <p><strong>Price:</strong> ₱{{ product.price|number_format(2, '.', ',') }}</p>
-                    <p><strong>Quantity:</strong> {{ product.quantity }}</p>
-                    <p><strong>Description:</strong> {{ product.description }}</p>
-                    <p><strong>Created At:</strong> {{ product.createdAt|date('Y-m-d H:i:s') }}</p>
-
-                    <div class="action-buttons">
-
-                        <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="btn btn-edit">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-
-                        <a href="{{ path('app_product_index') }}" class="btn btn-back">
-                            <i class="fas fa-arrow-left"></i> Back
-                        </a>
-
+                <div class="space-y-6">
+                    <div class="panel p-6 border-l-4 border-l-blue-500">
+                        <h2 class="text-xl font-semibold text-white flex items-center gap-3 mb-6">
+                            <i class="fas fa-image text-blue-500"></i> Product Image
+                        </h2>
+                        <div class="text-center">
+                            {% if product.image %}
+                                <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="{{ product.name }}" class="w-full max-w-md mx-auto rounded-lg shadow-lg border border-gray-700">
+                            {% else %}
+                                <div class="w-full max-w-md mx-auto h-64 flex items-center justify-center bg-gray-700/50 rounded-lg border-2 border-dashed border-gray-600">
+                                    <i class="fas fa-image text-5xl text-gray-500 opacity-50"></i>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
 
-                    {{ include('product/_delete_form.html.twig') }}
-
+                    <div class="panel p-6 border-l-4 border-l-green-500">
+                        <h2 class="text-xl font-semibold text-white flex items-center gap-3 mb-4">
+                            <i class="fas fa-align-left text-green-500"></i> Description
+                        </h2>
+                        <p class="text-gray-300 leading-relaxed">
+                            {{ product.description ?: 'No description available for this product.' }}
+                        </p>
+                    </div>
                 </div>
             </div>
+
+            <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-700">
+                <a href="{{ path('app_product_index') }}" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+                
+                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                    <a href="{{ path('app_product_edit', {'id': product.id}) }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                        <i class="fas fa-edit"></i> Edit Product
+                    </a>
+
+                    {{ include('product/_delete_form.html.twig') }}
+                {% endif %}
+            </div>
         </div>
-
-        <footer>
-            &copy; {{ "now"|date("Y") }} GearGrid Admin Panel. All Rights Reserved.
-        </footer>
-
     </main>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(function(message) {
+            message.style.transition = 'opacity 0.5s';
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 500);
+        });
+    }, 5000);
+});
+</script>
 {% endblock %}

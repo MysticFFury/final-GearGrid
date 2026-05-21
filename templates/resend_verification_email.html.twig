@@ -1,0 +1,194 @@
+{# templates/resend_verification_email.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Resend Verification Email | GearGrid{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #0B1120;
+        font-family: 'Inter', sans-serif;
+        color: #fff;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+ 
+    .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+    }
+
+    .card {
+        background: rgba(30, 30, 47, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 3rem;
+        max-width: 420px;
+        width: 100%;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .card h1 {
+        font-family: 'Oswald', sans-serif;
+        font-size: 1.8rem;
+        margin: 0 0 0.5rem 0;
+        color: #fff;
+    }
+
+    .card p {
+        color: #94a3b8;
+        margin: 0 0 2rem 0;
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        color: #cbd5e1;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        color: #fff;
+        font-size: 1rem;
+        font-family: 'Inter', sans-serif;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #6C63FF;
+        background: rgba(255, 255, 255, 0.06);
+        box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.15);
+    }
+
+    .btn {
+        width: 100%;
+        padding: 1.1rem;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #6C63FF, #ff6584);
+        color: #fff;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 10px 25px rgba(108, 99, 255, 0.3);
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 35px rgba(108, 99, 255, 0.4);
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .alert-success {
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        color: #86efac;
+    }
+
+    .alert-error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+    }
+
+    .alert-info {
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        color: #93c5fd;
+    }
+
+    .footer-link {
+        text-align: center;
+        margin-top: 2rem;
+        color: #94a3b8;
+        font-size: 0.95rem;
+    }
+
+    .footer-link a {
+        color: #6C63FF;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+
+    .footer-link a:hover {
+        color: #8b7fff;
+    }
+</style>
+
+<div class="container">
+    <div class="card">
+        <h1>Resend Verification</h1>
+        <p>Enter your email address and we'll send you a new verification link.</p>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('info') %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="your@email.com" required autofocus>
+            </div>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('resend_verification') }}">
+
+            <button type="submit" class="btn">
+                <i class="fas fa-envelope"></i> Send Verification Email
+            </button>
+        </form>
+
+        <div class="footer-link">
+            Remember your password? <a href="{{ path('app_login') }}">Sign In</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

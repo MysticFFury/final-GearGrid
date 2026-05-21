@@ -1,0 +1,304 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Stock | GearGrid Admin{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    :root {
+        --primary: #6C63FF;
+        --primary-glow: rgba(108, 99, 255, 0.45);
+        --accent: #ff6584;
+        --glass: rgba(17, 24, 39, 0.55);
+        --glass-border: rgba(255, 255, 255, 0.1);
+    }
+    .stock-add-page main.main-content {
+        margin-left: 16rem;
+        padding: 2rem 3rem 3rem;
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+        position: relative;
+        overflow: hidden;
+        background: #0B1120;
+    }
+    .stock-add-page .bg-ambient {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+    }
+    .stock-add-page .orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0.55;
+        animation: stockOrb 18s ease-in-out infinite;
+    }
+    .stock-add-page .orb-1 {
+        width: 420px; height: 420px;
+        background: radial-gradient(circle, var(--primary-glow), transparent 70%);
+        top: -8%; right: -5%;
+    }
+    .stock-add-page .orb-2 {
+        width: 380px; height: 380px;
+        background: radial-gradient(circle, rgba(255, 101, 132, 0.35), transparent 70%);
+        bottom: 5%; left: -8%;
+        animation-delay: -7s;
+    }
+    .stock-add-page .orb-3 {
+        width: 280px; height: 280px;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.25), transparent 70%);
+        top: 40%; left: 35%;
+        animation-delay: -12s;
+    }
+    @keyframes stockOrb {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(24px, -20px) scale(1.05); }
+        66% { transform: translate(-16px, 12px) scale(0.98); }
+    }
+    .stock-add-page .content-z { position: relative; z-index: 1; }
+    .stock-add-page .title-hero {
+        font-family: 'Oswald', sans-serif;
+        letter-spacing: 0.02em;
+        line-height: 1.1;
+    }
+    .stock-add-page .glass-card {
+        background: linear-gradient(145deg, rgba(17, 24, 39, 0.82), rgba(11, 17, 32, 0.88));
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        box-shadow:
+            0 4px 24px rgba(0, 0, 0, 0.35),
+            0 0 0 1px rgba(108, 99, 255, 0.08) inset,
+            0 -1px 0 rgba(255, 255, 255, 0.04) inset;
+    }
+    .stock-add-page .glass-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        border-radius: 20px 20px 0 0;
+        background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+        opacity: 0.95;
+    }
+    .stock-add-page .field-icon {
+        width: 40px; height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, rgba(108, 99, 255, 0.25), rgba(255, 101, 132, 0.12));
+        border: 1px solid rgba(108, 99, 255, 0.25);
+        color: #c4b5fd;
+    }
+    .stock-add-page .qty-chips button {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .stock-add-page .qty-chips button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(108, 99, 255, 0.35);
+    }
+    .stock-add-page .qty-chips button:active {
+        transform: translateY(0);
+    }
+    .stock-add-page .btn-submit {
+        background: linear-gradient(135deg, #6C63FF 0%, #8b5cf6 45%, #ff6584 100%);
+        background-size: 200% 200%;
+        animation: btnShine 6s ease infinite;
+        box-shadow: 0 8px 28px rgba(108, 99, 255, 0.4), 0 0 0 1px rgba(255,255,255,0.08) inset;
+    }
+    .stock-add-page .btn-submit:hover {
+        filter: brightness(1.08);
+        box-shadow: 0 12px 36px rgba(108, 99, 255, 0.5), 0 0 0 1px rgba(255,255,255,0.12) inset;
+    }
+    @keyframes btnShine {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    .stock-add-page .fade-up {
+        animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+    }
+    .stock-add-page .fade-up.d1 { animation-delay: 0.08s; }
+    .stock-add-page .fade-up.d2 { animation-delay: 0.16s; }
+    .stock-add-page .fade-up.d3 { animation-delay: 0.24s; }
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .stock-add-page select option { background: #1f2937; color: #fff; }
+    @media (max-width: 768px) {
+        .stock-add-page main.main-content { margin-left: 0; padding: 1.25rem; }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard stock-add-page">
+    {% include 'partials/_sidebar.html.twig' %}
+
+    <main class="main-content">
+        <div class="bg-ambient">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+
+        <div class="content-z max-w-6xl mx-auto">
+            <header class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10 pb-6 border-b border-white/5 fade-up">
+                <div>
+                    <p class="text-purple-400 text-xs font-semibold uppercase tracking-[0.2em] mb-2">Inventory</p>
+                    <h1 class="title-hero text-4xl md:text-5xl font-semibold text-white">
+                        <span class="bg-gradient-to-r from-white via-purple-200 to-pink-300 bg-clip-text text-transparent">Add stock</span>
+                    </h1>
+                    <nav class="flex items-center gap-2 text-sm text-gray-500 mt-3">
+                        <a href="{{ path('app_dashboard') }}" class="hover:text-purple-400 transition-colors">Dashboard</a>
+                        <i class="fas fa-chevron-right text-[10px] opacity-40"></i>
+                        <a href="{{ path('app_stock_index') }}" class="hover:text-purple-400 transition-colors">Stock</a>
+                        <i class="fas fa-chevron-right text-[10px] opacity-40"></i>
+                        <span class="text-purple-400/90 font-medium">New entry</span>
+                    </nav>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="{{ path('app_stock_index') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-700/80 bg-gray-900/40 text-gray-300 text-sm font-medium hover:bg-gray-800/60 hover:border-gray-600 transition-all">
+                        <i class="fas fa-list-ul text-purple-400"></i> View activity
+                    </a>
+                    {% include 'partials/_user_dropdown.html.twig' %}
+                </div>
+            </header>
+
+            {% for message in app.flashes('success') %}
+                <div class="fade-up d1 mb-4 rounded-xl bg-emerald-500/15 border border-emerald-500/25 text-emerald-300 px-4 py-3 flex items-center justify-between gap-3 shadow-lg shadow-emerald-500/5">
+                    <span class="flex items-center gap-2 text-sm font-medium"><i class="fas fa-check-circle"></i> {{ message }}</span>
+                    <button type="button" onclick="this.parentElement.remove()" class="text-emerald-400/80 hover:text-emerald-300 text-lg leading-none">&times;</button>
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="fade-up d1 mb-4 rounded-xl bg-red-500/15 border border-red-500/25 text-red-300 px-4 py-3 flex items-center justify-between gap-3">
+                    <span class="flex items-center gap-2 text-sm font-medium"><i class="fas fa-exclamation-circle"></i> {{ message }}</span>
+                    <button type="button" onclick="this.parentElement.remove()" class="text-red-400/80 hover:text-red-300 text-lg leading-none">&times;</button>
+                </div>
+            {% endfor %}
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <aside class="lg:col-span-5 space-y-6 fade-up d1">
+                    <div class="rounded-2xl border border-white/5 bg-gray-900/30 p-6">
+                        <div class="flex items-start gap-4">
+                            <div class="field-icon text-lg"><i class="fas fa-bolt"></i></div>
+                            <div>
+                                <h2 class="text-white font-semibold text-lg mb-1">Fast restock</h2>
+                                <p class="text-gray-400 text-sm leading-relaxed">Pick a product, enter how many units arrived, and save. Shelves and the product list update instantly.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rounded-2xl border border-white/5 bg-gray-900/30 p-6">
+                        <div class="flex items-start gap-4">
+                            <div class="field-icon text-lg"><i class="fas fa-clipboard-check"></i></div>
+                            <div>
+                                <h2 class="text-white font-semibold text-lg mb-1">Tracked and logged</h2>
+                                <p class="text-gray-400 text-sm leading-relaxed">Every add appears in <strong class="text-gray-300">Stock activity</strong> and your <strong class="text-gray-300">Activity logs</strong> as <code class="text-purple-300 text-xs bg-purple-500/10 px-1.5 py-0.5 rounded">STOCK_ADD</code>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rounded-2xl border border-dashed border-purple-500/20 bg-purple-500/5 p-5">
+                        <p class="text-gray-500 text-xs uppercase tracking-wider font-semibold mb-2">Tip</p>
+                        <p class="text-gray-400 text-sm">Use the quick chips below the quantity field for common bundle sizes.</p>
+                    </div>
+                </aside>
+
+                <div class="lg:col-span-7 relative glass-card p-8 md:p-10 fade-up d2">
+                    <div class="flex items-center gap-3 mb-8">
+                        <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500/30 to-pink-500/20 border border-purple-500/25 text-purple-200 text-xl shadow-lg shadow-purple-500/10">
+                            <i class="fas fa-boxes-stacked"></i>
+                        </span>
+                        <div>
+                            <h2 class="text-xl font-semibold text-white tracking-tight">New stock entry</h2>
+                            <p class="text-gray-500 text-sm">Updates on-hand quantity for the selected SKU.</p>
+                        </div>
+                    </div>
+
+                    {{ form_start(form, { attr: { class: 'space-y-8', id: 'stock-add-form' } }) }}
+
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2">
+                            {{ form_label(form.product, null, { label_attr: { class: 'text-gray-400 text-xs uppercase tracking-wider font-semibold' } }) }}
+                        </div>
+                        <div class="flex gap-4 items-start">
+                            <div class="field-icon mt-1 hidden sm:flex"><i class="fas fa-tag"></i></div>
+                            <div class="flex-1 min-w-0">
+                                {{ form_widget(form.product, { attr: {
+                                    class: 'w-full px-4 py-3.5 rounded-xl border border-gray-700/80 bg-gray-900/50 text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25 transition-shadow text-[15px]',
+                                    style: 'appearance: auto;'
+                                }}) }}
+                                {{ form_errors(form.product) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2">
+                            {{ form_label(form.amount, null, { label_attr: { class: 'text-gray-400 text-xs uppercase tracking-wider font-semibold' } }) }}
+                        </div>
+                        <div class="flex gap-4 items-start">
+                            <div class="field-icon mt-1 hidden sm:flex"><i class="fas fa-layer-group"></i></div>
+                            <div class="flex-1 min-w-0 space-y-3">
+                                {{ form_widget(form.amount, { attr: {
+                                    class: 'stock-qty-input w-full px-4 py-3.5 rounded-xl border border-gray-700/80 bg-gray-900/50 text-white text-2xl font-semibold tracking-tight tabular-nums placeholder-gray-600 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/25 transition-shadow',
+                                    min: '1',
+                                    placeholder: '0',
+                                    inputmode: 'numeric',
+                                    autocomplete: 'off'
+                                }}) }}
+                                {{ form_errors(form.amount) }}
+                                <div class="qty-chips flex flex-wrap gap-2">
+                                    <span class="text-gray-600 text-xs w-full sm:w-auto sm:mr-1 py-1">Quick add:</span>
+                                    <button type="button" data-qty="5" class="qty-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800/80 text-purple-300 border border-purple-500/20 hover:border-purple-500/50">+5</button>
+                                    <button type="button" data-qty="10" class="qty-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800/80 text-purple-300 border border-purple-500/20 hover:border-purple-500/50">+10</button>
+                                    <button type="button" data-qty="25" class="qty-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800/80 text-purple-300 border border-purple-500/20 hover:border-purple-500/50">+25</button>
+                                    <button type="button" data-qty="50" class="qty-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800/80 text-pink-300/90 border border-pink-500/20 hover:border-pink-500/50">+50</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 pt-4 border-t border-white/5">
+                        <button type="submit" class="btn-submit order-1 sm:order-none flex-1 sm:flex-none inline-flex items-center justify-center gap-2 text-white font-semibold px-8 py-3.5 rounded-xl transition-all">
+                            <i class="fas fa-circle-plus"></i>
+                            Add to inventory
+                        </button>
+                        <a href="{{ path('app_stock_index') }}" class="order-2 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-gray-600/60 text-gray-400 hover:text-white hover:bg-gray-800/50 text-sm font-medium transition-colors">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+(function () {
+    var input = document.querySelector('.stock-qty-input');
+    if (!input) return;
+    document.querySelectorAll('.qty-chip').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var add = parseInt(btn.getAttribute('data-qty'), 10) || 0;
+            var cur = parseInt(input.value, 10);
+            if (isNaN(cur) || cur < 0) cur = 0;
+            input.value = Math.max(1, cur + add);
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.focus();
+        });
+    });
+})();
+</script>
+{% endblock %}

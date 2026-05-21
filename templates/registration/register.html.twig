@@ -1,0 +1,205 @@
+{# templates/registration/register.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Register | GearGrid{% endblock %}
+
+{% block stylesheets %}
+    {% if is_granted('ROLE_ADMIN') %}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+        <style>
+            :root { --primary: #6C63FF; --secondary: #ff6584; --danger: #dc3545; --bg-dark: #12121e; --card-bg: #1e1e2f; --text-muted: #88889b; --glass-border: rgba(255, 255, 255, 0.08); }
+            .dashboard main { padding: 2rem 3rem; min-height: 100vh; background: var(--bg-dark); font-family: 'Inter', sans-serif; }
+            .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); }
+            .header-left h1 { font-family: 'Oswald', sans-serif; color: #fff; font-size: 2rem; letter-spacing: 1px; margin: 0; }
+            .card { background: var(--card-bg); padding: 3rem; border-radius: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); max-width: 900px; margin: 0 auto; border: 1px solid var(--glass-border); position: relative; }
+            .gg-form { width: 100%; }
+            .gg-form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin-bottom: 2.5rem; }
+            .gg-form-grid .gg-full { grid-column: 1 / -1; }
+            .form-group { display: flex; flex-direction: column; gap: 0.75rem; }
+            .gg-form label { color: var(--text-muted); font-weight: 500; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1.5px; }
+            .gg-form input, .gg-form select { width: 100%; padding: 1rem 1.2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05); color: #fff; font-size: 1rem; font-family: 'Inter', sans-serif; }
+            .gg-form input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 20px rgba(108, 99, 255, 0.2); }
+            .checkbox-group { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem; }
+            .btn-save { background: var(--primary); color: #fff; padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; border: none; cursor: pointer; }
+            .form-error { color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem; }
+        </style>
+    {% else %}
+        <style>
+            /* --- Split-Screen Auth Layout --- */
+            body { margin: 0; padding: 0; background-color: #0B1120; font-family: 'Inter', sans-serif; color: #fff; min-height: 100vh; overflow-x: hidden; }
+            .auth-container { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+            
+            /* Left Side Image */
+            .auth-cover { position: relative; background-image: url('https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=1200&q=80'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: space-between; padding: 3rem; }
+            .auth-cover-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(11, 17, 32, 0.3), rgba(11, 17, 32, 0.9)); }
+            .auth-cover-content { position: relative; z-index: 1; }
+            .auth-brand { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; font-family: 'Oswald', sans-serif; font-size: 1.8rem; font-weight: 700; letter-spacing: 1px; }
+            .auth-brand .mark { width: 45px; height: 45px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), rgba(255, 101, 132, 0.8)); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+            .auth-quote { position: relative; z-index: 1; max-width: 500px; }
+            .auth-quote h2 { font-family: 'Oswald', sans-serif; font-size: 3rem; line-height: 1.2; margin-bottom: 1rem; }
+            .auth-quote p { color: #94a3b8; font-size: 1.1rem; line-height: 1.6; }
+
+            /* Right Side Form */
+            .auth-form-wrapper { display: flex; align-items: center; justify-content: center; padding: 2rem; position: relative; }
+            .bg-orb { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; animation: float 10s infinite ease-in-out alternate; }
+            .orb-1 { width: 300px; height: 300px; background: rgba(108, 99, 255, 0.15); top: 10%; right: 10%; }
+            .orb-2 { width: 400px; height: 400px; background: rgba(255, 101, 132, 0.1); bottom: 10%; left: 10%; animation-delay: -5s; }
+            @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(20px, -30px) scale(1.05); } }
+
+            .auth-card { position: relative; z-index: 1; width: 100%; max-width: 420px; }
+            .auth-header { margin-bottom: 2.5rem; }
+            .auth-title { font-family: 'Oswald', sans-serif; font-size: 2.2rem; font-weight: 600; margin: 0 0 0.5rem 0; }
+            .auth-subtitle { color: #94a3b8; font-size: 1rem; margin: 0; }
+
+            .input-group { position: relative; margin-bottom: 1.5rem; }
+            .input-group label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.5rem; font-weight: 500; }
+            .auth-input { width: 100%; padding: 1.1rem 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: #fff; font-size: 1rem; font-family: 'Inter', sans-serif; transition: all 0.3s ease; box-sizing: border-box; }
+            .auth-input:focus { outline: none; border-color: #6C63FF; background: rgba(255, 255, 255, 0.06); box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.15); }
+            
+            .auth-checkbox { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: #cbd5e1; margin-bottom: 2rem; cursor: pointer; }
+            .auth-checkbox input { accent-color: #6C63FF; width: 16px; height: 16px; cursor: pointer; }
+            
+            .auth-btn { width: 100%; padding: 1.1rem; border: none; border-radius: 12px; background: linear-gradient(135deg, #6C63FF, #ff6584); color: #fff; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.05rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 10px 25px rgba(108, 99, 255, 0.3); }
+            .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(108, 99, 255, 0.4); }
+            .auth-footer { text-align: center; margin-top: 2rem; font-size: 0.95rem; color: #94a3b8; }
+            .auth-footer a { color: #fff; font-weight: 600; text-decoration: none; transition: color 0.2s; }
+            .auth-footer a:hover { color: #6C63FF; }
+            .form-error { color: #fca5a5; font-size: 0.85rem; margin-top: 0.5rem; display: block; }
+
+            @media (max-width: 992px) { .auth-container { grid-template-columns: 1fr; } .auth-cover { display: none; } .auth-form-wrapper { padding: 2rem 1.5rem; } }
+        </style>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    
+    {# --------------------------------------------------------- #}
+    {# ADMIN VIEW: Keep the dashboard layout for creating users  #}
+    {# --------------------------------------------------------- #}
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="dashboard">
+            {% include 'partials/_sidebar.html.twig' %}
+            <main class="main-content">
+                <div class="top-header">
+                    <div class="header-left">
+                        <h1>Register New User</h1>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2><i class="fas fa-user-plus"></i> Create New User</h2>
+                    {{ form_start(registrationForm, { 'attr': { 'class': 'gg-form' } }) }}
+                    <div class="gg-form-grid">
+                        <div class="form-group">
+                            {{ form_label(registrationForm.name) }}
+                            {{ form_widget(registrationForm.name, {'attr': {'placeholder': 'Enter full name'}}) }}
+                            {{ form_errors(registrationForm.name) }}
+                        </div>
+                        <div class="form-group">
+                            {{ form_label(registrationForm.email) }}
+                            {{ form_widget(registrationForm.email, {'attr': {'placeholder': 'Enter email address'}}) }}
+                            {{ form_errors(registrationForm.email) }}
+                        </div>
+                        <div class="form-group gg-full">
+                            {{ form_label(registrationForm.roles) }}
+                            <div class="checkbox-group">
+                                {{ form_widget(registrationForm.roles) }}
+                            </div>
+                        </div>
+                        <div class="form-group gg-full">
+                            {{ form_label(registrationForm.plainPassword) }}
+                            {{ form_widget(registrationForm.plainPassword, {'attr': {'placeholder': 'Enter password'}}) }}
+                            {{ form_errors(registrationForm.plainPassword) }}
+                        </div>
+                        <div class="form-group gg-full" style="display: none;">
+                            {{ form_widget(registrationForm.agreeTerms) }}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-save"><i class="fas fa-save"></i> Register User</button>
+                    {{ form_end(registrationForm) }}
+                </div>
+            </main>
+        </div>
+
+    {# --------------------------------------------------------- #}
+    {# PUBLIC VIEW: Display the cool Split-Screen Auth layout    #}
+    {# --------------------------------------------------------- #}
+    {% else %}
+        <div class="auth-container">
+            <div class="auth-cover">
+                <div class="auth-cover-overlay"></div>
+                <div class="auth-cover-content">
+                    <a href="{{ path('app_customer_landing') }}" class="auth-brand">
+                        <span class="mark"><i class="fas fa-gears"></i></span>
+                        GearGrid
+                    </a>
+                </div>
+                <div class="auth-quote">
+                    <h2>Start Building.</h2>
+                    <p>Create an account to track orders, save your favorite parts, and manage your custom hardware setups.</p>
+                </div>
+            </div>
+
+            <div class="auth-form-wrapper">
+                <div class="bg-orb orb-1"></div>
+                <div class="bg-orb orb-2"></div>
+
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h1 class="auth-title">Join GearGrid</h1>
+                        <p class="auth-subtitle">Create your account in seconds.</p>
+                    </div>
+
+                    {{ form_start(registrationForm) }}
+                        
+                        <div class="input-group">
+                            <label>Full Name</label>
+                            {{ form_widget(registrationForm.name, {'attr': {'class': 'auth-input', 'placeholder': 'Name', 'autofocus': true}}) }}
+                            {{ form_errors(registrationForm.name) }}
+                        </div>
+
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            {{ form_widget(registrationForm.email, {'attr': {'class': 'auth-input', 'placeholder': 'name@example.com'}}) }}
+                            {{ form_errors(registrationForm.email) }}
+                        </div>
+
+                        <div class="input-group">
+                            <label>Password</label>
+                            {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'auth-input', 'placeholder': 'Minimum 6 characters'}}) }}
+                            {{ form_errors(registrationForm.plainPassword) }}
+                        </div>
+
+                        {# Hide roles for public users #}
+                        <div style="display: none;">
+                            {{ form_widget(registrationForm.roles) }}
+                        </div>
+
+                        <label class="auth-checkbox">
+                            {{ form_widget(registrationForm.agreeTerms) }}
+                            <span>I agree to the Terms of Service</span>
+                        </label>
+                        {{ form_errors(registrationForm.agreeTerms) }}
+
+                        <button class="auth-btn" type="submit">Create Account <i class="fas fa-arrow-right" style="margin-left: 5px;"></i></button>
+                    {{ form_end(registrationForm) }}
+
+                    <!-- OAuth2 Sign-In Options -->
+                    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                        <p style="text-align: center; color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem;">Or sign up with</p>
+                        <a href="{{ path('connect_google') }}" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 1.1rem; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #fff; text-decoration: none; transition: all 0.3s ease; font-weight: 600; background: rgba(255, 255, 255, 0.02);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21.3055 10.0415H20.5039V10H12V14H18.4927C17.9921 15.9297 16.3633 17.3438 14.3438 17.3438C11.9258 17.3438 9.96484 15.3828 9.96484 13C9.96484 10.6172 11.9258 8.65625 14.3438 8.65625C15.4766 8.65625 16.5117 9.02344 17.3242 9.62891L20.2266 6.72656C18.3945 5.09375 15.9766 4.3125 13.5 4.3125C8.33008 4.3125 4.16016 8.48242 4.16016 13.6523C4.16016 18.8223 8.33008 22.9922 13.5 22.9922C18.6699 22.9922 22.8398 18.8223 22.8398 13.6523C22.8398 13.0039 22.7773 12.3691 22.6621 11.7578H21.3055V10.0415Z" fill="white"/>
+                            </svg>
+                            Google
+                        </a>
+                    </div>
+
+                    <div class="auth-footer">
+                        Already have an account? <a href="{{ path('app_login') }}">Sign In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

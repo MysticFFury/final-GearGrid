@@ -3,62 +3,171 @@
 {% block title %}Edit Product | GearGrid Admin{% endblock %}
 
 {% block stylesheets %}
-<!-- Font Awesome for Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    :root {
+        --glass-border: rgba(255,255,255,0.08);
+    }
 
-<!-- Google Fonts for Oswald -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    .dashboard main {
+        margin-left: 16rem;
+        padding: 2rem 3rem;
+        min-height: 100vh;
+        background: #0B1120;
+        font-family: 'Inter', sans-serif;
+    }
 
-<!-- Page CSS -->
-<link rel="stylesheet" href="{{ asset('css/admin_product_edit.css') }}">
+    .panel {
+        background: linear-gradient(180deg, rgba(17,24,39,0.72), rgba(11,17,32,0.75));
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+    }
+    
+    select option {
+        background: #1f2937;
+        color: #fff;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard main {
+            margin-left: 0;
+            padding: 1rem;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block body %}
 <div class="dashboard">
-
-    <!-- Sidebar -->
     {% include 'partials/_sidebar.html.twig' %}
 
-    <!-- Main Content -->
     <main class="main-content">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-700">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Edit Product</h1>
+                <nav class="flex items-center gap-2 text-sm text-gray-400">
+                    <a href="{{ path('app_dashboard') }}" class="hover:text-purple-500 transition-colors">Dashboard</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <a href="{{ path('app_product_index') }}" class="hover:text-purple-500 transition-colors">Products</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="hover:text-purple-500 transition-colors">{{ product.name }}</a>
+                    <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    <span class="text-purple-500 font-semibold">Edit</span>
+                </nav>
+            </div>
 
-        <!-- Top Header -->
-        <div class="top-header">
-            <h1>Edit Product</h1>
+            <div class="mt-4 md:mt-0">
+                {% include 'partials/_user_dropdown.html.twig' %}
+            </div>
+        </div>
 
-            <div class="user-info">
-                <div class="profile">
-                    <img src="https://ui-avatars.com/api/?name=John+Ralf&background=17a2b8&color=fff" alt="User">
-                    <span>John Ralf</span>
+        <div class="space-y-4">
+            {# Flash Messages #}
+            {% for message in app.flashes('success') %}
+                <div class="bg-green-500/20 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg flex items-center justify-between gap-3 shadow-lg shadow-green-500/10">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-green-400 cursor-pointer text-xl opacity-80 hover:opacity-100">&times;</button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="bg-red-500/20 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg flex items-center justify-between gap-3 shadow-lg shadow-red-500/10">
+                    <span class="flex items-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i> {{ message }}
+                    </span>
+                    <button onclick="this.parentElement.remove()" class="bg-transparent border-none text-red-400 cursor-pointer text-xl opacity-80 hover:opacity-100">&times;</button>
+                </div>
+            {% endfor %}
+
+            <div class="panel p-6 border-l-4 border-l-purple-500">
+                <h2 class="text-xl font-semibold text-white flex items-center gap-3 mb-6">
+                    <i class="fas fa-edit text-purple-500"></i> Edit Product
+                </h2>
+
+                {{ form_start(form, { 'attr': { 'class': 'space-y-6' } }) }}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        {{ form_label(form.name, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                        {{ form_widget(form.name, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500', 'placeholder': 'Enter product name'}}) }}
+                        {{ form_errors(form.name) }}
+                    </div>
+
+                    <div class="space-y-2">
+                        {{ form_label(form.category, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                        {{ form_widget(form.category, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
+                        {{ form_errors(form.category) }}
+                    </div>
+
+                    <div class="space-y-2">
+                        {{ form_label(form.price, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                        {{ form_widget(form.price, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500', 'placeholder': '0.00', 'step': '0.01'}}) }}
+                        {{ form_errors(form.price) }}
+                    </div>
+
+                    <div class="space-y-2">
+                        <p class="text-gray-400 text-sm uppercase tracking-wider font-medium">Stock quantity</p>
+                        <p class="w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/30 text-green-400 font-semibold">{{ product.quantity ?? 0 }}</p>
+                        <p class="text-gray-500 text-xs">Quantity is updated from the <a href="{{ path('app_stock_index') }}" class="text-purple-400 hover:underline">Stock</a> page (and reduced when customers purchase).</p>
+                    </div>
+
+                    <div class="space-y-2 md:col-span-2">
+                        {{ form_label(form.description, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 min-h-[120px]', 'placeholder': 'Enter product description (optional)'}}) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+
+                    <div class="space-y-2 md:col-span-2">
+                        {{ form_label(form.imageFile, null, {'label_attr': {'class': 'text-gray-400 text-sm uppercase tracking-wider font-medium'}}) }}
+                        {{ form_widget(form.imageFile, {'attr': {'class': 'w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/50 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500'}}) }}
+                        {{ form_errors(form.imageFile) }}
+                        {% if product.image %}
+                            <div class="mt-2 flex items-center gap-3 rounded-lg bg-gray-900/60 border border-gray-700 px-3 py-2">
+                                <img src="{{ asset('uploads/products/' ~ product.image) }}" alt="{{ product.name }}" class="w-10 h-10 rounded-lg object-cover border border-gray-700">
+                                <p class="text-gray-400 text-sm">Current image: {{ product.image }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-700">
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-lg shadow-purple-500/20">
+                        <i class="fas fa-save"></i> Update Product
+                    </button>
+                </div>
+
+                {{ form_end(form) }}
+
+                <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-700">
+                    <a href="{{ path('app_product_show', {'id': product.id}) }}" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Back to Details
+                    </a>
+
+                    {{ include('product/_delete_form.html.twig') }}
                 </div>
             </div>
         </div>
-
-        <!-- Content Area -->
-        <div class="content-area">
-
-            <!-- Card with Form -->
-            <div class="form-card">
-                {{ include('product/_form.html.twig', {'button_label': 'Update'}) }}
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <a href="{{ path('app_product_index') }}" class="btn btn-back">
-                    <i class="fas fa-arrow-left"></i> Back to list
-                </a>
-
-                {{ include('product/_delete_form.html.twig') }}
-            </div>
-
-        </div>
     </main>
-
-    <!-- Footer -->
-    <footer>
-        &copy; {{ "now"|date("Y") }} GearGrid Admin Panel. All Rights Reserved.
-    </footer>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(function(message) {
+            message.style.transition = 'opacity 0.5s';
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 500);
+        });
+    }, 5000);
+});
+</script>
 {% endblock %}

@@ -1,0 +1,199 @@
+{# templates/customer/services.html.twig #}
+{% extends 'customer/base_customer.html.twig' %}
+
+{% block title %}Our Services | GearGrid{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .service-card {
+        background: rgba(15, 22, 38, 0.58);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 22px; padding: 2.5rem 1.75rem;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex; flex-direction: column; align-items: center;
+        text-align: center; position: relative; overflow: hidden;
+        box-shadow: 0 10px 36px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .service-card:hover {
+        transform: translateY(-8px); border-color: rgba(108, 99, 255, 0.4);
+        box-shadow: 0 25px 50px rgba(108, 99, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    /* A glowing orb that appears on hover */
+    .service-card::before {
+        content: ''; position: absolute; top: 0%; left: 50%; transform: translate(-50%, -50%);
+        width: 150px; height: 150px; background: var(--primary);
+        filter: blur(60px); opacity: 0; transition: opacity 0.5s ease; z-index: 0;
+    }
+
+    .service-card:hover::before { opacity: 0.25; }
+
+    .service-icon-wrapper {
+        width: 80px; height: 80px; border-radius: 20px;
+        background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border-hover);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.2rem; margin-bottom: 2rem; color: var(--primary);
+        z-index: 1; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .service-card:hover .service-icon-wrapper {
+        background: var(--primary); color: #fff;
+        transform: scale(1.1) translateY(-5px); border-color: var(--primary-hover);
+        box-shadow: 0 15px 30px rgba(108, 99, 255, 0.4);
+    }
+
+    .service-title { font-family: 'Oswald', sans-serif; font-size: 1.8rem; color: #fff; margin-bottom: 1rem; z-index: 1; }
+    .service-desc { color: var(--text-muted); line-height: 1.8; font-size: 1.05rem; z-index: 1; }
+
+    /* Animated Stats */
+    .service-stats { display: flex; gap: 2rem; margin-top: 2rem; justify-content: center; }
+    .stat-item { text-align: center; }
+    .stat-number { font-family: 'Oswald', sans-serif; font-size: 2.2rem; color: var(--primary); font-weight: 700; line-height: 1; }
+    .stat-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.5rem; }
+
+    @keyframes countUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .stat-item { animation: countUp 0.8s ease-out forwards; }
+
+    /* Seamless CTA Banner matching Newsletter */
+    .cta-banner {
+        background: linear-gradient(135deg, rgba(108,99,255,0.1), rgba(255,101,132,0.05)), url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=');
+        border: 1px solid var(--glass-border-hover); border-radius: 30px;
+        padding: 5rem 3rem; text-align: center; margin-top: 6rem;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+        position: relative; overflow: hidden;
+    }
+    
+    .cta-banner::before {
+        content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 60%); pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <section class="landing-section animate-up">
+        <header class="customer-page-hero">
+            <span class="customer-kicker"><i class="fas fa-star"></i> Premium support</span>
+            <h2 class="customer-page-title"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>More than hardware</h2>
+            <p class="customer-page-lead">
+                From pro assembly to enterprise rollouts, our team helps your gear work flawlessly.
+            </p>
+        </header>
+        
+        <div class="landing-grid animate-up delay-1">
+            <div class="service-card">
+                <div class="service-icon-wrapper"><i class="fas fa-screwdriver-wrench"></i></div>
+                <h3 class="service-title">Custom PC Assembly</h3>
+                <p class="service-desc">Don't want to build it yourself? Select your components and our professional technicians will assemble, cable-manage, and stress-test your rig.</p>
+            <div class="service-stats">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="500">0</div>
+                    <div class="stat-label">Builds/Month</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="99">0</div>
+                    <div class="stat-label">Success Rate%</div>
+                </div>
+            </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon-wrapper" style="color: var(--success);"><i class="fas fa-puzzle-piece"></i></div>
+                <h3 class="service-title">Compatibility Checks</h3>
+                <p class="service-desc">Not sure if that new RTX 4090 will fit in your case? Our experts review every order to guarantee 100% hardware compatibility before shipping.</p>
+            <div class="service-stats">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="10000">0</div>
+                    <div class="stat-label">Checks/Day</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="100">0</div>
+                    <div class="stat-label">Accuracy%</div>
+                </div>
+            </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon-wrapper" style="color: var(--secondary);"><i class="fas fa-stethoscope"></i></div>
+                <h3 class="service-title">Diagnostics & Repair</h3>
+                <p class="service-desc">Experiencing blue screens or thermal throttling? Bring in your machine for deep-level diagnostics, component repair, and thermal repasting.</p>
+            <div class="service-stats">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="200">0</div>
+                    <div class="stat-label">Repairs/Month</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="48">0</div>
+                    <div class="stat-label">Hour Turnaround</div>
+                </div>
+            </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon-wrapper" style="color: #00c6ff;"><i class="fas fa-building"></i></div>
+                <h3 class="service-title">Enterprise Solutions</h3>
+                <p class="service-desc">Equipping a whole office or an e-sports arena? We offer bulk pricing, standardized workstation builds, and dedicated corporate account management.</p>
+            <div class="service-stats">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="50">0</div>
+                    <div class="stat-label">Enterprise Clients</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="30">0</div>
+                    <div class="stat-label">Discount%</div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div class="cta-banner animate-up delay-2">
+            <h2 style="font-family: 'Oswald', sans-serif; font-size: 2.8rem; margin-bottom: 1rem; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">Ready to upgrade your experience?</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2.5rem; font-size: 1.15rem;">Reach out to our team to schedule a build consultation or diagnostic appointment.</p>
+            <a href="{{ path('app_customer_contact') }}" style="display: inline-flex; align-items: center; gap: 10px; background: var(--primary); color: #fff; border: none; padding: 1rem 2.5rem; border-radius: 40px; font-weight: 700; font-size: 1.1rem; cursor: pointer; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 10px 25px rgba(108, 99, 255, 0.4);">
+                <i class="fas fa-envelope"></i> Contact Our Experts
+            </a>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animated Counter
+            const counters = document.querySelectorAll('.stat-number');
+            const speed = 200;
+            
+            const countUp = (counter) => {
+                const target = +counter.getAttribute('data-target');
+                const increment = target / speed;
+                
+                const updateCount = () => {
+                    const current = +counter.innerText;
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current + increment);
+                        setTimeout(updateCount, 10);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                
+                updateCount();
+            };
+            
+            // Intersection Observer for triggering animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const counter = entry.target;
+                        countUp(counter);
+                        observer.unobserve(counter);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            counters.forEach(counter => observer.observe(counter));
+        });
+    </script>
+{% endblock %}
