@@ -23,7 +23,7 @@ final class DashboardController extends AbstractController
         $isAdmin = $this->isGranted('ROLE_ADMIN');
         $isStaff = $this->isGranted('ROLE_STAFF');
 
-        if ($isAdmin) {
+        if ($isAdmin || $isStaff) {
             $totalProducts = $em->getRepository(Product::class)->count([]);
             $totalCategories = $em->getRepository(Category::class)->count([]);
             $totalOrders = $em->getRepository(Order::class)->count([]);
@@ -31,15 +31,6 @@ final class DashboardController extends AbstractController
             $recentOrders = $em->getRepository(Order::class)->findBy([], ['createdAt' => 'DESC'], 10);
             $recentProducts = $em->getRepository(Product::class)->findBy([], ['createdAt' => 'DESC'], 10);
             $recentLogs = $em->getRepository(Log::class)->findBy([], ['createdAt' => 'DESC'], 10);
-        } elseif ($isStaff) {
-            // Staff sees the same dashboard structure but only their own operational data.
-            $totalProducts = $em->getRepository(Product::class)->count(['createdBy' => $user]);
-            $totalCategories = $em->getRepository(Category::class)->count([]);
-            $totalOrders = $em->getRepository(Order::class)->count(['createdBy' => $user]);
-            $totalUsers = null;
-            $recentOrders = $em->getRepository(Order::class)->findBy(['createdBy' => $user], ['createdAt' => 'DESC'], 10);
-            $recentProducts = $em->getRepository(Product::class)->findBy(['createdBy' => $user], ['createdAt' => 'DESC'], 10);
-            $recentLogs = null;
         } else {
             // Regular user - minimal data
             $totalProducts = null;

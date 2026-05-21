@@ -59,6 +59,7 @@ security:
     # API authentication endpoints
     - { path: ^/api/login$, roles: PUBLIC_ACCESS }
     - { path: ^/api/register$, roles: PUBLIC_ACCESS }
+    - { path: ^/api/google$, roles: PUBLIC_ACCESS }
 
     # Dashboard - Admin & Staff
     - { path: ^/dashboard, roles: [ROLE_ADMIN, ROLE_STAFF] }
@@ -89,9 +90,26 @@ security:
     - { path: ^/customer-services$, roles: PUBLIC_ACCESS }
     - { path: ^/customer-contact, roles: PUBLIC_ACCESS }
 
+    # API documentation and public endpoints
+    - { path: ^/api/?$, roles: PUBLIC_ACCESS }
+    - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+    - { path: ^/api/contexts, roles: PUBLIC_ACCESS }
+    - { path: ^/api/products, roles: PUBLIC_ACCESS }
+    - { path: ^/api/categories, roles: PUBLIC_ACCESS }
+    - { path: ^/api/customer/contact$, roles: PUBLIC_ACCESS }
+    - { path: ^/api/customer/pc-builder/catalog$, roles: PUBLIC_ACCESS }
+    - { path: ^/customer-pc-builder/check$, roles: PUBLIC_ACCESS }
+
+    # Mobile admin API (JWT)
+    - { path: ^/api/admin/users, roles: ROLE_ADMIN }
+    - { path: ^/api/admin/logs, roles: ROLE_ADMIN }
+    - { path: ^/api/admin, roles: [ROLE_ADMIN, ROLE_STAFF] }
+
+    # All other API routes require authentication
+    - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
     # Any other pages require login
     - { path: ^/, roles: ROLE_USER }
-    - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 # Test environment overrides
 when@test:

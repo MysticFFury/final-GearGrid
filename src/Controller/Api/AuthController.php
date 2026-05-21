@@ -49,8 +49,13 @@ class AuthController extends AbstractController
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        // Check if user is verified
-        if (!$user->isVerified()) {
+        // Match web UserChecker: only customers must verify email (staff/admin skip this).
+        $roles = $user->getRoles();
+        $isCustomerOnly =
+            !in_array('ROLE_ADMIN', $roles, true)
+            && !in_array('ROLE_STAFF', $roles, true);
+
+        if ($isCustomerOnly && $user->isVerified() !== true) {
             return new JsonResponse([
                 'error' => 'Please verify your email before logging in'
             ], Response::HTTP_UNAUTHORIZED);
@@ -128,6 +133,54 @@ class AuthController extends AbstractController
                 'roles' => $user->getRoles()
             ]
         ], Response::HTTP_CREATED);
+    }
+
+    #[Route('/google', name: 'api_google', methods: ['POST'])]
+    public function googleLogin(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        
+        if (!isset($data['email'])) {
+            return new JsonResponse([
+                'error' => 'Email is required for Google login'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $email = $data['email'];
+        $name = $data['name'] ?? explode('@', $email)[0];
+
+        $userRepository = $this->entityManager->getRepository(User::class);
+        $user = $userRepository->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            // Create the user if they don't exist
+            $user = new User();
+            $user->setEmail($email);
+            $user->setName($name);
+            // Give a secure random password since they use Google
+            $randomPassword = bin2hex(random_bytes(16));
+            $user->setPassword($this->passwordHasher->hashPassword($user, $randomPassword));
+            $user->setRoles(['ROLE_USER']);
+            $user->setIsVerified(true);
+            $user->setVerificationToken(null);
+
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        }
+
+        // Generate JWT token
+        $token = $this->jwtManager->create($user);
+
+        return new JsonResponse([
+            'message' => 'Google authentication successful',
+            'token' => $token,
+            'user' => [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'name' => $user->getName(),
+                'roles' => $user->getRoles()
+            ]
+        ], Response::HTTP_OK);
     }
 
     #[Route('/me', name: 'api_me', methods: ['GET'])]

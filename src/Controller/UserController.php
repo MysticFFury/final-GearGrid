@@ -44,6 +44,13 @@ final class UserController extends AbstractController
                 $user->setPassword($hashedPassword);
             }
 
+            // Staff/admin accounts do not need email verification (same as web UserChecker).
+            $roles = $user->getRoles();
+            if (in_array('ROLE_ADMIN', $roles, true) || in_array('ROLE_STAFF', $roles, true)) {
+                $user->setIsVerified(true);
+                $user->setVerificationToken(null);
+            }
+
             $entityManager->persist($user);
             $entityManager->flush();
 
